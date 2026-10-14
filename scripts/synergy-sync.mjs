@@ -51,7 +51,9 @@ async function d1Query(sql, params = []) {
 async function d1Batch(statements) {
   for (let i = 0; i < statements.length; i += D1_BATCH_SIZE) {
     const chunk = statements.slice(i, i + D1_BATCH_SIZE);
-    const res = await fetch(`${D1}/batch`, { method: "POST", headers, body: JSON.stringify({ sql: chunk }) });
+    // NOTE: batching goes through /query with a {batch:[...]} body — there is
+    // no separate /batch route ("Route not found", verified 2026-10-13).
+    const res = await fetch(`${D1}/query`, { method: "POST", headers, body: JSON.stringify({ batch: chunk.map((sql) => ({ sql })) }) });
     const json = await res.json();
     if (!json.success) throw new Error(`D1 batch failed: ${JSON.stringify(json.errors)}`);
   }
