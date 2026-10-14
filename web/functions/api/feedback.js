@@ -74,7 +74,7 @@ export async function onRequestPost({ request, env }) {
       )
       .run();
   } catch (e) {
-    return Response.json({ error: "Could not save feedback. Please try again." }, { status: 500 });
+    return Response.json({ error: "Could not save feedback. Please try again.", detail: String(e?.message ?? e).slice(0, 200) }, { status: 500 });
   }
 
   // Fire-and-forget Discord ping. Never fails the request.
