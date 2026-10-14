@@ -4,37 +4,42 @@
 export async function onRequestGet({ request, env }) {
   const url = new URL(request.url);
   const q = (url.searchParams.get("q") || "").trim();
-  const all = url.searchParams.get("all") === "1";
-  const COLS = "slug, name, color_identity, deck_count, status, vote_count, image_url";
-  try {
-    if (all) {
-      // status/vote_count/image_url exist after the request-commander migration;
-      // fall back to the base columns on a fresh DB where it hasn't run yet.
-      let commanders;
+
+  if (url.searchParams.get("all") === "1") {
+    // status/vote_count/image_url exist after the request-commander migration;
+    // fall back to the base columns on a fresh DB where it hasn't run yet.
+    let commanders;
+    try {
+      ({ results: commanders } = await env.MANACENTS_DB.prepare(
+        `SELECT slug, name, color_identity, deck_count, status, vote_count, image_url
+         FROM commanders ORDER BY deck_count DESC`
+      ).all());
+    } catch {
       try {
         ({ results: commanders } = await env.MANACENTS_DB.prepare(
-          `SELECT ${COLS} FROM commanders ORDER BY deck_count DESC`
+          `SELECT slug, name, color_identity, deck_count, image_url
+           FROM commanders ORDER BY deck_count DESC`
         ).all());
+        commanders = (commanders ?? []).map((c) => ({ ...c, status: "live", vote_count: 0 }));
       } catch {
-        ({ results: commanders } = await env.MANACENTS_DB.prepare(
-          `SELECT slug, name, color_identity, deck_count FROM commanders ORDER BY deck_count DESC`
-        ).all());
-        commanders = (commanders ?? []).map((c) => ({ ...c, status: "live", vote_count: 0, image_url: null }));
+        return Response.json({ error: "Commander list failed." }, { status: 500 });
       }
-      return Response.json(
-        { commanders: commanders ?? [] },
-        // Registry changes rarely (daily sync at most); let Cloudflare cache
-        // it at the edge instead of reading ~300 D1 rows on every page load.
-        { headers: { "Cache-Control": "public, max-age=300, s-maxage=600" } }
-      );
     }
-    if (q.length < 2) {
-      return Response.json({ commanders: [] });
-    }
+    return Response.json(
+      { commanders: commanders ?? [] },
+      // Registry changes rarely (daily sync at most); let Cloudflare cache
+      // it at the edge instead of reading ~300 D1 rows on every page load.
+      { headers: { "Cache-Control": "public, max-age=300, s-maxage=600" } }
+    );
+  }
+
+  if (q.length < 2) {
+    return Response.json({ commanders: [] });
+  }
   const like = `%${q.replace(/[%_\\]/g, "\\$&")}%`;
   try {
-    // status/vote_count exist after the request-commander migration; fall
-    // back to the base columns on a fresh DB where it hasn't run yet.
+    // status/vote_count/image_url exist after the request-commander migration;
+    // fall back to the base columns on a fresh DB where it hasn't run yet.
     let commanders;
     try {
       ({ results: commanders } = await env.MANACENTS_DB.prepare(
