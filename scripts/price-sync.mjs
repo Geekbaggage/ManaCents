@@ -98,10 +98,11 @@ async function fetchPrices(ids) {
 }
 
 function toUpsert(card) {
-  // NON-FOIL USD ONLY. Never fall back to foil/etched (locked 2026-10-13).
-  let usd = parseFloat(card.prices?.usd);
-  if (!Number.isFinite(usd)) usd = PRICE_FLOOR; // missing price -> floor, keeps scores computable
-  usd = Math.max(usd, PRICE_FLOOR);
+  // Pricing rule (changed 2026-10-13 per Valerie, overriding the old "never foil" rule):
+  // non-foil USD first, foil USD fallback (many precon/promo printings are foil-only),
+  // then the $0.10 floor. Never NaN, never null.
+  const rawPrice = card.prices?.usd ?? card.prices?.usd_foil ?? "0.10";
+  let usd = Math.max(parseFloat(rawPrice) || PRICE_FLOOR, PRICE_FLOOR);
   const price_log = Math.log(usd + PRICE_OFFSET);
   const tcgId = Number.isFinite(parseInt(card.tcgplayer_id, 10)) ? parseInt(card.tcgplayer_id, 10) : null;
   const name = card.name.replace(/'/g, "''");
