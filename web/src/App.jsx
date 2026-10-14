@@ -293,6 +293,17 @@ export default function App() {
                     />
                   ))}
                 </div>
+                {result.budgetBreaker && (
+                  <div className="breaker-callout">
+                    <p>
+                      💡 <strong>Popular Heavy Hitter: {result.budgetBreaker.expensiveName} ({money(result.budgetBreaker.expensiveUsd)})</strong> — Played
+                      in {result.budgetBreaker.expensiveRate}% of decks, {result.budgetBreaker.expensiveName} alone
+                      takes up a big chunk of a {money(result.budget)} budget. Your list includes{" "}
+                      <strong>{result.budgetBreaker.selectedName} ({money(result.budgetBreaker.selectedUsd)})</strong>{" "}
+                      to cover {result.budgetBreaker.roleLabel} while leaving room for the rest of your upgrades.
+                    </p>
+                  </div>
+                )}
                 <p className="note" style={{ marginBottom: "7rem" }}>
                   EDHREC inclusion · Scryfall USD price · affiliate links support ManaCents at no extra cost
                 </p>

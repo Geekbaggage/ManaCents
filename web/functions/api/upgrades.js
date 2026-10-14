@@ -7,12 +7,12 @@
 //   is normalized 60-99 across the returned list.
 // - Budget fill with silent role quotas (fractions of target count):
 //     synergy 0.50, ramp 0.15, draw(card advantage) 0.15, removal 0.10
-// - Budget utilization pass (both modes): if the score-greedy pick totals
-//   under 85% of budget, iteratively swap the lowest-synergy sub-$1 pick
-//   for the highest-synergy $2–$8 staple in the pool, stopping in the
-//   [85%, 98%] band. Guard: a swap never brings in a card scoring under
-//   60% of the card it replaces, so filling the budget never means buying
-//   a much worse card.
+// - Budget utilization pass (both modes, budgets >= $15): if the score-greedy
+//   pick totals under 85% of budget, iteratively swap the lowest-synergy
+//   sub-$1 pick for the highest-synergy $2–$8 staple in the pool, preferring
+//   the same role, stopping in the [85%, 98%] band. Guards: a swap never
+//   brings in a card scoring under 60% of the card it replaces, so filling
+//   the budget never means buying a much worse card.
 // - Splash cornerstones prefer $3+ high-synergy cards (Big Splash wants a
 //   few high-impact staples, not penny cards).
 // - Basic lands are never recommended.
@@ -162,19 +162,31 @@ export async function onRequestGet({ request, env }) {
       total += c.usd;
     }
 
-    // Phase C: budget utilization swap pass (both modes).
+    // Phase C: budget utilization swap pass (both modes, budgets >= $15).
     // The score-greedy pick above systematically favors the cheapest
     // high-synergy cards, so a $40 budget can return ~$5 of penny cards.
     // If the total sits under 85% of budget, iteratively swap the
     // lowest-synergy sub-$1 pick for the highest-synergy $2–$8 staple
-    // remaining in the pool, stopping once the total lands in [85%, 98%].
-    // Guard: never swap in a card scoring under 60% of the card it
-    // replaces — using the budget must not mean buying a much worse card.
-    // If the pool has no valid swaps, the loop ends early and the total
-    // stays wherever the honest swaps got it.
+    // remaining in the pool — preferring the same role so the role
+    // balance survives the swaps — stopping once the total lands in
+    // [85%, 98%]. Guard: never swap in a card scoring under 60% of the
+    // card it replaces — using the budget must not mean buying a much
+    // worse card. If the pool has no valid swaps, the loop ends early and
+    // the total stays wherever the honest swaps got it.
     const UTIL_LO = budget * 0.85;
     const UTIL_HI = budget * 0.98;
-    if (total < UTIL_LO && selected.length > 0) {
+    if (budget >= 15 && total < UTIL_LO && selected.length > 0) {
+      const findSwap = (drop, sameRole) => {
+        for (const c of candidates) {
+          if (selected.includes(c)) continue;
+          if (sameRole && c.role !== drop.role) continue;
+          if (c.usd < 2 || c.usd > 8) continue;
+          if (c.raw_score < drop.raw_score * 0.6) continue;
+          if (total - drop.usd + c.usd > UTIL_HI + 1e-9) continue;
+          return c; // candidates are pre-sorted by raw_score desc
+        }
+        return null;
+      };
       for (;;) {
         let dropIdx = -1;
         let dropScore = Infinity;
@@ -186,15 +198,7 @@ export async function onRequestGet({ request, env }) {
         });
         if (dropIdx === -1) break;
         const drop = selected[dropIdx];
-        let swap = null;
-        for (const c of candidates) {
-          if (selected.includes(c)) continue;
-          if (c.usd < 2 || c.usd > 8) continue;
-          if (c.raw_score < drop.raw_score * 0.6) continue;
-          if (total - drop.usd + c.usd > UTIL_HI + 1e-9) continue;
-          swap = c;
-          break; // candidates are pre-sorted by raw_score desc
-        }
+        const swap = findSwap(drop, true) || findSwap(drop, false);
         if (!swap) break;
         selected[dropIdx] = swap;
         total = total - drop.usd + swap.usd;
@@ -206,6 +210,56 @@ export async function onRequestGet({ request, env }) {
     // not in the selected list (up to 14).
     const selectedIds = new Set(selected.map((c) => c.scryfall_id));
     const alternates = candidates.filter((c) => !selectedIds.has(c.scryfall_id)).slice(0, 14);
+
+    // Budget Breaker callout: the highest-synergy (cmdr_rate) unselected card
+    // that's pricey for this budget, paired with the highest-scoring selected
+    // card covering the same role. "Pricey" (usd > 40% of budget, or > $15)
+    // is an honest heuristic proxy — we don't track per-card skip reasons —
+    // so the UI copy must not claim the price is why it wasn't picked.
+    let budgetBreaker = null;
+    {
+      let pricey = null;
+      for (const c of candidates) {
+        if (selectedIds.has(c.scryfall_id)) continue;
+        if (!(c.usd > budget * 0.4 || c.usd > 15)) continue;
+        if (!pricey || c.cmdr_rate > pricey.cmdr_rate) pricey = c;
+      }
+      if (pricey) {
+        let partner = null;
+        for (const c of selected) {
+          if (c.role !== pricey.role) continue;
+          if (!partner || c.raw_score > partner.raw_score) partner = c;
+        }
+        if (partner) {
+          budgetBreaker = {
+            expensiveName: pricey.name,
+            expensiveUsd: pricey.usd,
+            expensiveRate: Math.round(pricey.cmdr_rate * 100),
+            selectedName: partner.name,
+            selectedUsd: partner.usd,
+            roleLabel: ROLE_LABELS[pricey.role] ?? "Core Synergy",
+          };
+        }
+      }
+    }
+
+    // Synergy micro-tags: a support card (ramp/draw/removal) whose specificity
+    // ratio (cmdr_rate / (global_rate + 0.03)) is >= 3.0 is genuinely tailored
+    // to this commander, not generic — but only when real global data exists
+    // (global_rate > 0); with no global data the ratio is meaningless.
+    const SYNERGY_MICRO_TAG = {
+      ramp: "Synergy Mana",
+      draw: "Synergy Draw",
+      removal: "Synergy Removal",
+    };
+    const roleLabelFor = (c) => {
+      const base = ROLE_LABELS[c.role] ?? "Core Synergy";
+      const g = c.global_rate ?? 0;
+      if (c.role !== "synergy" && g > 0 && c.cmdr_rate / (g + 0.03) >= 3.0) {
+        return SYNERGY_MICRO_TAG[c.role] ?? base;
+      }
+      return base;
+    };
 
     // Display scores: round(60 + 39 * raw/highestRaw), clamped 60-99
     // (matches the artifact's normalizeDisplayScore exactly).
@@ -222,7 +276,7 @@ export async function onRequestGet({ request, env }) {
         usd: c.usd,
         image_url: c.image_url,
         role: c.role,
-        roleLabel: ROLE_LABELS[c.role] ?? "Core Synergy",
+        roleLabel: roleLabelFor(c),
         cmdr_rate: c.cmdr_rate,
         score,
         tier,
@@ -241,7 +295,7 @@ export async function onRequestGet({ request, env }) {
         usd: c.usd,
         image_url: c.image_url,
         role: c.role,
-        roleLabel: ROLE_LABELS[c.role] ?? "Core Synergy",
+        roleLabel: roleLabelFor(c),
         cmdr_rate: c.cmdr_rate,
         score,
         tier,
@@ -258,6 +312,7 @@ export async function onRequestGet({ request, env }) {
       upgrades,
       alternates: alternateItems,
       skipped,
+      budgetBreaker,
       includedUniversalCards: includeUniversal,
     });
   } catch (e) {

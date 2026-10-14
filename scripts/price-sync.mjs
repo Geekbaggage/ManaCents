@@ -127,13 +127,30 @@ function toUpsert(card) {
 VALUES ('${card.id}', '${name}', ${usd}, ${price_log}, ${tcgId ?? "NULL"}, ${imageUrl ? `'${imageUrl}'` : "NULL"}, datetime('now'))
 ON CONFLICT(scryfall_id) DO UPDATE SET
   usd = excluded.usd,
+  usd_30d_avg = CASE WHEN cards.usd_30d_avg = 0 THEN excluded.usd ELSE (cards.usd_30d_avg * 0.93) + (excluded.usd * 0.07) END,
   price_log = excluded.price_log,
   tcgplayer_id = excluded.tcgplayer_id,
   image_url = COALESCE(excluded.image_url, cards.image_url),
   updated_at = excluded.updated_at;`;
 }
 
+// 30-day price baseline (for future price-drop / price-spike flags):
+// Scryfall only returns today's price, so we build history ourselves with an
+// exponential moving average (alpha = 0.07/day). First observation seeds the
+// average; after ~3 weeks of nightly runs it reflects a real baseline.
+// The ALTER is idempotent — D1 has no ADD COLUMN IF NOT EXISTS, so we catch
+// the duplicate-column error and move on.
+async function ensurePriceHistoryColumn() {
+  try {
+    await d1Query(`ALTER TABLE cards ADD COLUMN usd_30d_avg REAL NOT NULL DEFAULT 0`);
+    console.log("Added cards.usd_30d_avg column");
+  } catch (e) {
+    if (!/duplicate column/i.test(e.message)) throw e;
+  }
+}
+
 async function main() {
+  await ensurePriceHistoryColumn();
   const pool = await getPool();
   console.log(`Price pool: ${pool.length} cards`);
   if (!pool.length) {

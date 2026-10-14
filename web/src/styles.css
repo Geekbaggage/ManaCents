@@ -126,6 +126,15 @@ input:focus, select:focus, button:focus-visible {
 }
 .smart-banner p { margin: 0; }
 
+/* Budget Breaker callout */
+.breaker-callout {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  border-radius: var(--radius);
+  padding: 0.8rem 1rem; margin: 0 0 1.2rem;
+}
+.breaker-callout p { margin: 0; }
+
 /* Skipped staples pill */
 .skipped-pill {
   display: inline-flex; align-items: center; gap: 0.6rem;
