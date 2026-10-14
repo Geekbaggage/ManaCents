@@ -81,12 +81,27 @@ async function fetchPrices(ids) {
   const out = [];
   for (let i = 0; i < ids.length; i += BATCH) {
     const chunk = ids.slice(i, i + BATCH);
-    const res = await fetch("https://api.scryfall.com/cards/collection", {
-      method: "POST",
-      headers: { ...API_HEADERS, "Content-Type": "application/json" },
-      body: JSON.stringify({ identifiers: chunk.map((id) => ({ id })) }),
-    });
-    if (!res.ok) throw new Error(`Scryfall ${res.status} on chunk ${i / BATCH}`);
+    let res;
+    for (let attempt = 0; ; attempt++) {
+      res = await fetch("https://api.scryfall.com/cards/collection", {
+        method: "POST",
+        headers: { ...API_HEADERS, "Content-Type": "application/json" },
+        body: JSON.stringify({ identifiers: chunk.map((id) => ({ id })) }),
+      });
+      if (res.ok) break;
+      // Retry rate limits (429) and transient 5xx with exponential backoff;
+      // fail fast on anything else. Honors Retry-After when Scryfall sends it.
+      const retryable = res.status === 429 || res.status >= 500;
+      if (!retryable || attempt >= 5) {
+        throw new Error(`Scryfall ${res.status} on chunk ${i / BATCH} after ${attempt} retries`);
+      }
+      const retryAfter = Number(res.headers.get("retry-after"));
+      const waitMs = Number.isFinite(retryAfter) && retryAfter > 0
+        ? retryAfter * 1000
+        : Math.min(2000 * 2 ** attempt, 60000);
+      console.warn(`Scryfall ${res.status} on chunk ${i / BATCH} — retry ${attempt + 1}/5 in ${waitMs}ms`);
+      await sleep(waitMs);
+    }
     const json = await res.json();
     out.push(...(json.data ?? []));
     if (json.not_found?.length) {
