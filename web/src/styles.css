@@ -81,7 +81,8 @@ input:focus, select:focus, button:focus-visible {
 /* Animated brand mark: one play on load, then rests on the final frame. */
 .hero-logo-anim {
   display: block;
-  width: min(300px, 72vw);
+  width: min(260px, 64vw);
+  aspect-ratio: 1 / 1;
   height: auto;
   margin: 0 auto 0.75rem;
   border-radius: 1rem;
