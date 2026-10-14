@@ -53,3 +53,18 @@ CREATE TABLE IF NOT EXISTS commander_synergy (
 );
 CREATE INDEX IF NOT EXISTS idx_synergy_commander ON commander_synergy(commander_slug);
 CREATE INDEX IF NOT EXISTS idx_synergy_card ON commander_synergy(scryfall_id);
+
+-- Inline results-page feedback. Created idempotently by POST /api/feedback on
+-- first submission (no separate migration needed); the Discord webhook ping
+-- uses the DISCORD_FEEDBACK_WEBHOOK_URL Pages secret.
+CREATE TABLE IF NOT EXISTS feedback (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  commander TEXT,
+  budget REAL,
+  mode TEXT,
+  rating TEXT,          -- 'up' or 'down'
+  category TEXT,        -- 'missing_card', 'wrong_role', 'price_issue', 'other'
+  comment TEXT,
+  cards_shown TEXT,     -- comma-separated names of the recommended cards on screen
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);

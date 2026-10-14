@@ -12,6 +12,91 @@ function useDebounced(value, ms) {
   return v;
 }
 
+function FeedbackWidget({ commander, budget, mode, cards }) {
+  const [rating, setRating] = useState(null);
+  const [category, setCategory] = useState("missing_card");
+  const [comment, setComment] = useState("");
+  const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  const submitFeedback = async () => {
+    if (!rating || sending) return;
+    setSending(true);
+    setFailed(false);
+    try {
+      const res = await fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          commander: commander.name,
+          budget,
+          mode,
+          rating,
+          category,
+          comment,
+          cards_shown: cards.map((c) => c.name).join(", "),
+        }),
+      });
+      if (!res.ok) throw new Error("bad status");
+      setSent(true);
+    } catch {
+      setFailed(true);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  if (sent) {
+    return (
+      <div className="feedback-widget">
+        <p>Thanks — your feedback helps ManaCents get smarter. 💚</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="feedback-widget">
+      <p><strong>Was this list helpful?</strong></p>
+      <div className="feedback-row">
+        <button
+          type="button"
+          className={rating === "up" ? "on" : ""}
+          onClick={() => setRating("up")}
+          aria-label="Thumbs up"
+        >👍</button>
+        <button
+          type="button"
+          className={rating === "down" ? "on" : ""}
+          onClick={() => setRating("down")}
+          aria-label="Thumbs down"
+        >👎</button>
+        {rating && (
+          <>
+            <select value={category} onChange={(e) => setCategory(e.target.value)} aria-label="Feedback category">
+              <option value="missing_card">Missing card</option>
+              <option value="wrong_role">Wrong role label</option>
+              <option value="price_issue">Price looks off</option>
+              <option value="other">Other</option>
+            </select>
+            <input
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Tell us more (optional)"
+              maxLength={1000}
+              aria-label="Feedback comment"
+            />
+            <button type="button" className="primary" onClick={submitFeedback} disabled={sending}>
+              {sending ? "Sending…" : "Send"}
+            </button>
+          </>
+        )}
+      </div>
+      {failed && <p className="form-error">Couldn't send — try again in a moment.</p>}
+    </div>
+  );
+}
+
 function CardTile({ card, selected, onToggle, onSwap }) {
   return (
     <div className={`card-tile${selected ? " selected" : ""}`}>
@@ -412,6 +497,12 @@ export default function App() {
                     </div>
                   );
                 })}
+                <FeedbackWidget
+                  commander={result.commander}
+                  budget={result.budget}
+                  mode={mode}
+                  cards={visibleUpgrades}
+                />
               </>
             )}
 
