@@ -30,6 +30,14 @@ if (!TOKEN || !ACCOUNT_ID) {
 }
 
 const headers = { Authorization: `Bearer ${TOKEN}`, "Content-Type": "application/json" };
+
+// Scryfall's API guidelines require a descriptive User-Agent on every call;
+// EDHREC sits behind Cloudflare and is friendlier with one too.
+// (contact email is used because manacents.com is not registered yet.)
+const API_HEADERS = {
+  "User-Agent": "ManaCents/1.0 (contact: geekbaggage@gmail.com)",
+  Accept: "application/json;q=0.9,*/*;q=0.8",
+};
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const esc = (s) => s.replace(/'/g, "''");
 
@@ -76,7 +84,9 @@ async function getCommanders() {
 }
 
 async function fetchCommanderJson(slug) {
-  const res = await fetch(`https://json.edhrec.com/pages/commanders/${slug}.json`);
+  const res = await fetch(`https://json.edhrec.com/pages/commanders/${slug}.json`, {
+    headers: API_HEADERS,
+  });
   if (!res.ok) {
     console.warn(`EDHREC ${res.status} for ${slug} — skipping`);
     return null;
@@ -85,15 +95,16 @@ async function fetchCommanderJson(slug) {
 }
 
 // Defensive parse: EDHREC nests card lists under container.json_dict.cardlists,
-// each with cardviews [{name, inclusion (0-100), ...}].
+// each with cardviews [{name, num_decks, potential_decks, ...}].
+// Inclusion rate = num_decks / potential_decks (there is no `inclusion` field).
 function extractCards(edhrecJson) {
   const dict = edhrecJson?.container?.json_dict ?? {};
   const lists = dict.cardlists ?? [];
   const seen = new Map(); // name -> max inclusion
   for (const list of lists) {
     for (const cv of list.cardviews ?? []) {
-      if (!cv.name || !Number.isFinite(cv.inclusion)) continue;
-      const rate = cv.inclusion / 100;
+      if (!cv.name || !Number.isFinite(cv.num_decks) || !Number.isFinite(cv.potential_decks) || cv.potential_decks <= 0) continue;
+      const rate = cv.num_decks / cv.potential_decks;
       if (rate < NOISE_FLOOR) continue;
       if (!seen.has(cv.name) || seen.get(cv.name) < rate) seen.set(cv.name, rate);
     }
@@ -101,6 +112,16 @@ function extractCards(edhrecJson) {
   return [...seen.entries()]
     .map(([name, cmdr_rate]) => ({ name, cmdr_rate }))
     .sort((a, b) => b.cmdr_rate - a.cmdr_rate);
+}
+
+// Commander metadata lives in container.json_dict.card (name, color_identity[], num_decks).
+function extractCommanderMeta(edhrecJson, fallback) {
+  const card = edhrecJson?.container?.json_dict?.card ?? {};
+  return {
+    name: card.name ?? fallback.name ?? fallback.slug,
+    color_identity: Array.isArray(card.color_identity) ? card.color_identity.join("") : (fallback.color_identity ?? ""),
+    deck_count: Number.isFinite(card.num_decks) ? card.num_decks : (fallback.deck_count ?? 0),
+  };
 }
 
 async function resolveScryfallIds(names) {
@@ -111,7 +132,7 @@ async function resolveScryfallIds(names) {
     const chunk = unique.slice(i, i + 75);
     const res = await fetch("https://api.scryfall.com/cards/collection", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { ...API_HEADERS, "Content-Type": "application/json" },
       body: JSON.stringify({ identifiers: chunk.map((name) => ({ name })) }),
     });
     if (!res.ok) throw new Error(`Scryfall ${res.status} resolving names`);
@@ -144,11 +165,12 @@ async function main() {
     const data = await fetchCommanderJson(cmd.slug);
     await sleep(EDHREC_DELAY_MS);
     if (!data) continue;
+    const meta = extractCommanderMeta(data, cmd);
+    cmd.name = meta.name;
+    cmd.color_identity = meta.color_identity;
+    cmd.deck_count = meta.deck_count;
     const cards = extractCards(data);
     for (const c of cards) tuples.push({ slug: cmd.slug, name: c.name, cmdr_rate: c.cmdr_rate });
-    // Stash commander color identity from EDHREC when present.
-    cmd.color_identity = data?.container?.json_dict?.color_identity?.join?.("") ?? cmd.color_identity ?? "";
-    cmd.deck_count = data?.container?.json_dict?.num_decks ?? cmd.deck_count ?? 0;
   }
   console.log(`Collected ${tuples.length} (commander, card) tuples`);
 

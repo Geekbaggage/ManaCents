@@ -26,9 +26,16 @@ if (!TOKEN || !ACCOUNT_ID) {
   process.exit(1);
 }
 
-const headers = {
+const HEADERS = {
   Authorization: `Bearer ${TOKEN}`,
   "Content-Type": "application/json",
+};
+
+// Scryfall's API guidelines require a descriptive User-Agent on every call.
+// (contact email is used because manacents.com is not registered yet.)
+const API_HEADERS = {
+  "User-Agent": "ManaCents/1.0 (contact: geekbaggage@gmail.com)",
+  Accept: "application/json;q=0.9,*/*;q=0.8",
 };
 
 async function d1Query(sql, params = []) {
@@ -74,7 +81,7 @@ async function fetchPrices(ids) {
     const chunk = ids.slice(i, i + BATCH);
     const res = await fetch("https://api.scryfall.com/cards/collection", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { ...API_HEADERS, "Content-Type": "application/json" },
       body: JSON.stringify({ identifiers: chunk.map((id) => ({ id })) }),
     });
     if (!res.ok) throw new Error(`Scryfall ${res.status} on chunk ${i / BATCH}`);
