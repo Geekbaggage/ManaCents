@@ -1,0 +1,22 @@
+# ManaCents weekly Discord digest — top searches, missed searches, feedback.
+name: weekly-digest
+
+on:
+  schedule:
+    - cron: "0 15 * * 1" # Mondays 15:00 UTC = 08:00 PT
+  workflow_dispatch: # manual trigger
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Post weekly digest to Discord
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          DISCORD_FEEDBACK_WEBHOOK_URL: ${{ secrets.DISCORD_FEEDBACK_WEBHOOK_URL }}
+        run: node scripts/weekly-digest.mjs
