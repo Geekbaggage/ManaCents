@@ -66,21 +66,43 @@ export async function onRequestGet({ request, env }) {
       );
     }
 
-    const { results: rows } = await env.MANACENTS_DB.prepare(
-      `SELECT s.scryfall_id, c.name, c.usd, c.image_url, c.type_line, s.role, s.cmdr_rate, s.raw_score,
-              COALESCE(g.inclusion_rate, 0) AS global_rate
-       FROM commander_synergy s
-       JOIN cards c ON c.scryfall_id = s.scryfall_id
-       JOIN commanders d ON d.slug = s.commander_slug
-       LEFT JOIN global_rates g
-         ON g.scryfall_id = s.scryfall_id AND g.color_identity = d.color_identity
-       WHERE s.commander_slug = ?
-         AND s.cmdr_rate >= ?
-       ORDER BY s.raw_score DESC
-       LIMIT 400`
-    )
-      .bind(slug, NOISE_FLOOR)
-      .all();
+    // type_line was added 2026-10-13 and backfills on the next price-sync;
+    // if the column doesn't exist yet, fall back to NULL (the splash land
+    // filter treats NULL as "unknown" and skips exclusion).
+    let rows;
+    try {
+      ({ results: rows } = await env.MANACENTS_DB.prepare(
+        `SELECT s.scryfall_id, c.name, c.usd, c.image_url, c.type_line, s.role, s.cmdr_rate, s.raw_score,
+                COALESCE(g.inclusion_rate, 0) AS global_rate
+         FROM commander_synergy s
+         JOIN cards c ON c.scryfall_id = s.scryfall_id
+         JOIN commanders d ON d.slug = s.commander_slug
+         LEFT JOIN global_rates g
+           ON g.scryfall_id = s.scryfall_id AND g.color_identity = d.color_identity
+         WHERE s.commander_slug = ?
+           AND s.cmdr_rate >= ?
+         ORDER BY s.raw_score DESC
+         LIMIT 400`
+      )
+        .bind(slug, NOISE_FLOOR)
+        .all());
+    } catch (e) {
+      ({ results: rows } = await env.MANACENTS_DB.prepare(
+        `SELECT s.scryfall_id, c.name, c.usd, c.image_url, NULL AS type_line, s.role, s.cmdr_rate, s.raw_score,
+                COALESCE(g.inclusion_rate, 0) AS global_rate
+         FROM commander_synergy s
+         JOIN cards c ON c.scryfall_id = s.scryfall_id
+         JOIN commanders d ON d.slug = s.commander_slug
+         LEFT JOIN global_rates g
+           ON g.scryfall_id = s.scryfall_id AND g.color_identity = d.color_identity
+         WHERE s.commander_slug = ?
+           AND s.cmdr_rate >= ?
+         ORDER BY s.raw_score DESC
+         LIMIT 400`
+      )
+        .bind(slug, NOISE_FLOOR)
+        .all());
+    }
 
     if (!rows || rows.length === 0) {
       return Response.json({
