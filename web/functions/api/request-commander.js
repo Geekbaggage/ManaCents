@@ -31,6 +31,7 @@ async function ensureSchema(db) {
     `ALTER TABLE commanders ADD COLUMN oracle_id TEXT`,
     `ALTER TABLE commanders ADD COLUMN vote_count INTEGER NOT NULL DEFAULT 0`,
     `ALTER TABLE commanders ADD COLUMN image_url TEXT`,
+    `ALTER TABLE commanders ADD COLUMN fulfill_attempts INTEGER NOT NULL DEFAULT 0`,
     `ALTER TABLE commanders ADD COLUMN created_at TEXT DEFAULT (datetime('now'))`,
     `CREATE INDEX IF NOT EXISTS idx_commanders_oracle ON commanders(oracle_id)`,
     `CREATE INDEX IF NOT EXISTS idx_commanders_status ON commanders(status)`,
@@ -224,19 +225,27 @@ export async function onRequestPost({ request, env }) {
       return Response.json({ ok: false, error: `"${card.name}" ${validation.reason}.` });
     }
 
-    // Preview mode: return the card for the one-tap confirm UI. No DB writes.
+    // Preview mode: return the card for the one-tap confirm UI. No DB writes,
+    // no rate-limit consumption — typing in the search bar never burns quota.
     if (previewOnly) {
-      const existing = await db
+      let existing = await db
         .prepare(`SELECT slug, name, status, vote_count FROM commanders WHERE oracle_id = ?`)
         .bind(preview.oracle_id)
         .first();
+      // Fall back to slug match for the pre-existing 300 (oracle_id NULL).
+      if (!existing) {
+        existing = await db
+          .prepare(`SELECT slug, name, status, vote_count FROM commanders WHERE slug = ?`)
+          .bind(preview.slug)
+          .first();
+      }
       return Response.json({
         ok: true,
         preview: true,
         card: preview,
         unreleased: validation.unreleased,
         existing: existing
-          ? { slug: existing.slug, name: existing.name, status: existing.status, vote_count: existing.vote_count }
+          ? { slug: existing.slug, name: existing.name, status: existing.status ?? "live", vote_count: existing.vote_count }
           : null,
       });
     }
@@ -263,31 +272,60 @@ export async function onRequestPost({ request, env }) {
       return Response.json({ ok: true, alreadyRequested: true, slug: existing.slug, name: existing.name, vote_count, oracle_id: preview.oracle_id });
     }
 
-    // Also guard against slug collisions (two different cards, same front-face slug).
-    const slugTaken = await db
-      .prepare(`SELECT slug FROM commanders WHERE slug = ?`)
+    // The existing 300 commanders have oracle_id = NULL (predates this
+    // feature), so a Scryfall resolve to one of them misses the check above.
+    // Match by slug too — but only backfill oracle_id when it's currently
+    // NULL; a non-NULL mismatch means two different cards share a slug
+    // (true collision), not a backfill case.
+    const bySlug = await db
+      .prepare(`SELECT slug, name, status, vote_count, oracle_id AS existing_oracle FROM commanders WHERE slug = ?`)
       .bind(preview.slug)
       .first();
-    if (slugTaken) {
-      return Response.json({ ok: false, error: `"${preview.name}" conflicts with an existing entry — try a more specific name.` });
+    if (bySlug) {
+      if (bySlug.existing_oracle && bySlug.existing_oracle !== preview.oracle_id) {
+        return Response.json({ ok: false, error: `"${preview.name}" conflicts with an existing entry — try a more specific name.` });
+      }
+      if (!bySlug.existing_oracle) {
+        await db
+          .prepare(`UPDATE commanders SET oracle_id = ?, updated_at = datetime('now') WHERE slug = ?`)
+          .bind(preview.oracle_id, preview.slug)
+          .run();
+      }
+      if (!bySlug.status || bySlug.status === "live") {
+        return Response.json({ ok: true, alreadyLive: true, slug: bySlug.slug, name: bySlug.name });
+      }
+      const vote_count = (bySlug.vote_count ?? 0) + 1;
+      await db
+        .prepare(`UPDATE commanders SET vote_count = ? WHERE slug = ?`)
+        .bind(vote_count, preview.slug)
+        .run();
+      await pingDiscord(env, preview, vote_count, false);
+      return Response.json({ ok: true, alreadyRequested: true, slug: bySlug.slug, name: bySlug.name, vote_count, oracle_id: preview.oracle_id });
     }
 
     // Stage 1: insert the pending_sync stub. Appears in autocomplete instantly;
     // the daily fulfillment cron builds synergy data (Stage 2).
-    await db
+    // Atomic upsert: if two requests race for the same new commander, the
+    // loser hits the conflict branch and becomes a vote instead of a 500.
+    const upserted = await db
       .prepare(
-        `INSERT INTO commanders (slug, name, color_identity, deck_count, status, oracle_id, vote_count, image_url, created_at, updated_at)
-         VALUES (?, ?, ?, 0, 'pending_sync', ?, 1, ?, datetime('now'), datetime('now'))`
+        `INSERT INTO commanders (slug, name, color_identity, deck_count, status, oracle_id, vote_count, image_url, fulfill_attempts, created_at, updated_at)
+         VALUES (?, ?, ?, 0, 'pending_sync', ?, 1, ?, 0, datetime('now'), datetime('now'))
+         ON CONFLICT(slug) DO UPDATE SET vote_count = vote_count + 1, updated_at = datetime('now')
+         RETURNING vote_count`
       )
       .bind(preview.slug, preview.front_name, preview.color_identity, preview.oracle_id, preview.image_url)
-      .run();
-    await pingDiscord(env, preview, 1, true);
+      .first();
+    const isNew = upserted.vote_count === 1;
+    const finalVotes = upserted.vote_count;
+    await pingDiscord(env, preview, finalVotes, isNew);
 
     return Response.json({
       ok: true,
+      alreadyRequested: !isNew,
       slug: preview.slug,
       name: preview.front_name,
-      vote_count: 1,
+      vote_count: finalVotes,
       oracle_id: preview.oracle_id,
       image_url: preview.image_url,
       unreleased: validation.unreleased,

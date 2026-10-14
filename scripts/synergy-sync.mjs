@@ -142,11 +142,14 @@ async function cheapestStandardPrinting(name) {
 // In ONLY_PENDING mode: only user-requested stubs, most-voted first, capped.
 async function getCommanders() {
   if (ONLY_PENDING) {
+    // Untried requests first (fulfill_attempts ASC) so high-vote spoilers
+    // with no EDHREC data yet can't starve brand-new requests behind them
+    // in the LIMIT cap. Then most-voted, then oldest.
     const rows = await d1Query(
       `SELECT slug, name, color_identity, deck_count
        FROM commanders
        WHERE status = 'pending_sync'
-       ORDER BY vote_count DESC, created_at ASC
+       ORDER BY fulfill_attempts ASC, vote_count DESC, created_at ASC
        LIMIT ?`,
       [PENDING_LIMIT]
     );
@@ -244,6 +247,25 @@ async function resolveScryfallIds(names) {
 }
 
 async function main() {
+  // Fulfillment mode needs the request columns; create idempotently in case
+  // the API migration hasn't run yet (cron and Pages deploy independently).
+  if (ONLY_PENDING) {
+    for (const sql of [
+      `ALTER TABLE commanders ADD COLUMN status TEXT NOT NULL DEFAULT 'live'`,
+      `ALTER TABLE commanders ADD COLUMN oracle_id TEXT`,
+      `ALTER TABLE commanders ADD COLUMN vote_count INTEGER NOT NULL DEFAULT 0`,
+      `ALTER TABLE commanders ADD COLUMN image_url TEXT`,
+      `ALTER TABLE commanders ADD COLUMN fulfill_attempts INTEGER NOT NULL DEFAULT 0`,
+      `ALTER TABLE commanders ADD COLUMN created_at TEXT DEFAULT (datetime('now'))`,
+    ]) {
+      try {
+        await d1Query(sql);
+      } catch {
+        // Already exists.
+      }
+    }
+  }
+
   const commanders = await getCommanders();
   console.log(`Syncing ${commanders.length} commanders`);
 
@@ -254,6 +276,15 @@ async function main() {
     // Jittered delay in fulfillment mode so a burst of new commanders
     // doesn't look like a scraper spike to EDHREC.
     await sleep(ONLY_PENDING ? jitter() : EDHREC_DELAY_MS);
+    if (ONLY_PENDING) {
+      // Count the attempt whether or not EDHREC has data yet — this is what
+      // keeps unready spoilers from starving new requests in the LIMIT cap.
+      try {
+        await d1Query(`UPDATE commanders SET fulfill_attempts = fulfill_attempts + 1 WHERE slug = ?`, [cmd.slug]);
+      } catch {
+        // Non-fatal; ordering degrades gracefully.
+      }
+    }
     if (!data) {
       // No EDHREC data yet (e.g. unreleased spoiler) — stays pending_sync
       // and retries on the next run. Not a failure.

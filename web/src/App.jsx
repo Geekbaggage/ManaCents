@@ -477,7 +477,7 @@ export default function App() {
                   <ul role="listbox">
                     {suggestions.length === 0 && !requestPreview && !requestDone && (
                       <li className="request-empty">
-                        {cmdrInput.trim().length >= 5 ? (
+                        {cmdrInput.trim().length >= 3 ? (
                           <>
                             <span className="request-prompt">Don't see your commander?</span>
                             <button type="button" className="ghost" onClick={startRequestPreview} disabled={requestLoading}>
