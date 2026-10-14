@@ -1,6 +1,12 @@
 # ManaCents nightly price sync — refreshes non-foil USD for the card pool in D1.
 name: price-sync
 
+# The concurrency group serializes D1 writers: if the Sunday synergy run
+# overruns into this job, the price sync waits instead of writing concurrently.
+concurrency:
+  group: manacents-d1
+  cancel-in-progress: false
+
 on:
   schedule:
     - cron: "0 6 * * *" # daily 06:00 UTC
