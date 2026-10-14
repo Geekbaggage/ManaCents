@@ -223,35 +223,40 @@ export async function onRequestGet({ request, env }) {
     const selectedIds = new Set(selected.map((c) => c.scryfall_id));
     const alternates = candidates.filter((c) => !selectedIds.has(c.scryfall_id)).slice(0, 14);
 
-    // Budget Breaker callout: the highest-synergy (cmdr_rate) unselected card
-    // that's pricey for this budget, paired with the highest-scoring selected
-    // card covering the same role. "Pricey" (usd > 40% of budget, or > $15)
-    // is an honest heuristic proxy — we don't track per-card skip reasons —
-    // so the UI copy must not claim the price is why it wasn't picked.
-    let budgetBreaker = null;
+    // Budget Breaker callouts: the priciest high-synergy cards that didn't make
+    // the list — top 3 by commander inclusion rate among unselected cards
+    // costing > 40% of budget (or > $15). Each is paired with the
+    // highest-scoring selected card covering the same role. "Pricey" is an
+    // honest heuristic proxy — we don't track per-card skip reasons — so the
+    // UI copy must not claim the price is why it wasn't picked. The frontend
+    // lets the user add any of them anyway, per card.
+    let budgetBreakers = [];
     {
-      let pricey = null;
+      const pricey = [];
       for (const c of candidates) {
         if (selectedIds.has(c.scryfall_id)) continue;
         if (!(c.usd > budget * 0.4 || c.usd > 15)) continue;
-        if (!pricey || c.cmdr_rate > pricey.cmdr_rate) pricey = c;
+        pricey.push(c);
       }
-      if (pricey) {
+      pricey.sort((a, b) => b.cmdr_rate - a.cmdr_rate);
+      for (const p of pricey.slice(0, 3)) {
         let partner = null;
         for (const c of selected) {
-          if (c.role !== pricey.role) continue;
+          if (c.role !== p.role) continue;
           if (!partner || c.raw_score > partner.raw_score) partner = c;
         }
-        if (partner) {
-          budgetBreaker = {
-            expensiveName: pricey.name,
-            expensiveUsd: pricey.usd,
-            expensiveRate: Math.round(pricey.cmdr_rate * 100),
-            selectedName: partner.name,
-            selectedUsd: partner.usd,
-            roleLabel: ROLE_LABELS[pricey.role] ?? "Core Synergy",
-          };
-        }
+        if (!partner) continue;
+        budgetBreakers.push({
+          scryfall_id: p.scryfall_id,
+          expensiveName: p.name,
+          expensiveUsd: p.usd,
+          expensiveImage: p.image_url,
+          expensiveRate: Math.round(p.cmdr_rate * 100),
+          role: p.role,
+          roleLabel: ROLE_LABELS[p.role] ?? "Core Synergy",
+          partnerName: partner.name,
+          partnerUsd: partner.usd,
+        });
       }
     }
 
@@ -324,7 +329,7 @@ export async function onRequestGet({ request, env }) {
       upgrades,
       alternates: alternateItems,
       skipped,
-      budgetBreaker,
+      budgetBreakers,
       includedUniversalCards: includeUniversal,
     });
   } catch (e) {

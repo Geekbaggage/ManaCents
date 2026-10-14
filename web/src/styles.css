@@ -132,8 +132,9 @@ input:focus, select:focus, button:focus-visible {
   border: 1px solid rgba(245, 158, 11, 0.45);
   border-radius: var(--radius);
   padding: 0.8rem 1rem; margin: 0 0 1.2rem;
+  display: flex; gap: 0.8rem; align-items: center; justify-content: space-between; flex-wrap: wrap;
 }
-.breaker-callout p { margin: 0; }
+.breaker-callout p { margin: 0; flex: 1 1 16rem; }
 
 /* Skipped staples pill */
 .skipped-pill {

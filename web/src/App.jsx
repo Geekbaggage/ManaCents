@@ -24,7 +24,9 @@ function CardTile({ card, selected, onToggle, onSwap }) {
           <div className="card-img" style={{ display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8" }}>{card.name}</div>
         )}
         <span className="select-check">{selected ? "✓" : "＋"}</span>
-        <span className={`value-badge ${card.tier}`}>{card.score} Value</span>
+        {card.score != null && (
+          <span className={`value-badge ${card.tier}`}>{card.score} Value</span>
+        )}
       </div>
       <div className="meta">
         <span className="name">{card.name}</span>
@@ -50,6 +52,7 @@ export default function App() {
   const [resultError, setResultError] = useState("");
   const [deselected, setDeselected] = useState(new Set());
   const [swaps, setSwaps] = useState({});
+  const [addedBreakers, setAddedBreakers] = useState([]);
   const [showSkipped, setShowSkipped] = useState(false);
   const [includeUniversal, setIncludeUniversal] = useState(false);
   const [including, setIncluding] = useState(false);
@@ -100,6 +103,7 @@ export default function App() {
       setIncludeUniversal(withUniversal);
       setDeselected(new Set());
       setSwaps({});
+      setAddedBreakers([]);
       setShowSkipped(false);
       setView("results");
       window.scrollTo(0, 0);
@@ -113,11 +117,13 @@ export default function App() {
 
   const visibleUpgrades = useMemo(() => {
     if (!result) return [];
-    return result.upgrades.map((c) => {
-      const s = swaps[c.scryfall_id];
-      return s ? { ...s, _origId: c.scryfall_id, swappedIn: true } : c;
-    });
-  }, [result, swaps]);
+    const applySwaps = (list) =>
+      list.map((c) => {
+        const s = swaps[c.scryfall_id];
+        return s ? { ...s, _origId: c.scryfall_id, swappedIn: true } : c;
+      });
+    return [...applySwaps(result.upgrades), ...applySwaps(addedBreakers)];
+  }, [result, swaps, addedBreakers]);
 
   const selectedCards = useMemo(
     () => visibleUpgrades.filter((c) => !deselected.has(c.scryfall_id)),
@@ -158,6 +164,42 @@ export default function App() {
 
   const selectAll = () => setDeselected(new Set());
   const clearAll = () => setDeselected(new Set(visibleUpgrades.map((c) => c.scryfall_id)));
+
+  // Heavy-hitter add/remove, strictly per card: each breaker callout gets its
+  // own button, and the added card joins the grid as a normal tile (tappable
+  // to remove, counted in the total even when it blows past the budget).
+  const toggleBreaker = (b) => {
+    const exists = addedBreakers.some((c) => c.scryfall_id === b.scryfall_id);
+    if (exists) {
+      setSwaps((sp) => {
+        const n = { ...sp };
+        delete n[b.scryfall_id];
+        return n;
+      });
+      setDeselected((prev) => {
+        const n = new Set(prev);
+        n.delete(b.scryfall_id);
+        return n;
+      });
+      setAddedBreakers((prev) => prev.filter((c) => c.scryfall_id !== b.scryfall_id));
+      return;
+    }
+    setAddedBreakers((prev) => [
+      ...prev,
+      {
+        scryfall_id: b.scryfall_id,
+        name: b.expensiveName,
+        usd: b.expensiveUsd,
+        image_url: b.expensiveImage,
+        role: b.role,
+        roleLabel: b.roleLabel,
+        score: null, // tile hides the Value badge; inclusion % is in the callout
+        tier: "gold",
+        cmdr_rate: b.expensiveRate / 100,
+        breakerAdded: true,
+      },
+    ]);
+  };
 
   const checkedLabel = result?.checkedAt
     ? new Date(result.checkedAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })
@@ -293,17 +335,23 @@ export default function App() {
                     />
                   ))}
                 </div>
-                {result.budgetBreaker && (
-                  <div className="breaker-callout">
-                    <p>
-                      💡 <strong>Popular Heavy Hitter: {result.budgetBreaker.expensiveName} ({money(result.budgetBreaker.expensiveUsd)})</strong> — Played
-                      in {result.budgetBreaker.expensiveRate}% of decks, {result.budgetBreaker.expensiveName} alone
-                      takes up a big chunk of a {money(result.budget)} budget. Your list includes{" "}
-                      <strong>{result.budgetBreaker.selectedName} ({money(result.budgetBreaker.selectedUsd)})</strong>{" "}
-                      to cover {result.budgetBreaker.roleLabel} while leaving room for the rest of your upgrades.
-                    </p>
-                  </div>
-                )}
+                {(result.budgetBreakers ?? []).map((b) => {
+                  const added = addedBreakers.some((c) => c.scryfall_id === b.scryfall_id);
+                  return (
+                    <div className="breaker-callout" key={b.scryfall_id}>
+                      <p>
+                        💡 <strong>Popular Heavy Hitter: {b.expensiveName} ({money(b.expensiveUsd)})</strong> — Played
+                        in {b.expensiveRate}% of decks, {b.expensiveName} alone
+                        takes up a big chunk of a {money(result.budget)} budget. Your list includes{" "}
+                        <strong>{b.partnerName} ({money(b.partnerUsd)})</strong>{" "}
+                        to cover {b.roleLabel} while leaving room for the rest of your upgrades.
+                      </p>
+                      <button className={added ? "ghost" : "primary"} onClick={() => toggleBreaker(b)}>
+                        {added ? "Added ✓ — tap to remove" : "Add anyway"}
+                      </button>
+                    </div>
+                  );
+                })}
                 <p className="note" style={{ marginBottom: "7rem" }}>
                   EDHREC inclusion · Scryfall USD price · affiliate links support ManaCents at no extra cost
                 </p>
