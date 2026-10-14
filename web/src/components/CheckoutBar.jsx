@@ -153,7 +153,11 @@ export default function CheckoutBar({ commander, budget, cards, total, remaining
           <div className="row">
             <div className="totals">
               {cards.length} Upgrades Selected • Total: {money(total)}
-              <small>Leaves ~{money(Math.max(0, remaining))} for shipping</small>
+              {remaining >= 0 ? (
+                <small>Leaves ~{money(remaining)} for shipping</small>
+              ) : (
+                <small>{money(-remaining)} over target budget</small>
+              )}
             </div>
             <div className="actions">
               <button className="primary" onClick={buyTcgplayer}>Buy All on TCGplayer</button>

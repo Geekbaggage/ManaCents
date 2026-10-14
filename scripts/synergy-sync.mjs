@@ -63,13 +63,67 @@ async function d1Batch(statements) {
 // Order matters: check ramp/removal/draw before defaulting to synergy.
 function classifyRole(typeLine = "", oracle = "") {
   const t = `${typeLine}\n${oracle}`;
-  if (/add \{[WUBRGC]\}/.test(oracle) && /artifact/i.test(typeLine)) return "ramp"; // mana rocks
+  // Lands that tap for mana are mana base (ramp), not generic synergy.
+  // (Blazemire Verge was mislabeled Core Synergy before this rule.)
+  if (/land/i.test(typeLine) && /add \{[WUBRGC]\}/i.test(oracle)) return "ramp";
+  // Mana rituals: "Add {B}{B}{B}" at instant/sorcery speed (Dark Ritual).
+  // The old regex required lowercase "add" AND artifact type — missing both.
+  if (/^add \{[WUBRGC]\}/im.test(oracle) && /instant|sorcery/i.test(typeLine)) return "ramp";
+  if (/add \{[WUBRGC]\}/i.test(oracle) && /artifact/i.test(typeLine)) return "ramp"; // mana rocks
+  if (/add \{[WUBRGC]\}/i.test(oracle) && /creature/i.test(typeLine)) return "ramp"; // mana dorks
   if (/search your library/i.test(oracle) && /(land|plains|island|swamp|mountain|forest)/i.test(oracle)) return "ramp"; // land fetch
   if (/(destroy|exile) target/i.test(oracle)) return "removal";
   if (/deals \d+ damage to (any target|target)/i.test(oracle)) return "removal";
   if (/counter target spell/i.test(oracle)) return "removal";
   if (/draw( a)? cards?/i.test(oracle)) return "draw";
   return "synergy";
+}
+
+// ---- Printing normalization (see Pass 2b) ----
+const SUSPECT_SET_TYPES = new Set([
+  "memorabilia", "spellbook", "masterpiece", "promo", "funny", "treasure_chest",
+]);
+const PREMIUM_SETS = new Set([
+  "msc", // Marvel Super Heroes Commander — pricey UB-style printings; extend as new ones appear
+]);
+const STANDARD_SET_TYPES = new Set(["core", "expansion", "commander", "masters", "starter"]);
+const ODDBALL_SETS = new Set([
+  "sum", // Summer Magic: rare misprint run, not a real affordable option
+]);
+
+function isSuspectPrinting(r) {
+  return r.promo === true || SUSPECT_SET_TYPES.has(r.set_type) || PREMIUM_SETS.has(r.set);
+}
+
+async function cheapestStandardPrinting(name) {
+  const url =
+    "https://api.scryfall.com/cards/search?q=" +
+    encodeURIComponent(`!"${name}" game:paper`) +
+    "&unique=prints&order=usd&dir=asc";
+  const res = await fetch(url, { headers: API_HEADERS });
+  if (!res.ok) {
+    console.warn(`Printing search failed for ${name}: ${res.status}`);
+    return null;
+  }
+  const json = await res.json();
+  for (const c of json.data ?? []) {
+    const usd = parseFloat(c.prices?.usd);
+    if (!usd || usd <= 0) continue;
+    if (!STANDARD_SET_TYPES.has(c.set_type) || c.promo === true) continue;
+    if (ODDBALL_SETS.has(c.set)) continue;
+    const face = c.card_faces?.[0] ?? c;
+    return {
+      id: c.id,
+      type_line: face.type_line ?? c.type_line ?? "",
+      oracle: face.oracle_text ?? c.oracle_text ?? "",
+      color_identity: (c.color_identity ?? []).join(""),
+      set: c.set ?? "",
+      set_type: c.set_type ?? "",
+      promo: false,
+      usd: usd.toFixed(2),
+    };
+  }
+  return null;
 }
 
 // Active commanders: prefer D1's registry (populated by prior runs); on a
@@ -147,6 +201,9 @@ async function resolveScryfallIds(names) {
         type_line: face.type_line ?? c.type_line ?? "",
         oracle: face.oracle_text ?? c.oracle_text ?? "",
         color_identity: (c.color_identity ?? []).join(""),
+        set: c.set ?? "",
+        set_type: c.set_type ?? "",
+        promo: c.promo === true,
       });
     }
     if (json.not_found?.length) {
@@ -179,6 +236,33 @@ async function main() {
   // Pass 2: resolve distinct names to Scryfall IDs (+ oracle text for roles).
   const resolved = await resolveScryfallIds(tuples.map((t) => t.name));
   console.log(`Resolved ${resolved.size} distinct cards`);
+
+  // Pass 2b: printing normalization. Scryfall's name resolution returns the
+  // newest printing, which is often a pricey special set (Dark Ritual's
+  // default is the Marvel Commander printing at $7.42). For suspect
+  // printings, swap to the cheapest standard paper printing so the stored
+  // price and art reflect an affordable version.
+  // NOTE: a set_type/promo filter alone is NOT enough — MSC is set_type
+  // "commander" with promo=false — hence the small premium-set denylist.
+  {
+    const replacements = new Map(); // oldId -> newId
+    for (const [name, r] of resolved) {
+      if (!isSuspectPrinting(r)) continue;
+      const std = await cheapestStandardPrinting(name);
+      await sleep(SCRYFALL_DELAY_MS);
+      if (std && std.id !== r.id) {
+        replacements.set(r.id, std.id);
+        resolved.set(name, std);
+        console.log(`Printing swap: ${name} [${r.set}] -> [${std.set}] @ $${std.usd}`);
+      }
+    }
+    if (replacements.size > 0) {
+      const oldIds = [...replacements.keys()].map((id) => `'${id}'`).join(",");
+      await d1Query(`DELETE FROM commander_synergy WHERE scryfall_id IN (${oldIds})`);
+      await d1Query(`DELETE FROM cards WHERE scryfall_id IN (${oldIds})`);
+      console.log(`Cleaned ${replacements.size} superseded printing IDs`);
+    }
+  }
 
   // Pass 3: per commander, top-150 + top-40 per role.
   const stmts = [];

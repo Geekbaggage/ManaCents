@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS cards (
   usd REAL,
   price_log REAL,
   usd_30d_avg REAL NOT NULL DEFAULT 0, -- EMA baseline for price-drop/spike flags (seeded by price-sync)
+  type_line TEXT,                     -- e.g. "Legendary Creature — ..."; powers the Big Splash land exclusion
   tcgplayer_id INTEGER,
   image_url TEXT,                 -- Scryfall image_uris.normal (cards.scryfall.io hotlink)
   updated_at TEXT DEFAULT (datetime('now'))

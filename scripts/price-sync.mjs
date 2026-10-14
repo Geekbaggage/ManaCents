@@ -123,14 +123,16 @@ function toUpsert(card) {
   const face = card.card_faces?.[0] ?? card;
   const imageUrl = (face.image_uris?.normal ?? card.image_uris?.normal ?? "").replace(/'/g, "");
   const name = card.name.replace(/'/g, "''");
-  return `INSERT INTO cards (scryfall_id, name, usd, price_log, tcgplayer_id, image_url, updated_at)
-VALUES ('${card.id}', '${name}', ${usd}, ${price_log}, ${tcgId ?? "NULL"}, ${imageUrl ? `'${imageUrl}'` : "NULL"}, datetime('now'))
+  const typeLine = (face.type_line ?? card.type_line ?? "").replace(/'/g, "''");
+  return `INSERT INTO cards (scryfall_id, name, usd, price_log, tcgplayer_id, image_url, type_line, updated_at)
+VALUES ('${card.id}', '${name}', ${usd}, ${price_log}, ${tcgId ?? "NULL"}, ${imageUrl ? `'${imageUrl}'` : "NULL"}, '${typeLine}', datetime('now'))
 ON CONFLICT(scryfall_id) DO UPDATE SET
   usd = excluded.usd,
   usd_30d_avg = CASE WHEN cards.usd_30d_avg = 0 THEN excluded.usd ELSE (cards.usd_30d_avg * 0.93) + (excluded.usd * 0.07) END,
   price_log = excluded.price_log,
   tcgplayer_id = excluded.tcgplayer_id,
   image_url = COALESCE(excluded.image_url, cards.image_url),
+  type_line = COALESCE(NULLIF(excluded.type_line, ''), cards.type_line),
   updated_at = excluded.updated_at;`;
 }
 
@@ -149,8 +151,19 @@ async function ensurePriceHistoryColumn() {
   }
 }
 
+// type_line powers the Big Splash land exclusion; backfilled by the upsert.
+async function ensureTypeLineColumn() {
+  try {
+    await d1Query(`ALTER TABLE cards ADD COLUMN type_line TEXT`);
+    console.log("Added cards.type_line column");
+  } catch (e) {
+    if (!/duplicate column/i.test(e.message)) throw e;
+  }
+}
+
 async function main() {
   await ensurePriceHistoryColumn();
+  await ensureTypeLineColumn();
   const pool = await getPool();
   console.log(`Price pool: ${pool.length} cards`);
   if (!pool.length) {

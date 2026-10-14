@@ -116,7 +116,7 @@ input:focus, select:focus, button:focus-visible {
 
 .form-error { color: var(--crimson); margin: 0.6rem 0; min-height: 1.4em; }
 
-/* Smart banner */
+/* Smart banner (merged skipped-cards banner) */
 .smart-banner {
   background: rgba(16, 185, 129, 0.1);
   border: 1px solid var(--teal);
@@ -124,7 +124,10 @@ input:focus, select:focus, button:focus-visible {
   padding: 0.8rem 1rem; margin: 0 0 1.2rem;
   display: flex; gap: 0.8rem; align-items: center; justify-content: space-between; flex-wrap: wrap;
 }
-.smart-banner p { margin: 0; }
+.smart-banner p { margin: 0; flex: 1 1 18rem; }
+.smart-banner .banner-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.smart-banner .banner-actions button { min-height: 36px; padding: 0.3rem 0.9rem; font-size: 0.85rem; }
+.smart-banner .skipped-list { flex-basis: 100%; margin: 0.2rem 0 0; }
 
 /* Budget Breaker callout */
 .breaker-callout {
@@ -136,14 +139,7 @@ input:focus, select:focus, button:focus-visible {
 }
 .breaker-callout p { margin: 0; flex: 1 1 16rem; }
 
-/* Skipped staples pill */
-.skipped-pill {
-  display: inline-flex; align-items: center; gap: 0.6rem;
-  background: var(--slate); border: 1px dashed var(--teal);
-  border-radius: 999px; padding: 0.45rem 0.4rem 0.45rem 1rem;
-  color: var(--gray); font-size: 0.9rem; margin-bottom: 1rem;
-}
-.skipped-pill button { min-height: 36px; padding: 0.3rem 0.9rem; font-size: 0.85rem; }
+/* Skipped staples (chips inside the merged banner) */
 .skipped-list {
   display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0 0 1rem;
 }
@@ -174,30 +170,32 @@ input:focus, select:focus, button:focus-visible {
 }
 .card-tile .imgwrap { position: relative; aspect-ratio: 63 / 88; background: #0b1220; }
 .card-tile img.card-img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.card-tile .select-check {
-  position: absolute; top: 8px; left: 8px;
-  width: 34px; height: 34px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.2rem; font-weight: 800;
-  background: rgba(15, 23, 42, 0.85); border: 2px solid var(--gray); color: var(--gray);
-}
-.card-tile.selected .select-check { background: var(--emerald); border-color: var(--emerald); color: #06281c; }
+/* No overlays on the card art itself — name and mana cost stay 100% readable. */
 .card-tile:not(.selected) .imgwrap::after {
   content: "Removed"; position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
   background: rgba(15, 23, 42, 0.72); color: var(--gray);
   font-weight: 700; letter-spacing: 0.06em;
 }
+/* Value badge now lives inline next to the price, below the image. */
 .value-badge {
-  position: absolute; top: 8px; right: 8px;
-  border-radius: 999px; padding: 0.25rem 0.6rem;
-  font-size: 0.78rem; font-weight: 800;
+  border-radius: 999px; padding: 0.2rem 0.55rem;
+  font-size: 0.75rem; font-weight: 800; white-space: nowrap;
   background: rgba(15, 23, 42, 0.9); border: 1px solid var(--gray); color: var(--wisp);
 }
 .value-badge.gold { border-color: var(--gold); color: var(--gold); }
 .value-badge.emerald { border-color: var(--emerald); color: var(--mint); }
-.card-tile .meta { padding: 0.6rem 0.7rem 0.7rem; display: flex; flex-direction: column; gap: 0.25rem; }
+.card-tile .meta { padding: 0.6rem 0.7rem 0.7rem; display: flex; flex-direction: column; gap: 0.3rem; }
+.card-tile .meta-head { display: flex; align-items: center; gap: 0.45rem; }
+.card-tile .select-dot {
+  flex: none; width: 22px; height: 22px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.85rem; font-weight: 800;
+  background: transparent; border: 2px solid var(--gray); color: var(--gray);
+}
+.card-tile.selected .select-dot { background: var(--emerald); border-color: var(--emerald); color: #06281c; }
 .card-tile .name { font-weight: 700; font-size: 0.92rem; }
+.card-tile .price-row { display: flex; align-items: center; gap: 0.5rem; }
 .card-tile .price { color: var(--mint); font-weight: 700; }
 .card-tile .role {
   display: inline-block; align-self: flex-start;
@@ -259,6 +257,8 @@ input:focus, select:focus, button:focus-visible {
 .site-footer {
   border-top: 1px solid var(--teal); padding: 1.4rem 0 2rem;
   color: var(--gray); font-size: 0.82rem; line-height: 1.7;
+  /* Clear the fixed checkout bar so the footer reads cleanly at max scroll. */
+  margin-bottom: 9rem;
 }
 .site-footer .credit { opacity: 0.75; }
 .site-footer .legal { color: #64748B; }
@@ -266,11 +266,47 @@ input:focus, select:focus, button:focus-visible {
 /* Receipt */
 .receipt-preview { max-width: 100%; border-radius: var(--radius); border: 1px solid var(--teal); }
 
-/* Results header */
-.results-head { padding: 1.6rem 0 0.4rem; }
-.results-head .kicker { color: var(--gold); text-transform: uppercase; font-size: 0.78rem; letter-spacing: 0.12em; }
-.results-head h2 { margin: 0.2rem 0; }
-.results-metrics { display: flex; gap: 1.4rem; flex-wrap: wrap; color: var(--gray); font-size: 0.92rem; margin: 0.5rem 0 1rem; }
+/* Commander hero header */
+.hero {
+  position: relative; overflow: hidden;
+  display: flex; gap: 1.1rem; align-items: center;
+  border: 1px solid var(--teal); border-radius: var(--radius);
+  padding: 1rem 1.2rem; margin: 1.2rem 0 1.2rem;
+  background: rgba(15, 23, 42, 0.6);
+}
+.hero-glow {
+  position: absolute; inset: -40px; z-index: 0; pointer-events: none;
+  filter: blur(48px) saturate(1.4); opacity: 0.35;
+}
+.hero-glow img { width: 100%; height: 100%; object-fit: cover; }
+.hero-art {
+  position: relative; z-index: 1; flex: none;
+  width: 96px; height: 96px; object-fit: cover; border-radius: 12px;
+  border: 2px solid var(--teal); box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+}
+.hero-body { position: relative; z-index: 1; flex: 1 1 16rem; min-width: 0; }
+.hero-body .kicker { color: var(--gold); text-transform: uppercase; font-size: 0.78rem; letter-spacing: 0.12em; }
+.hero-body h2 { margin: 0.15rem 0 0.6rem; }
+.hero-controls { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin-bottom: 0.7rem; }
+.mode-toggle.small button { padding: 0.45rem 0.9rem; font-size: 0.88rem; }
+.mode-toggle.small button small { display: none; }
+.hero-budget { display: inline-flex; align-items: center; gap: 0.35rem; color: var(--gray); font-size: 0.9rem; }
+.hero-budget input {
+  width: 4.5rem; background: var(--slate-2); border: 1px solid var(--teal);
+  border-radius: 8px; color: var(--wisp); padding: 0.45rem 0.5rem; font-size: 0.95rem;
+}
+.hero-budget button, .hero-controls > button.ghost { min-height: 38px; padding: 0.35rem 0.9rem; font-size: 0.88rem; }
+.budget-bar {
+  height: 10px; border-radius: 999px; background: rgba(148, 163, 184, 0.18);
+  overflow: hidden; margin-bottom: 0.5rem;
+}
+.budget-fill {
+  height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, var(--teal), var(--emerald));
+  transition: width 0.4s ease;
+}
+.budget-fill.over { background: linear-gradient(90deg, #b45309, var(--crimson)); }
+.results-metrics { display: flex; gap: 1.4rem; flex-wrap: wrap; color: var(--gray); font-size: 0.92rem; }
 .results-metrics strong { color: var(--wisp); }
 
 @media (max-width: 390px) {

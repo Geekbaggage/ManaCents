@@ -67,7 +67,7 @@ export async function onRequestGet({ request, env }) {
     }
 
     const { results: rows } = await env.MANACENTS_DB.prepare(
-      `SELECT s.scryfall_id, c.name, c.usd, c.image_url, s.role, s.cmdr_rate, s.raw_score,
+      `SELECT s.scryfall_id, c.name, c.usd, c.image_url, c.type_line, s.role, s.cmdr_rate, s.raw_score,
               COALESCE(g.inclusion_rate, 0) AS global_rate
        FROM commander_synergy s
        JOIN cards c ON c.scryfall_id = s.scryfall_id
@@ -112,12 +112,26 @@ export async function onRequestGet({ request, env }) {
 
     const fits = (card) => total + card.usd <= budget + 1e-9;
 
+    // Big Splash pool: powerhouse slots are for mid-to-high-tier NON-LAND
+    // staples — exclude lands (type_line containing "Land") and enforce a
+    // $2.00 floor so a $0.25 bulk card can't take one of only 4–6 slots.
+    // type_line is NULL until the nightly price-sync backfills it; NULL
+    // means "unknown", so those cards stay eligible (no false exclusions).
+    const isLand = (c) => c.type_line != null && /land/i.test(c.type_line);
+    const splashPool =
+      mode === "splash" ? candidates.filter((c) => c.usd >= 2 && !isLand(c)) : candidates;
+    // If the filtered pool is too thin to fill the minimum, fall back to
+    // the unfiltered pool (still excluding known lands) rather than
+    // returning a 2-card "splash".
+    const pool = splashPool.length >= MIN_TARGETS[mode] ? splashPool : candidates.filter((c) => !isLand(c));
+    const usePool = mode === "splash" ? pool : candidates;
+
     if (mode === "splash") {
       // Up to 2 cornerstones: the priciest cards among the top scorers
       // (each within 60% of budget). Big Splash is for a few high-impact
       // staples — not the $0.10 cards the pure score ranking favors.
       let cornerstones = 0;
-      for (const c of candidates) {
+      for (const c of usePool) {
         if (cornerstones >= 2 || selected.length >= target) break;
         if (c.usd >= 3 && total + c.usd <= budget * 0.6 + 1e-9) {
           selected.push(c);
@@ -126,7 +140,7 @@ export async function onRequestGet({ request, env }) {
         }
       }
       // Fallback: if no $3+ cornerstone fit, take top-by-score within 60%.
-      for (const c of candidates) {
+      for (const c of usePool) {
         if (cornerstones >= 2 || selected.length >= target) break;
         if (selected.includes(c)) continue;
         if (total + c.usd <= budget * 0.6 + 1e-9) {
@@ -145,7 +159,7 @@ export async function onRequestGet({ request, env }) {
     const roleCount = { synergy: 0, ramp: 0, draw: 0, removal: 0 };
     for (const c of selected) roleCount[c.role] = (roleCount[c.role] ?? 0) + 1;
 
-    for (const c of candidates) {
+    for (const c of usePool) {
       if (selected.length >= target) break;
       if (selected.includes(c) || !fits(c)) continue;
       const role = c.role in minCounts ? c.role : "synergy";
@@ -157,7 +171,7 @@ export async function onRequestGet({ request, env }) {
     }
 
     // Phase B: fill remaining slots by score within budget.
-    for (const c of candidates) {
+    for (const c of usePool) {
       if (selected.length >= target) break;
       if (selected.includes(c) || !fits(c)) continue;
       selected.push(c);
@@ -271,6 +285,11 @@ export async function onRequestGet({ request, env }) {
     };
     const roleLabelFor = (c) => {
       const base = ROLE_LABELS[c.role] ?? "Core Synergy";
+      // Overwhelming commander inclusion (>=75%) means the card is a core
+      // synergy piece for THIS deck, even when its oracle text matched a
+      // support keyword (e.g. Saw in Half's "destroy target" is a clone
+      // effect in Deadpool at 92% inclusion).
+      if (c.role !== "synergy" && c.cmdr_rate >= 0.75) return "Core Synergy";
       const g = c.global_rate ?? 0;
       if (c.role !== "synergy" && g > 0 && c.cmdr_rate / (g + 0.03) >= 3.0) {
         return SYNERGY_MICRO_TAG[c.role] ?? base;

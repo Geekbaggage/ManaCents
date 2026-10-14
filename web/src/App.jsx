@@ -23,14 +23,18 @@ function CardTile({ card, selected, onToggle, onSwap }) {
         ) : (
           <div className="card-img" style={{ display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8" }}>{card.name}</div>
         )}
-        <span className="select-check">{selected ? "✓" : "＋"}</span>
-        {card.score != null && (
-          <span className={`value-badge ${card.tier}`}>{card.score} Value</span>
-        )}
       </div>
       <div className="meta">
-        <span className="name">{card.name}</span>
-        <span className="price">{money(card.usd)}</span>
+        <div className="meta-head">
+          <span className={`select-dot${selected ? " on" : ""}`}>{selected ? "✓" : "＋"}</span>
+          <span className="name">{card.name}</span>
+        </div>
+        <div className="price-row">
+          <span className="price">{money(card.usd)}</span>
+          {card.score != null && (
+            <span className={`value-badge ${card.tier}`}>{card.score} Value</span>
+          )}
+        </div>
         <span className="role">{card.roleLabel}</span>
         <button className="swap" onClick={onSwap}>Already own this? Swap it</button>
       </div>
@@ -86,10 +90,12 @@ export default function App() {
     setShowSuggest(false);
   };
 
-  const submit = async (withUniversal = false) => {
+  const submit = async (withUniversal = false, overrides = {}) => {
     setFormError("");
     if (!selectedCmdr) { setFormError("Choose a commander first."); return; }
-    const budget = parseFloat(budgetInput);
+    const effMode = overrides.mode ?? mode;
+    const effBudgetInput = overrides.budgetInput ?? budgetInput;
+    const budget = parseFloat(effBudgetInput);
     if (!Number.isFinite(budget) || budget < 1 || budget > 1000) {
       setFormError("Enter a budget between $1 and $1,000.");
       return;
@@ -98,8 +104,10 @@ export default function App() {
     else setLoading(true);
     setResultError("");
     try {
-      const data = await fetchUpgrades(selectedCmdr.slug, budget, mode, withUniversal);
+      const data = await fetchUpgrades(selectedCmdr.slug, budget, effMode, withUniversal);
       setResult(data);
+      if (overrides.mode) setMode(overrides.mode);
+      if (overrides.budgetInput) setBudgetInput(overrides.budgetInput);
       setIncludeUniversal(withUniversal);
       setDeselected(new Set());
       setSwaps({});
@@ -113,6 +121,12 @@ export default function App() {
       setLoading(false);
       setIncluding(false);
     }
+  };
+
+  // Rebuild the current results with a different mode/budget (hero controls).
+  const rebuild = (patch) => {
+    if (loading || including) return;
+    submit(false, patch);
   };
 
   const visibleUpgrades = useMemo(() => {
@@ -271,34 +285,80 @@ export default function App() {
 
         {view === "results" && result && (
           <main>
-            <div className="results-head">
-              <div className="kicker">Your upgrade plan</div>
-              <h2>{result.commander.name}</h2>
-              <div className="results-metrics">
-                <span>{mode === "splash" ? "Big Splash" : "Full Tune-Up"} · checked {checkedLabel}</span>
-                <span>Selected <strong>{selectedCards.length}</strong></span>
-                <span>Total <strong>{money(total)}</strong></span>
-                <span>Budget left <strong>{money(Math.max(0, remaining))}</strong></span>
+            <div className="hero">
+              <div className="hero-glow" aria-hidden="true">
+                <img
+                  src={`https://api.scryfall.com/cards/named?exact=${encodeURIComponent(result.commander.name)}&format=image&version=large`}
+                  alt=""
+                />
+              </div>
+              <img
+                className="hero-art"
+                src={`https://api.scryfall.com/cards/named?exact=${encodeURIComponent(result.commander.name)}&format=image&version=art_crop`}
+                alt={`${result.commander.name} card art`}
+                loading="lazy"
+              />
+              <div className="hero-body">
+                <div className="kicker">Your upgrade plan</div>
+                <h2>{result.commander.name}</h2>
+                <div className="hero-controls">
+                  <div className="mode-toggle small" role="group" aria-label="Upgrade style">
+                    <button className={mode === "tuneup" ? "on" : ""} onClick={() => rebuild({ mode: "tuneup" })}>
+                      Full Tune-Up
+                    </button>
+                    <button className={mode === "splash" ? "on" : ""} onClick={() => rebuild({ mode: "splash" })}>
+                      Big Splash
+                    </button>
+                  </div>
+                  <label className="hero-budget">
+                    <span>$</span>
+                    <input
+                      inputMode="decimal"
+                      value={budgetInput}
+                      onChange={(e) => setBudgetInput(e.target.value)}
+                      aria-label="Budget in dollars"
+                    />
+                    <button className="ghost" onClick={() => rebuild({})}>Update</button>
+                  </label>
+                  <button className="ghost" onClick={() => setView("landing")}>Change Commander</button>
+                </div>
+                <div
+                  className="budget-bar"
+                  role="progressbar"
+                  aria-label="Budget used"
+                  aria-valuenow={Math.round(Math.min(100, (total / result.budget) * 100))}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                >
+                  <div
+                    className={`budget-fill${remaining < 0 ? " over" : ""}`}
+                    style={{ width: `${Math.min(100, (total / result.budget) * 100)}%` }}
+                  />
+                </div>
+                <div className="results-metrics">
+                  <span>Total <strong>{money(total)}</strong> of {money(result.budget)}</span>
+                  {remaining >= 0 ? (
+                    <span>Budget left <strong>{money(remaining)}</strong></span>
+                  ) : (
+                    <span><strong>{money(-remaining)}</strong> over budget</span>
+                  )}
+                  <span>checked {checkedLabel}</span>
+                </div>
               </div>
             </div>
 
-            {result.skipped.length > 0 && !showSkipped && (
-              <div className="smart-banner">
+            {result.skipped.length > 0 && !includeUniversal && (
+              <div className="smart-banner merged">
                 <p>
                   ✨ Tailored for your Commander. We skipped {result.skipped.length} basics you
                   probably already have (like {result.skipped.slice(0, 2).map((s) => s.name).join(" & ")}).
                 </p>
-              </div>
-            )}
-            {result.skipped.length > 0 && !includeUniversal && (
-              <div>
-                <span className="skipped-pill">
-                  Skipped {result.skipped.length} universal cards you likely already own
+                <div className="banner-actions">
                   <button onClick={() => setShowSkipped((v) => !v)}>{showSkipped ? "Hide them" : "Show them"}</button>
                   <button onClick={() => submit(true)} disabled={including}>
                     {including ? "Including…" : "Include them anyway"}
                   </button>
-                </span>
+                </div>
                 {showSkipped && (
                   <div className="skipped-list">
                     {result.skipped.map((s) => (
@@ -352,9 +412,6 @@ export default function App() {
                     </div>
                   );
                 })}
-                <p className="note" style={{ marginBottom: "7rem" }}>
-                  EDHREC inclusion · Scryfall USD price · affiliate links support ManaCents at no extra cost
-                </p>
               </>
             )}
 
