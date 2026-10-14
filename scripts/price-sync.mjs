@@ -105,13 +105,16 @@ function toUpsert(card) {
   let usd = Math.max(parseFloat(rawPrice) || PRICE_FLOOR, PRICE_FLOOR);
   const price_log = Math.log(usd + PRICE_OFFSET);
   const tcgId = Number.isFinite(parseInt(card.tcgplayer_id, 10)) ? parseInt(card.tcgplayer_id, 10) : null;
+  const face = card.card_faces?.[0] ?? card;
+  const imageUrl = (face.image_uris?.normal ?? card.image_uris?.normal ?? "").replace(/'/g, "");
   const name = card.name.replace(/'/g, "''");
-  return `INSERT INTO cards (scryfall_id, name, usd, price_log, tcgplayer_id, updated_at)
-VALUES ('${card.id}', '${name}', ${usd}, ${price_log}, ${tcgId ?? "NULL"}, datetime('now'))
+  return `INSERT INTO cards (scryfall_id, name, usd, price_log, tcgplayer_id, image_url, updated_at)
+VALUES ('${card.id}', '${name}', ${usd}, ${price_log}, ${tcgId ?? "NULL"}, ${imageUrl ? `'${imageUrl}'` : "NULL"}, datetime('now'))
 ON CONFLICT(scryfall_id) DO UPDATE SET
   usd = excluded.usd,
   price_log = excluded.price_log,
   tcgplayer_id = excluded.tcgplayer_id,
+  image_url = COALESCE(excluded.image_url, cards.image_url),
   updated_at = excluded.updated_at;`;
 }
 

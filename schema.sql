@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS cards (
   usd REAL,
   price_log REAL,
   tcgplayer_id INTEGER,
+  image_url TEXT,                 -- Scryfall image_uris.normal (cards.scryfall.io hotlink)
   updated_at TEXT DEFAULT (datetime('now'))
 );
 CREATE INDEX IF NOT EXISTS idx_cards_name ON cards(name);

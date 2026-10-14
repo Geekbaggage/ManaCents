@@ -1,0 +1,306 @@
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { searchCommanders, fetchUpgrades, money } from "./api.js";
+import CheckoutBar from "./components/CheckoutBar.jsx";
+import Footer from "./components/Footer.jsx";
+
+function useDebounced(value, ms) {
+  const [v, setV] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setV(value), ms);
+    return () => clearTimeout(t);
+  }, [value, ms]);
+  return v;
+}
+
+function CardTile({ card, selected, onToggle, onSwap }) {
+  return (
+    <div className={`card-tile${selected ? " selected" : ""}`}>
+      <div className="imgwrap" onClick={onToggle} role="button" tabIndex={0}
+        aria-label={`${selected ? "Remove" : "Add"} ${card.name}`}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onToggle(); }}>
+        {card.image_url ? (
+          <img className="card-img" src={card.image_url} alt={card.name} loading="lazy" />
+        ) : (
+          <div className="card-img" style={{ display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8" }}>{card.name}</div>
+        )}
+        <span className="select-check">{selected ? "✓" : "＋"}</span>
+        <span className={`value-badge ${card.tier}`}>{card.score} Value</span>
+      </div>
+      <div className="meta">
+        <span className="name">{card.name}</span>
+        <span className="price">{money(card.usd)}</span>
+        <span className="role">{card.roleLabel}</span>
+        <button className="swap" onClick={onSwap}>Already own this? Swap it</button>
+      </div>
+    </div>
+  );
+}
+
+export default function App() {
+  const [view, setView] = useState("landing");
+  const [cmdrInput, setCmdrInput] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggest, setShowSuggest] = useState(false);
+  const [selectedCmdr, setSelectedCmdr] = useState(null);
+  const [budgetInput, setBudgetInput] = useState("40");
+  const [mode, setMode] = useState("tuneup");
+  const [loading, setLoading] = useState(false);
+  const [formError, setFormError] = useState("");
+  const [result, setResult] = useState(null);
+  const [resultError, setResultError] = useState("");
+  const [deselected, setDeselected] = useState(new Set());
+  const [swaps, setSwaps] = useState({});
+  const [showSkipped, setShowSkipped] = useState(false);
+  const [toast, setToast] = useState("");
+  const suggestRef = useRef(null);
+
+  const debouncedQuery = useDebounced(cmdrInput, 260);
+
+  useEffect(() => {
+    let alive = true;
+    if (debouncedQuery.trim().length >= 2 && !selectedCmdr) {
+      searchCommanders(debouncedQuery.trim())
+        .then((list) => { if (alive) { setSuggestions(list); setShowSuggest(true); } })
+        .catch(() => { if (alive) { setSuggestions([]); setShowSuggest(true); } });
+    } else {
+      setSuggestions([]);
+      setShowSuggest(false);
+    }
+    return () => { alive = false; };
+  }, [debouncedQuery, selectedCmdr]);
+
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(""), 2600);
+    return () => clearTimeout(t);
+  }, [toast]);
+
+  const pickCommander = (c) => {
+    setSelectedCmdr(c);
+    setCmdrInput(c.name);
+    setShowSuggest(false);
+  };
+
+  const submit = async () => {
+    setFormError("");
+    if (!selectedCmdr) { setFormError("Choose a commander first."); return; }
+    const budget = parseFloat(budgetInput);
+    if (!Number.isFinite(budget) || budget < 1 || budget > 1000) {
+      setFormError("Enter a budget between $1 and $1,000.");
+      return;
+    }
+    setLoading(true);
+    setResultError("");
+    try {
+      const data = await fetchUpgrades(selectedCmdr.slug, budget, mode);
+      setResult(data);
+      setDeselected(new Set());
+      setSwaps({});
+      setShowSkipped(false);
+      setView("results");
+      window.scrollTo(0, 0);
+    } catch (e) {
+      setFormError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const visibleUpgrades = useMemo(() => {
+    if (!result) return [];
+    return result.upgrades.map((c) => (swaps[c.scryfall_id] ? { ...swaps[c.scryfall_id], swappedIn: true } : c));
+  }, [result, swaps]);
+
+  const selectedCards = useMemo(
+    () => visibleUpgrades.filter((c) => !deselected.has(c.scryfall_id)),
+    [visibleUpgrades, deselected]
+  );
+
+  const total = useMemo(
+    () => Math.round(selectedCards.reduce((s, c) => s + c.usd, 0) * 100) / 100,
+    [selectedCards]
+  );
+  const remaining = result ? Math.round((result.budget - total) * 100) / 100 : 0;
+
+  const toggleCard = (id) => {
+    setDeselected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const swapCard = (card) => {
+    if (!result) return;
+    const headroom = result.budget - (total - card.usd);
+    const pool = result.alternates.filter((a) => a.usd <= headroom + 1e-9);
+    const pick = pool.find((a) => a.role === card.role) ?? pool[0];
+    if (!pick) {
+      setToast("No affordable swap available right now.");
+      return;
+    }
+    // Carry the display score/tier from the removed card's slot is wrong; recompute
+    // from the alternate's standing: reuse its rank by giving it the removed card's score.
+    setSwaps((prev) => ({ ...prev, [card.scryfall_id]: { ...pick, score: card.score, tier: card.tier, tierLabel: card.tierLabel } }));
+    setToast(`Swapped in ${pick.name}.`);
+  };
+
+  const selectAll = () => setDeselected(new Set());
+  const clearAll = () => setDeselected(new Set(visibleUpgrades.map((c) => c.scryfall_id)));
+
+  const checkedLabel = result?.checkedAt
+    ? new Date(result.checkedAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })
+    : "";
+
+  return (
+    <>
+      <div className="wrap">
+        <header className="site-header">
+          <img src="/logo.jpg" alt="ManaCents" />
+          <div>
+            <div className="brand">ManaCents</div>
+            <div className="tagline">Commander upgrades that respect your wallet</div>
+          </div>
+        </header>
+
+        {view === "landing" && (
+          <main className="landing">
+            <h1>Commander upgrades that respect your wallet.</h1>
+            <div className="fill-blank">
+              <span>Upgrade my</span>
+              <span className="cmdr-suggest" ref={suggestRef}>
+                <input
+                  type="text"
+                  placeholder="Type Commander Name..."
+                  value={cmdrInput}
+                  onChange={(e) => { setCmdrInput(e.target.value); setSelectedCmdr(null); }}
+                  onFocus={() => { if (suggestions.length) setShowSuggest(true); }}
+                  aria-label="Commander name"
+                />
+                {showSuggest && (
+                  <ul role="listbox">
+                    {suggestions.length === 0 && <li><button type="button" disabled>No commanders found.</button></li>}
+                    {suggestions.map((c) => (
+                      <li key={c.slug}>
+                        <button type="button" onClick={() => pickCommander(c)}>
+                          <span>{c.name}</span>
+                          <span className="decks">{c.deck_count?.toLocaleString?.() ?? ""} decks</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </span>
+              <span>deck with a budget of $</span>
+              <input
+                className="budget"
+                inputMode="decimal"
+                value={budgetInput}
+                onChange={(e) => setBudgetInput(e.target.value)}
+                aria-label="Budget in dollars"
+              />
+            </div>
+            <div className="mode-toggle" role="group" aria-label="Upgrade style">
+              <button className={mode === "tuneup" ? "on" : ""} onClick={() => setMode("tuneup")}>
+                Full Tune-Up<small>12–15 smart upgrades</small>
+              </button>
+              <button className={mode === "splash" ? "on" : ""} onClick={() => setMode("splash")}>
+                Big Splash<small>4–6 powerhouse cards</small>
+              </button>
+            </div>
+            <div>
+              <button className="primary" onClick={submit} disabled={loading} style={{ fontSize: "1.1rem", padding: "0.8rem 2rem" }}>
+                {loading ? "Building your list…" : "Find my upgrades"}
+              </button>
+            </div>
+            <p className="form-error" role="alert">{formError}</p>
+          </main>
+        )}
+
+        {view === "results" && result && (
+          <main>
+            <div className="results-head">
+              <div className="kicker">Your upgrade plan</div>
+              <h2>{result.commander.name}</h2>
+              <div className="results-metrics">
+                <span>{mode === "splash" ? "Big Splash" : "Full Tune-Up"} · checked {checkedLabel}</span>
+                <span>Selected <strong>{selectedCards.length}</strong></span>
+                <span>Total <strong>{money(total)}</strong></span>
+                <span>Budget left <strong>{money(Math.max(0, remaining))}</strong></span>
+              </div>
+            </div>
+
+            {result.skipped.length > 0 && !showSkipped && (
+              <div className="smart-banner">
+                <p>
+                  ✨ Tailored for your Commander. We skipped {result.skipped.length} basics you
+                  probably already have (like {result.skipped.slice(0, 2).map((s) => s.name).join(" & ")}).
+                </p>
+              </div>
+            )}
+            {result.skipped.length > 0 && (
+              <div>
+                <span className="skipped-pill">
+                  Skipped {result.skipped.length} universal cards you likely already own
+                  <button onClick={() => setShowSkipped((v) => !v)}>{showSkipped ? "Hide them" : "Show them"}</button>
+                </span>
+                {showSkipped && (
+                  <div className="skipped-list">
+                    {result.skipped.map((s) => (
+                      <span className="skipped-chip" key={s.scryfall_id}>
+                        {s.image_url && <img src={s.image_url} alt="" loading="lazy" />}
+                        {s.name} · {money(s.usd)}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {visibleUpgrades.length === 0 ? (
+              <p className="note">No list this round — no upgrades fit inside {money(result.budget)} right now. Try a higher budget or check back after prices refresh.</p>
+            ) : (
+              <>
+                <div className="grid-tools">
+                  <h2>Choose your upgrades</h2>
+                  <div>
+                    <button className="ghost" onClick={selectAll} style={{ marginRight: "0.5rem" }}>Select all</button>
+                    <button className="ghost" onClick={clearAll}>Clear</button>
+                  </div>
+                  <span className="hint">Tap a card image to add or remove it.</span>
+                </div>
+                <div className="card-grid">
+                  {visibleUpgrades.map((c) => (
+                    <CardTile
+                      key={c.scryfall_id}
+                      card={c}
+                      selected={!deselected.has(c.scryfall_id)}
+                      onToggle={() => toggleCard(c.scryfall_id)}
+                      onSwap={() => swapCard(c)}
+                    />
+                  ))}
+                </div>
+                <p className="note" style={{ marginBottom: "7rem" }}>
+                  EDHREC inclusion · Scryfall USD price · affiliate links support ManaCents at no extra cost
+                </p>
+              </>
+            )}
+
+            <CheckoutBar
+              commander={result.commander}
+              budget={result.budget}
+              cards={selectedCards}
+              total={total}
+              remaining={remaining}
+              onToast={setToast}
+            />
+          </main>
+        )}
+
+        <Footer />
+      </div>
+      {toast && <div className="toast" role="status">{toast}</div>}
+    </>
+  );
+}
