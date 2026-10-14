@@ -108,7 +108,10 @@ export default function App() {
 
   const visibleUpgrades = useMemo(() => {
     if (!result) return [];
-    return result.upgrades.map((c) => (swaps[c.scryfall_id] ? { ...swaps[c.scryfall_id], swappedIn: true } : c));
+    return result.upgrades.map((c) => {
+      const s = swaps[c.scryfall_id];
+      return s ? { ...s, _origId: c.scryfall_id, swappedIn: true } : c;
+    });
   }, [result, swaps]);
 
   const selectedCards = useMemo(
@@ -133,14 +136,18 @@ export default function App() {
 
   const swapCard = (card) => {
     if (!result) return;
+    const origId = card._origId ?? card.scryfall_id;
     const headroom = result.budget - (total - card.usd);
-    const pool = result.alternates.filter((a) => a.usd <= headroom + 1e-9);
+    const swappedInIds = new Set(Object.values(swaps).map((s) => s.scryfall_id));
+    const pool = result.alternates.filter(
+      (a) => a.usd <= headroom + 1e-9 && !swappedInIds.has(a.scryfall_id) && a.scryfall_id !== origId
+    );
     const pick = pool.find((a) => a.role === card.role) ?? pool[0];
     if (!pick) {
       setToast("No affordable swap available right now.");
       return;
     }
-    setSwaps((prev) => ({ ...prev, [card.scryfall_id]: pick }));
+    setSwaps((prev) => ({ ...prev, [origId]: pick }));
     setToast(`Swapped in ${pick.name}.`);
   };
 
