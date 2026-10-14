@@ -23,7 +23,11 @@ jobs:
           npm ci
           npm run build
       - name: Deploy to Cloudflare Pages
+        # NOTE: this step must run from web/ (not the repo root) so wrangler
+        # picks up web/functions/ — deploying from the root silently drops
+        # the API routes and /api/* falls through to the SPA.
+        working-directory: web
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx --yes wrangler@4 pages deploy web/dist --project-name=manacents
+        run: npx --yes wrangler@4 pages deploy dist --project-name=manacents
