@@ -322,7 +322,7 @@ export default function App() {
 
         {view === "landing" && (
           <main className="landing">
-            {/* Animated brand mark: plays once on load, then rests on the final frame. */}
+            {/* Animated brand mark: continuous slow rotation. */}
             {reducedMotion ? (
               <img
                 className="hero-logo-anim"
@@ -336,6 +336,7 @@ export default function App() {
                 poster="/logo-animated-poster.jpg"
                 autoPlay
                 muted
+                loop
                 playsInline
                 preload="auto"
                 aria-label="Animated ManaCents logo"
