@@ -21,7 +21,12 @@ export async function onRequestGet({ request, env }) {
         ).all());
         commanders = (commanders ?? []).map((c) => ({ ...c, status: "live", vote_count: 0, image_url: null }));
       }
-      return Response.json({ commanders: commanders ?? [] });
+      return Response.json(
+        { commanders: commanders ?? [] },
+        // Registry changes rarely (daily sync at most); let Cloudflare cache
+        // it at the edge instead of reading ~300 D1 rows on every page load.
+        { headers: { "Cache-Control": "public, max-age=300, s-maxage=600" } }
+      );
     }
     if (q.length < 2) {
       return Response.json({ commanders: [] });

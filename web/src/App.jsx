@@ -4,9 +4,11 @@ import { searchCommanders, fetchAllCommanders, fetchUpgrades, money, previewComm
 import CheckoutBar from "./components/CheckoutBar.jsx";
 import Footer from "./components/Footer.jsx";
 
-// Color-identity filter chips. Subset semantics: a commander shows when every
-// color in its identity is among the selected pips. "C" matches colorless
-// (empty identity) only; with no chips selected there is no filtering.
+// Color-identity filter chips. Exact-match semantics: a commander shows only
+// when its color identity is exactly the selected pips (so W+U+R finds Jeskai
+// commanders, not every mono-colored deck that happens to fit). "C" matches
+// colorless (empty identity) only, and only when selected alone. With no chips
+// selected there is no filtering.
 const COLOR_PIPS = [
   { id: "W", label: "White", bg: "#f8f6d8", fg: "#1e293b" },
   { id: "U", label: "Blue", bg: "#0e68ab", fg: "#f8fafc" },
@@ -17,9 +19,10 @@ const COLOR_PIPS = [
 ];
 function matchesColorFilter(commander, selected) {
   if (selected.size === 0) return true;
-  const identity = commander.color_identity ?? "";
-  if (identity === "") return selected.has("C");
-  return [...identity].every((pip) => selected.has(pip));
+  const pips = (commander.color_identity ?? "").replace(/[^WUBRG]/g, "");
+  if (pips.length === 0) return selected.has("C") && selected.size === 1;
+  if (selected.has("C")) return false;
+  return pips.length === selected.size && [...pips].every((p) => selected.has(p));
 }
 
 // localStorage watchlist: requested oracle_ids the user wants to hear about.
@@ -245,7 +248,9 @@ export default function App() {
     if (query.length >= 2 && !selectedCmdr) {
       if (fuse) {
         // Client-side fuzzy search over the full registry, then color filter.
-        const matches = fuse.search(query, { limit: 40 })
+        // No fuse-level limit: the registry is only ~300 rows, and capping
+        // before color filtering could cut matching commanders.
+        const matches = fuse.search(query)
           .map((r) => r.item)
           .filter((c) => matchesColorFilter(c, colorFilter))
           .slice(0, 15);
