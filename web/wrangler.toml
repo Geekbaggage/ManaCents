@@ -1,0 +1,9 @@
+# ManaCents Pages project config. Deploy with: wrangler pages deploy
+name = "manacents"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-10-01"
+
+[[d1_databases]]
+binding = "MANACENTS_DB"
+database_name = "manacents-db"
+database_id = "1acf65bc-ed4c-44ac-8815-6b46a9d57f67"
