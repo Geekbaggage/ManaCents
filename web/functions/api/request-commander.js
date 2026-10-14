@@ -32,7 +32,9 @@ async function ensureSchema(db) {
     `ALTER TABLE commanders ADD COLUMN vote_count INTEGER NOT NULL DEFAULT 0`,
     `ALTER TABLE commanders ADD COLUMN image_url TEXT`,
     `ALTER TABLE commanders ADD COLUMN fulfill_attempts INTEGER NOT NULL DEFAULT 0`,
-    `ALTER TABLE commanders ADD COLUMN created_at TEXT DEFAULT (datetime('now'))`,
+    // NOTE: D1 rejects non-constant DEFAULTs on ALTER TABLE, so created_at
+    // has no default here — the INSERT sets it explicitly via datetime('now').
+    `ALTER TABLE commanders ADD COLUMN created_at TEXT`,
     `CREATE INDEX IF NOT EXISTS idx_commanders_oracle ON commanders(oracle_id)`,
     `CREATE INDEX IF NOT EXISTS idx_commanders_status ON commanders(status)`,
   ]) {

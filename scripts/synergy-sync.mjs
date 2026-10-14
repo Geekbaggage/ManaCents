@@ -256,7 +256,9 @@ async function main() {
       `ALTER TABLE commanders ADD COLUMN vote_count INTEGER NOT NULL DEFAULT 0`,
       `ALTER TABLE commanders ADD COLUMN image_url TEXT`,
       `ALTER TABLE commanders ADD COLUMN fulfill_attempts INTEGER NOT NULL DEFAULT 0`,
-      `ALTER TABLE commanders ADD COLUMN created_at TEXT DEFAULT (datetime('now'))`,
+      // D1 rejects non-constant DEFAULTs on ALTER — no default here; the
+      // request API sets created_at explicitly on INSERT.
+      `ALTER TABLE commanders ADD COLUMN created_at TEXT`,
     ]) {
       try {
         await d1Query(sql);

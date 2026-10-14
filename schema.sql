@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS commanders (
   vote_count INTEGER NOT NULL DEFAULT 0,
   image_url TEXT,
   fulfill_attempts INTEGER NOT NULL DEFAULT 0,
-  created_at TEXT DEFAULT (datetime('now')),
+  created_at TEXT,
   updated_at TEXT DEFAULT (datetime('now'))
 );
 CREATE INDEX IF NOT EXISTS idx_commanders_oracle ON commanders(oracle_id);
