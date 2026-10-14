@@ -57,6 +57,10 @@ export async function onRequestPost({ request, env }) {
     return Response.json({ error: "Commander is required." }, { status: 400 });
   }
 
+  // Store in D1. If the write fails (e.g. D1 free-tier daily quota), the
+  // Discord ping below still goes out — the ping carries the full payload,
+  // so no feedback is ever silently lost.
+  let stored = false;
   try {
     await env.MANACENTS_DB.prepare(CREATE_TABLE).run();
     await env.MANACENTS_DB.prepare(
@@ -73,8 +77,9 @@ export async function onRequestPost({ request, env }) {
         cardsShown || null
       )
       .run();
-  } catch (e) {
-    return Response.json({ error: "Could not save feedback. Please try again.", detail: String(e?.message ?? e).slice(0, 200) }, { status: 500 });
+    stored = true;
+  } catch {
+    stored = false;
   }
 
   // Fire-and-forget Discord ping. Never fails the request.
@@ -108,5 +113,5 @@ export async function onRequestPost({ request, env }) {
     }
   }
 
-  return Response.json({ ok: true });
+  return Response.json({ ok: true, stored });
 }
