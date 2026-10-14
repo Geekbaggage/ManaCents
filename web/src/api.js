@@ -6,6 +6,15 @@ export async function searchCommanders(q) {
   return data.commanders ?? [];
 }
 
+// Full commander registry, fetched once for client-side fuzzy search and
+// color-identity filtering. Small (~300 rows).
+export async function fetchAllCommanders() {
+  const res = await fetch(`/api/commanders?all=1`);
+  if (!res.ok) throw new Error("Commander list failed.");
+  const data = await res.json();
+  return data.commanders ?? [];
+}
+
 export async function fetchUpgrades(slug, budget, mode, includeUniversal = false) {
   const params = new URLSearchParams({ commander: slug, budget: String(budget), mode });
   if (includeUniversal) params.set("includeUniversal", "1");

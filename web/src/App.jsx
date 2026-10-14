@@ -1,7 +1,26 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { searchCommanders, fetchUpgrades, money, previewCommanderRequest, confirmCommanderRequest, voteCommander, checkRequestStatus } from "./api.js";
+import Fuse from "fuse.js";
+import { searchCommanders, fetchAllCommanders, fetchUpgrades, money, previewCommanderRequest, confirmCommanderRequest, voteCommander, checkRequestStatus } from "./api.js";
 import CheckoutBar from "./components/CheckoutBar.jsx";
 import Footer from "./components/Footer.jsx";
+
+// Color-identity filter chips. Subset semantics: a commander shows when every
+// color in its identity is among the selected pips. "C" matches colorless
+// (empty identity) only; with no chips selected there is no filtering.
+const COLOR_PIPS = [
+  { id: "W", label: "White", bg: "#f8f6d8", fg: "#1e293b" },
+  { id: "U", label: "Blue", bg: "#0e68ab", fg: "#f8fafc" },
+  { id: "B", label: "Black", bg: "#3b2f2f", fg: "#f8fafc" },
+  { id: "R", label: "Red", bg: "#d3202a", fg: "#f8fafc" },
+  { id: "G", label: "Green", bg: "#00733e", fg: "#f8fafc" },
+  { id: "C", label: "Colorless", bg: "#94a3b8", fg: "#1e293b" },
+];
+function matchesColorFilter(commander, selected) {
+  if (selected.size === 0) return true;
+  const identity = commander.color_identity ?? "";
+  if (identity === "") return selected.has("C");
+  return [...identity].every((pip) => selected.has(pip));
+}
 
 // localStorage watchlist: requested oracle_ids the user wants to hear about.
 // On app load we check whether any transitioned to live and toast.
@@ -164,6 +183,10 @@ export default function App() {
   const [cmdrInput, setCmdrInput] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggest, setShowSuggest] = useState(false);
+  // Full registry for client-side fuzzy search + color filtering. Null until
+  // loaded; if the fetch fails we fall back to the server substring search.
+  const [allCommanders, setAllCommanders] = useState(null);
+  const [colorFilter, setColorFilter] = useState(new Set());
   const [selectedCmdr, setSelectedCmdr] = useState(null);
   const [budgetInput, setBudgetInput] = useState("40");
   const [mode, setMode] = useState("tuneup");
@@ -187,18 +210,68 @@ export default function App() {
 
   const debouncedQuery = useDebounced(cmdrInput, 260);
 
+  // Load the full registry once for fuzzy search. Best-effort: on failure the
+  // search effect below falls back to the server-side substring endpoint.
   useEffect(() => {
     let alive = true;
-    if (debouncedQuery.trim().length >= 2 && !selectedCmdr) {
-      searchCommanders(debouncedQuery.trim())
-        .then((list) => { if (alive) { setSuggestions(list); setShowSuggest(true); } })
-        .catch(() => { if (alive) { setSuggestions([]); setShowSuggest(true); } });
+    fetchAllCommanders()
+      .then((list) => { if (alive) setAllCommanders(list); })
+      .catch(() => { if (alive) setAllCommanders(null); });
+    return () => { alive = false; };
+  }, []);
+
+  const fuse = useMemo(() => {
+    if (!allCommanders) return null;
+    return new Fuse(allCommanders, {
+      keys: ["name"],
+      threshold: 0.35,       // typo-tolerant ("Atraxa" still matches "Atraxa")
+      ignoreLocation: true,   // match anywhere in the name, not just the start
+      includeScore: false,
+    });
+  }, [allCommanders]);
+
+  const toggleColorPip = (pip) => {
+    setColorFilter((prev) => {
+      const next = new Set(prev);
+      if (next.has(pip)) next.delete(pip);
+      else next.add(pip);
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    let alive = true;
+    const query = debouncedQuery.trim();
+    if (query.length >= 2 && !selectedCmdr) {
+      if (fuse) {
+        // Client-side fuzzy search over the full registry, then color filter.
+        const matches = fuse.search(query, { limit: 40 })
+          .map((r) => r.item)
+          .filter((c) => matchesColorFilter(c, colorFilter))
+          .slice(0, 15);
+        setSuggestions(matches);
+        setShowSuggest(true);
+      } else {
+        // Fallback: server substring search (also used before registry loads).
+        searchCommanders(query)
+          .then((list) => {
+            if (!alive) return;
+            setSuggestions(list.filter((c) => matchesColorFilter(c, colorFilter)));
+            setShowSuggest(true);
+          })
+          .catch(() => { if (alive) { setSuggestions([]); setShowSuggest(true); } });
+      }
+    } else if (query.length === 0 && colorFilter.size > 0 && !selectedCmdr) {
+      // Browsing: color chips selected but no text — show matching commanders.
+      const pool = allCommanders ?? [];
+      setSuggestions(pool.filter((c) => matchesColorFilter(c, colorFilter)).slice(0, 15));
+      setShowSuggest(true);
     } else {
       setSuggestions([]);
       setShowSuggest(false);
     }
     return () => { alive = false; };
-  }, [debouncedQuery, selectedCmdr]);
+  }, [debouncedQuery, selectedCmdr, fuse, allCommanders, colorFilter]);
 
   useEffect(() => {
     if (!toast) return;
@@ -473,6 +546,27 @@ export default function App() {
                   onFocus={() => { if (suggestions.length) setShowSuggest(true); }}
                   aria-label="Commander name"
                 />
+                <div className="color-chips" role="group" aria-label="Filter by color identity">
+                  {COLOR_PIPS.map((pip) => (
+                    <button
+                      key={pip.id}
+                      type="button"
+                      className={colorFilter.has(pip.id) ? "pip on" : "pip"}
+                      style={{ "--pip-bg": pip.bg, "--pip-fg": pip.fg }}
+                      onClick={() => toggleColorPip(pip.id)}
+                      aria-pressed={colorFilter.has(pip.id)}
+                      aria-label={`${pip.label} ${colorFilter.has(pip.id) ? "filter on" : "filter off"}`}
+                      title={pip.label}
+                    >
+                      {pip.id}
+                    </button>
+                  ))}
+                  {colorFilter.size > 0 && (
+                    <button type="button" className="pip-clear" onClick={() => setColorFilter(new Set())}>
+                      Clear
+                    </button>
+                  )}
+                </div>
                 {showSuggest && (
                   <ul role="listbox">
                     {suggestions.length === 0 && !requestPreview && !requestDone && (
@@ -539,6 +633,9 @@ export default function App() {
                     {suggestions.map((c) => (
                       <li key={c.slug}>
                         <button type="button" onClick={() => pickCommander(c)}>
+                          {c.image_url && (
+                            <img className="suggest-thumb" src={c.image_url} alt="" loading="lazy" />
+                          )}
                           <span>{c.name}</span>
                           {c.status === "pending_sync" ? (
                             <span className="decks stub-badge">indexing…</span>

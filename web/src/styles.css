@@ -108,11 +108,30 @@ input:focus, select:focus, button:focus-visible {
 .cmdr-suggest li button {
   width: 100%; text-align: left; border: none; background: transparent;
   padding: 0.55rem 0.7rem; border-radius: 8px; min-height: 44px;
-  display: flex; justify-content: space-between; gap: 0.5rem;
+  display: flex; justify-content: space-between; align-items: center; gap: 0.6rem;
 }
 .cmdr-suggest li button:hover, .cmdr-suggest li button.active { background: var(--teal); }
 .cmdr-suggest .decks { color: var(--gray); font-size: 0.8rem; }
 .cmdr-suggest .stub-badge { color: var(--gold); font-style: italic; }
+.cmdr-suggest .suggest-thumb { width: 38px; height: 38px; object-fit: cover; border-radius: 8px; flex-shrink: 0; }
+.cmdr-suggest li button .decks { margin-left: auto; }
+
+/* Color-identity filter chips */
+.color-chips { display: flex; gap: 0.35rem; align-items: center; margin-top: 0.4rem; flex-wrap: wrap; }
+.color-chips .pip {
+  width: 30px; height: 30px; min-height: 30px; padding: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: var(--pip-bg); color: var(--pip-fg);
+  font-size: 0.8rem; font-weight: 700;
+  opacity: 0.35;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.color-chips .pip.on { opacity: 1; border-color: var(--wisp); }
+.color-chips .pip-clear {
+  min-height: 30px; padding: 0 0.6rem; font-size: 0.8rem;
+  background: transparent; border: 1px solid var(--teal); color: var(--gray);
+}
 
 /* Commander request flow (empty search → Scryfall preview → one-tap). */
 .cmdr-suggest .request-empty { padding: 0.55rem 0.7rem; display: flex; flex-direction: column; gap: 0.5rem; }
