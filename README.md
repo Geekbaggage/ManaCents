@@ -23,6 +23,26 @@ GitHub Actions (cron)
 Cloudflare D1 (manacents-db): serves reads to the frontend
 ```
 
+## Web frontend (`web/`)
+
+Vite + React SPA deployed to Cloudflare Pages. Pages Functions in
+`web/functions/api/` read the same D1 via the `MANACENTS_DB` binding:
+
+- `GET /api/commanders?q=` — commander autocomplete
+- `GET /api/upgrades?commander=<slug>&budget=<n>&mode=tuneup|splash` —
+  ranked upgrades with the locked v2 rules applied in SQL (8% noise floor,
+  40% universal ceiling on color-eligible global rates), budget fill with
+  silent role quotas, display scores normalized 60–99.
+
+Card images hotlink Scryfall's CDN (`cards.image_url`, backfilled from
+`image_uris.normal`; populated on every price-sync upsert). All affiliate
+codes are empty placeholders (`web/src/affiliates.js`) — tracked URLs are
+built only when a code is configured.
+
+Local dev: `cd web && npm install && npm run build`. API functions can be
+exercised against the real D1 with the `/tmp/test-api.mjs` harness pattern
+(D1 HTTP API shim).
+
 ## Scoring engine v2 (locked 2026-10-13)
 
 `raw_score = (cmdr_rate × specificity) / ln(price + 1.50)`, `specificity = cmdr_rate / (eligible_global_rate + 0.03)`.

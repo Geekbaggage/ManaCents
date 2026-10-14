@@ -140,9 +140,7 @@ export default function App() {
       setToast("No affordable swap available right now.");
       return;
     }
-    // Carry the display score/tier from the removed card's slot is wrong; recompute
-    // from the alternate's standing: reuse its rank by giving it the removed card's score.
-    setSwaps((prev) => ({ ...prev, [card.scryfall_id]: { ...pick, score: card.score, tier: card.tier, tierLabel: card.tierLabel } }));
+    setSwaps((prev) => ({ ...prev, [card.scryfall_id]: pick }));
     setToast(`Swapped in ${pick.name}.`);
   };
 

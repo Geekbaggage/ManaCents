@@ -165,15 +165,24 @@ export async function onRequestGet({ request, env }) {
       };
     });
 
-    const alternateItems = alternates.map((c) => ({
-      scryfall_id: c.scryfall_id,
-      name: c.name,
-      usd: c.usd,
-      image_url: c.image_url,
-      role: c.role,
-      roleLabel: ROLE_LABELS[c.role] ?? "Core Synergy",
-      cmdr_rate: c.cmdr_rate,
-    }));
+    // Alternates use the same normalization scale (they naturally score at or
+    // below the selected list — truthful, no carried-over scores).
+    const alternateItems = alternates.map((c) => {
+      const score = Math.max(60, Math.min(99, Math.round(60 + (39 * (c.raw_score - minRaw)) / span)));
+      const { tier, label } = tierFor(score);
+      return {
+        scryfall_id: c.scryfall_id,
+        name: c.name,
+        usd: c.usd,
+        image_url: c.image_url,
+        role: c.role,
+        roleLabel: ROLE_LABELS[c.role] ?? "Core Synergy",
+        cmdr_rate: c.cmdr_rate,
+        score,
+        tier,
+        tierLabel: label,
+      };
+    });
 
     return Response.json({
       commander: { slug: cmdr.slug, name: cmdr.name, color_identity: cmdr.color_identity },
