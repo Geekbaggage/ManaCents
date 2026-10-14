@@ -7,6 +7,14 @@
 //   is normalized 60-99 across the returned list.
 // - Budget fill with silent role quotas (fractions of target count):
 //     synergy 0.50, ramp 0.15, draw(card advantage) 0.15, removal 0.10
+// - Budget utilization pass (both modes): if the score-greedy pick totals
+//   under 85% of budget, iteratively swap the lowest-synergy sub-$1 pick
+//   for the highest-synergy $2–$8 staple in the pool, stopping in the
+//   [85%, 98%] band. Guard: a swap never brings in a card scoring under
+//   60% of the card it replaces, so filling the budget never means buying
+//   a much worse card.
+// - Splash cornerstones prefer $3+ high-synergy cards (Big Splash wants a
+//   few high-impact staples, not penny cards).
 // - Basic lands are never recommended.
 
 const NOISE_FLOOR = 0.08;
@@ -103,10 +111,22 @@ export async function onRequestGet({ request, env }) {
     const fits = (card) => total + card.usd <= budget + 1e-9;
 
     if (mode === "splash") {
-      // Up to 2 top-raw-score cornerstones within 60% of budget.
+      // Up to 2 cornerstones: the priciest cards among the top scorers
+      // (each within 60% of budget). Big Splash is for a few high-impact
+      // staples — not the $0.10 cards the pure score ranking favors.
       let cornerstones = 0;
       for (const c of candidates) {
         if (cornerstones >= 2 || selected.length >= target) break;
+        if (c.usd >= 3 && total + c.usd <= budget * 0.6 + 1e-9) {
+          selected.push(c);
+          total += c.usd;
+          cornerstones++;
+        }
+      }
+      // Fallback: if no $3+ cornerstone fit, take top-by-score within 60%.
+      for (const c of candidates) {
+        if (cornerstones >= 2 || selected.length >= target) break;
+        if (selected.includes(c)) continue;
         if (total + c.usd <= budget * 0.6 + 1e-9) {
           selected.push(c);
           total += c.usd;
@@ -140,6 +160,46 @@ export async function onRequestGet({ request, env }) {
       if (selected.includes(c) || !fits(c)) continue;
       selected.push(c);
       total += c.usd;
+    }
+
+    // Phase C: budget utilization swap pass (both modes).
+    // The score-greedy pick above systematically favors the cheapest
+    // high-synergy cards, so a $40 budget can return ~$5 of penny cards.
+    // If the total sits under 85% of budget, iteratively swap the
+    // lowest-synergy sub-$1 pick for the highest-synergy $2–$8 staple
+    // remaining in the pool, stopping once the total lands in [85%, 98%].
+    // Guard: never swap in a card scoring under 60% of the card it
+    // replaces — using the budget must not mean buying a much worse card.
+    // If the pool has no valid swaps, the loop ends early and the total
+    // stays wherever the honest swaps got it.
+    const UTIL_LO = budget * 0.85;
+    const UTIL_HI = budget * 0.98;
+    if (total < UTIL_LO && selected.length > 0) {
+      for (;;) {
+        let dropIdx = -1;
+        let dropScore = Infinity;
+        selected.forEach((c, i) => {
+          if (c.usd < 1 && c.raw_score < dropScore) {
+            dropScore = c.raw_score;
+            dropIdx = i;
+          }
+        });
+        if (dropIdx === -1) break;
+        const drop = selected[dropIdx];
+        let swap = null;
+        for (const c of candidates) {
+          if (selected.includes(c)) continue;
+          if (c.usd < 2 || c.usd > 8) continue;
+          if (c.raw_score < drop.raw_score * 0.6) continue;
+          if (total - drop.usd + c.usd > UTIL_HI + 1e-9) continue;
+          swap = c;
+          break; // candidates are pre-sorted by raw_score desc
+        }
+        if (!swap) break;
+        selected[dropIdx] = swap;
+        total = total - drop.usd + swap.usd;
+        if (total >= UTIL_LO) break;
+      }
     }
 
     // Alternates for "Already own this? Swap it": next-best affordable cards

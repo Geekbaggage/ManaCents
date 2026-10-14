@@ -72,6 +72,7 @@ input:focus, select:focus, button:focus-visible {
 }
 .site-header img { width: 44px; height: 44px; border-radius: 10px; }
 .site-header .brand { font-size: 1.35rem; font-weight: 800; letter-spacing: 0.02em; }
+.brand-cents { color: #10B981; }
 .site-header .tagline { color: var(--gray); font-size: 0.85rem; }
 
 /* Landing */

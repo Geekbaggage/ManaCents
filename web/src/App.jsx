@@ -167,10 +167,9 @@ export default function App() {
     <>
       <div className="wrap">
         <header className="site-header">
-          <img src="/logo.jpg" alt="ManaCents" />
+          <img src="/logo-mark.png" alt="ManaCents" />
           <div>
-            <div className="brand">ManaCents</div>
-            <div className="tagline">Commander upgrades that respect your wallet</div>
+            <div className="brand">Mana<span className="brand-cents">Cents</span></div>
           </div>
         </header>
 
