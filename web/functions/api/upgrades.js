@@ -8,11 +8,13 @@
 // - Budget fill with silent role quotas (fractions of target count):
 //     synergy 0.50, ramp 0.15, draw(card advantage) 0.15, removal 0.10
 // - Budget utilization pass (both modes, budgets >= $15): if the score-greedy
-//   pick totals under 85% of budget, iteratively swap the lowest-synergy
-//   sub-$1 pick for the highest-synergy $2–$8 staple in the pool, preferring
-//   the same role, stopping in the [85%, 98%] band. Guards: a swap never
-//   brings in a card scoring under 60% of the card it replaces, so filling
-//   the budget never means buying a much worse card.
+//   pick totals under 85% of budget, iteratively swap the weakest sub-$1
+//   pick for the highest pure-synergy staple (raw_score * ln(usd + 1.5),
+//   i.e. synergy with the price dampener removed) priced $2–$max(8, 30% of
+//   budget) — the ceiling scales because a $50 budget has real $10–$15
+//   options a $15 budget doesn't — preferring the same role, stopping in
+//   the [85%, 98%] band. Guard: a swap's pure synergy never under 60% of
+//   the card it replaces.
 // - Splash cornerstones prefer $3+ high-synergy cards (Big Splash wants a
 //   few high-impact staples, not penny cards).
 // - Basic lands are never recommended.
@@ -163,37 +165,47 @@ export async function onRequestGet({ request, env }) {
     }
 
     // Phase C: budget utilization swap pass (both modes, budgets >= $15).
-    // The score-greedy pick above systematically favors the cheapest
-    // high-synergy cards, so a $40 budget can return ~$5 of penny cards.
-    // If the total sits under 85% of budget, iteratively swap the
-    // lowest-synergy sub-$1 pick for the highest-synergy $2–$8 staple
-    // remaining in the pool — preferring the same role so the role
-    // balance survives the swaps — stopping once the total lands in
-    // [85%, 98%]. Guard: never swap in a card scoring under 60% of the
-    // card it replaces — using the budget must not mean buying a much
-    // worse card. If the pool has no valid swaps, the loop ends early and
-    // the total stays wherever the honest swaps got it.
+    // The score-greedy pick above ranks by raw_score, which dampens synergy
+    // by ln(price) — so a $50 budget can return ~$20 of penny cards even
+    // when the pool holds $10–$15 staples with genuinely higher synergy.
+    // Pure synergy (raw_score * ln(usd + 1.5), i.e. the score with the price
+    // dampener removed) is the honest "how good is this card" metric, so
+    // the swap pass ranks by it: iteratively replace the weakest sub-$1
+    // pick (lowest pure synergy) with the highest pure-synergy staple
+    // priced $2–$max($8, 30%-of-budget) remaining in the pool — preferring
+    // the same role so the role balance survives — stopping once the total
+    // lands in [85%, 98%] of budget. Guard: never swap in a card whose
+    // pure synergy is under 60% of the card it replaces. If the pool has
+    // no valid swaps, the loop ends early and the total stays wherever
+    // the honest swaps got it.
     const UTIL_LO = budget * 0.85;
     const UTIL_HI = budget * 0.98;
+    const SWAP_MIN = 2;
+    const SWAP_MAX = Math.max(8, budget * 0.3);
+    const pureSynergy = (c) => c.raw_score * Math.log(c.usd + 1.5);
     if (budget >= 15 && total < UTIL_LO && selected.length > 0) {
       const findSwap = (drop, sameRole) => {
+        const dropSyn = pureSynergy(drop);
+        let best = null;
+        let bestSyn = -Infinity;
         for (const c of candidates) {
           if (selected.includes(c)) continue;
           if (sameRole && c.role !== drop.role) continue;
-          if (c.usd < 2 || c.usd > 8) continue;
-          if (c.raw_score < drop.raw_score * 0.6) continue;
+          if (c.usd < SWAP_MIN || c.usd > SWAP_MAX) continue;
+          const s = pureSynergy(c);
+          if (s < dropSyn * 0.6) continue;
           if (total - drop.usd + c.usd > UTIL_HI + 1e-9) continue;
-          return c; // candidates are pre-sorted by raw_score desc
+          if (s > bestSyn) { bestSyn = s; best = c; }
         }
-        return null;
+        return best;
       };
       for (;;) {
         let dropIdx = -1;
-        let dropScore = Infinity;
+        let dropSyn = Infinity;
         selected.forEach((c, i) => {
-          if (c.usd < 1 && c.raw_score < dropScore) {
-            dropScore = c.raw_score;
-            dropIdx = i;
+          if (c.usd < 1) {
+            const s = pureSynergy(c);
+            if (s < dropSyn) { dropSyn = s; dropIdx = i; }
           }
         });
         if (dropIdx === -1) break;
