@@ -78,6 +78,14 @@ input:focus, select:focus, button:focus-visible {
 /* Landing */
 .landing { padding: 3.5rem 0 4rem; text-align: center; }
 .landing h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); margin: 0.4rem 0 1.6rem; }
+/* Animated brand mark: one play on load, then rests on the final frame. */
+.hero-logo-anim {
+  display: block;
+  width: min(300px, 72vw);
+  height: auto;
+  margin: 0 auto 0.75rem;
+  border-radius: 1rem;
+}
 .fill-blank {
   display: flex; flex-wrap: wrap; gap: 0.6rem;
   align-items: center; justify-content: center;

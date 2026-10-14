@@ -129,6 +129,12 @@ function CardTile({ card, selected, onToggle, onSwap }) {
 
 export default function App() {
   const [view, setView] = useState("landing");
+  // Respect reduced-motion: show the poster's still instead of autoplaying.
+  const [reducedMotion] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+  );
   const [cmdrInput, setCmdrInput] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggest, setShowSuggest] = useState(false);
@@ -316,6 +322,25 @@ export default function App() {
 
         {view === "landing" && (
           <main className="landing">
+            {/* Animated brand mark: plays once on load, then rests on the final frame. */}
+            {reducedMotion ? (
+              <img
+                className="hero-logo-anim"
+                src="/logo-animated-poster.jpg"
+                alt="ManaCents logo"
+              />
+            ) : (
+              <video
+                className="hero-logo-anim"
+                src="/logo-animated.mp4"
+                poster="/logo-animated-poster.jpg"
+                autoPlay
+                muted
+                playsInline
+                preload="auto"
+                aria-label="Animated ManaCents logo"
+              />
+            )}
             <h1>Commander upgrades that respect your wallet.</h1>
             <div className="fill-blank">
               <span>Upgrade my</span>
