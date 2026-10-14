@@ -1,0 +1,1 @@
+{"description":"ManaCents — Commander upgrades that respect your wallet. Infra: Cloudflare D1 + GitHub Actions data pipelines.","devDependencies":{"wrangler":"^4.0.0"},"engines":{"node":">=20"},"name":"manacents","private":true,"scripts":{"price-sync":"node scripts/price-sync.mjs","synergy-sync":"node scripts/synergy-sync.mjs"},"type":"module","version":"0.1.0"}
