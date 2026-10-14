@@ -30,6 +30,16 @@ async function tableExists(name) {
 }
 
 async function main() {
+  // Storage hygiene: analytics tables grow forever, so prune anything older
+  // than 90 days. Missed-search intake only looks at the last 30 days, and
+  // 90 days of search history is plenty for trend reporting. Feedback and
+  // intake_log are tiny and kept indefinitely.
+  for (const t of ["search_log", "missed_searches"]) {
+    if (await tableExists(t)) {
+      await d1Query(`DELETE FROM ${t} WHERE created_at < datetime('now', '-90 days')`);
+    }
+  }
+
   const fields = [];
 
   if (await tableExists("search_log")) {
