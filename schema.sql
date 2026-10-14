@@ -68,3 +68,17 @@ CREATE TABLE IF NOT EXISTS feedback (
   cards_shown TEXT,     -- comma-separated names of the recommended cards on screen
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Search analytics: one row per search (added 2026-10-13 once Workers Paid
+-- made writes cheap). Powers "most searched commanders / popular budgets"
+-- reporting. Created idempotently by GET /api/upgrades.
+CREATE TABLE IF NOT EXISTS search_log (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  commander_slug TEXT,
+  commander_name TEXT,
+  budget REAL,
+  mode TEXT,            -- 'tuneup' or 'splash'
+  result_count INTEGER,
+  total REAL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);

@@ -16,7 +16,29 @@ export async function onRequestGet({ request, env }) {
     )
       .bind(like)
       .all();
-    return Response.json({ commanders: results ?? [] });
+    const commanders = results ?? [];
+    // Missed-search logging: a 5+ character query with zero matches almost
+    // always means a commander we don't carry yet. This table drives which
+    // commanders to add next. Best-effort, never blocks the response.
+    if (q.length >= 5 && commanders.length === 0) {
+      try {
+        await env.MANACENTS_DB.prepare(
+          `CREATE TABLE IF NOT EXISTS missed_searches (
+             id INTEGER PRIMARY KEY AUTOINCREMENT,
+             query TEXT,
+             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+           )`
+        ).run();
+        await env.MANACENTS_DB.prepare(
+          `INSERT INTO missed_searches (query) VALUES (?)`
+        )
+          .bind(q.slice(0, 60))
+          .run();
+      } catch {
+        // Analytics is best-effort.
+      }
+    }
+    return Response.json({ commanders });
   } catch (e) {
     return Response.json({ error: "Commander search failed." }, { status: 500 });
   }

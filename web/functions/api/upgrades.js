@@ -361,6 +361,32 @@ export async function onRequestGet({ request, env }) {
       };
     });
 
+    // Search analytics (Workers Paid made writes cheap): log every search so
+    // we learn which commanders/budgets are popular. Best-effort — never
+    // blocks or breaks the response.
+    try {
+      await env.MANACENTS_DB.prepare(
+        `CREATE TABLE IF NOT EXISTS search_log (
+           id INTEGER PRIMARY KEY AUTOINCREMENT,
+           commander_slug TEXT,
+           commander_name TEXT,
+           budget REAL,
+           mode TEXT,
+           result_count INTEGER,
+           total REAL,
+           created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+         )`
+      ).run();
+      await env.MANACENTS_DB.prepare(
+        `INSERT INTO search_log (commander_slug, commander_name, budget, mode, result_count, total)
+         VALUES (?, ?, ?, ?, ?, ?)`
+      )
+        .bind(cmdr.slug, cmdr.name, budget, mode, upgrades.length, Math.round(total * 100) / 100)
+        .run();
+    } catch {
+      // Analytics is best-effort; the search result is what matters.
+    }
+
     return Response.json({
       commander: { slug: cmdr.slug, name: cmdr.name, color_identity: cmdr.color_identity },
       budget,
