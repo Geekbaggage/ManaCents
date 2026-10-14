@@ -51,6 +51,8 @@ export default function App() {
   const [deselected, setDeselected] = useState(new Set());
   const [swaps, setSwaps] = useState({});
   const [showSkipped, setShowSkipped] = useState(false);
+  const [includeUniversal, setIncludeUniversal] = useState(false);
+  const [including, setIncluding] = useState(false);
   const [toast, setToast] = useState("");
   const suggestRef = useRef(null);
 
@@ -81,7 +83,7 @@ export default function App() {
     setShowSuggest(false);
   };
 
-  const submit = async () => {
+  const submit = async (withUniversal = false) => {
     setFormError("");
     if (!selectedCmdr) { setFormError("Choose a commander first."); return; }
     const budget = parseFloat(budgetInput);
@@ -89,11 +91,13 @@ export default function App() {
       setFormError("Enter a budget between $1 and $1,000.");
       return;
     }
-    setLoading(true);
+    if (withUniversal) setIncluding(true);
+    else setLoading(true);
     setResultError("");
     try {
-      const data = await fetchUpgrades(selectedCmdr.slug, budget, mode);
+      const data = await fetchUpgrades(selectedCmdr.slug, budget, mode, withUniversal);
       setResult(data);
+      setIncludeUniversal(withUniversal);
       setDeselected(new Set());
       setSwaps({});
       setShowSkipped(false);
@@ -103,6 +107,7 @@ export default function App() {
       setFormError(e.message);
     } finally {
       setLoading(false);
+      setIncluding(false);
     }
   };
 
@@ -215,7 +220,7 @@ export default function App() {
               </button>
             </div>
             <div>
-              <button className="primary" onClick={submit} disabled={loading} style={{ fontSize: "1.1rem", padding: "0.8rem 2rem" }}>
+              <button className="primary" onClick={() => submit(false)} disabled={loading} style={{ fontSize: "1.1rem", padding: "0.8rem 2rem" }}>
                 {loading ? "Building your list…" : "Find my upgrades"}
               </button>
             </div>
@@ -244,11 +249,14 @@ export default function App() {
                 </p>
               </div>
             )}
-            {result.skipped.length > 0 && (
+            {result.skipped.length > 0 && !includeUniversal && (
               <div>
                 <span className="skipped-pill">
                   Skipped {result.skipped.length} universal cards you likely already own
                   <button onClick={() => setShowSkipped((v) => !v)}>{showSkipped ? "Hide them" : "Show them"}</button>
+                  <button onClick={() => submit(true)} disabled={including}>
+                    {including ? "Including…" : "Include them anyway"}
+                  </button>
                 </span>
                 {showSkipped && (
                   <div className="skipped-list">

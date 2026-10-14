@@ -20,7 +20,7 @@ const ROLE_LABELS = {
   removal: "Stops Threats",
 };
 
-const QUOTAS = { synergy: 0.5, ramp: 0.15, draw: 0.15, removal: 0.1 };
+const QUOTAS = { synergy: 0.55, ramp: 0.2, draw: 0.15, removal: 0.1 };
 const TARGETS = { tuneup: 15, splash: 6 };
 const MIN_TARGETS = { tuneup: 12, splash: 4 };
 
@@ -35,6 +35,8 @@ export async function onRequestGet({ request, env }) {
   const slug = (url.searchParams.get("commander") || "").trim().toLowerCase();
   const budget = parseFloat(url.searchParams.get("budget") || "");
   const mode = url.searchParams.get("mode") === "splash" ? "splash" : "tuneup";
+  // "Include them anyway": bypass the universal ceiling (nothing is skipped).
+  const includeUniversal = url.searchParams.get("includeUniversal") === "1";
 
   if (!slug) return Response.json({ error: "Choose a commander first." }, { status: 400 });
   if (!Number.isFinite(budget) || budget < 1 || budget > 1000) {
@@ -80,15 +82,18 @@ export async function onRequestGet({ request, env }) {
 
     // Skipped universal staples (for the quiet pill): global_rate >= ceiling,
     // most-played first, basic lands excluded from this list too.
-    const skipped = rows
-      .filter((r) => r.global_rate >= UNIVERSAL_CEILING && !BASIC_LANDS.has(r.name))
-      .sort((a, b) => b.cmdr_rate - a.cmdr_rate)
-      .slice(0, 12)
-      .map((r) => ({ scryfall_id: r.scryfall_id, name: r.name, usd: r.usd, image_url: r.image_url }));
+    // With includeUniversal, nothing is skipped — the ceiling is bypassed.
+    const skipped = includeUniversal
+      ? []
+      : rows
+          .filter((r) => r.global_rate >= UNIVERSAL_CEILING && !BASIC_LANDS.has(r.name))
+          .sort((a, b) => b.cmdr_rate - a.cmdr_rate)
+          .slice(0, 12)
+          .map((r) => ({ scryfall_id: r.scryfall_id, name: r.name, usd: r.usd, image_url: r.image_url }));
 
-    // Candidates: ceiling applied, basic lands excluded.
+    // Candidates: ceiling applied (unless bypassed), basic lands excluded.
     const candidates = rows.filter(
-      (r) => r.global_rate < UNIVERSAL_CEILING && !BASIC_LANDS.has(r.name)
+      (r) => (includeUniversal || r.global_rate < UNIVERSAL_CEILING) && !BASIC_LANDS.has(r.name)
     );
 
     const target = TARGETS[mode];
@@ -142,14 +147,14 @@ export async function onRequestGet({ request, env }) {
     const selectedIds = new Set(selected.map((c) => c.scryfall_id));
     const alternates = candidates.filter((c) => !selectedIds.has(c.scryfall_id)).slice(0, 14);
 
-    // Normalize display scores 60-99 across the selected list (top = 99).
-    const raws = selected.map((c) => c.raw_score);
-    const maxRaw = Math.max(...raws, 0);
-    const minRaw = Math.min(...raws, 0);
-    const span = maxRaw - minRaw || 1;
+    // Display scores: round(60 + 39 * raw/highestRaw), clamped 60-99
+    // (matches the artifact's normalizeDisplayScore exactly).
+    const highestRaw = Math.max(...selected.map((c) => c.raw_score), 0) || 1;
+    const displayScore = (raw) =>
+      Math.max(60, Math.min(99, Math.round(60 + (39 * raw) / highestRaw)));
 
     const upgrades = selected.map((c) => {
-      const score = Math.max(60, Math.min(99, Math.round(60 + (39 * (c.raw_score - minRaw)) / span)));
+      const score = displayScore(c.raw_score);
       const { tier, label } = tierFor(score);
       return {
         scryfall_id: c.scryfall_id,
@@ -168,7 +173,7 @@ export async function onRequestGet({ request, env }) {
     // Alternates use the same normalization scale (they naturally score at or
     // below the selected list — truthful, no carried-over scores).
     const alternateItems = alternates.map((c) => {
-      const score = Math.max(60, Math.min(99, Math.round(60 + (39 * (c.raw_score - minRaw)) / span)));
+      const score = displayScore(c.raw_score);
       const { tier, label } = tierFor(score);
       return {
         scryfall_id: c.scryfall_id,
@@ -193,6 +198,7 @@ export async function onRequestGet({ request, env }) {
       upgrades,
       alternates: alternateItems,
       skipped,
+      includedUniversalCards: includeUniversal,
     });
   } catch (e) {
     return Response.json({ error: "ManaCents could not build the list. Please try again." }, { status: 500 });

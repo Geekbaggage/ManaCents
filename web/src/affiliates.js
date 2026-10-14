@@ -58,8 +58,13 @@ export function amazonSearchUrl(query) {
   return has(AFFILIATE_CODES.AMAZON_TAG) ? `${url}&tag=${AFFILIATE_CODES.AMAZON_TAG}` : url;
 }
 
-// Sleeves upsell: canonical Amazon search (no guessed product IDs).
-export const SLEEVES_URL = () => amazonSearchUrl("dragon shield matte sleeves 100 black");
+// Sleeves upsell: canonical Dragon Shield product URL (verified from the
+// ManaCents artifact source 2026-10-14 — no guessed product IDs).
+const SLEEVES_DP_URL = "https://www.amazon.com/dp/B00WX57O7M";
+export const SLEEVES_URL = () =>
+  has(AFFILIATE_CODES.AMAZON_TAG)
+    ? `${SLEEVES_DP_URL}?tag=${AFFILIATE_CODES.AMAZON_TAG}`
+    : SLEEVES_DP_URL;
 
 export function isEuLocale() {
   try {

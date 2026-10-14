@@ -6,8 +6,9 @@ export async function searchCommanders(q) {
   return data.commanders ?? [];
 }
 
-export async function fetchUpgrades(slug, budget, mode) {
+export async function fetchUpgrades(slug, budget, mode, includeUniversal = false) {
   const params = new URLSearchParams({ commander: slug, budget: String(budget), mode });
+  if (includeUniversal) params.set("includeUniversal", "1");
   const res = await fetch(`/api/upgrades?${params.toString()}`);
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "ManaCents could not build the list. Please try again.");
