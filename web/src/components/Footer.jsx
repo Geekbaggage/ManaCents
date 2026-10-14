@@ -14,9 +14,15 @@ export default function Footer() {
         </p>
       </section>
       <footer className="site-footer">
-        <div>
-          Fan-made tool. Not affiliated with or endorsed by Wizards of the Coast.
-          Magic: The Gathering is a trademark of Wizards of the Coast LLC.
+        <div className="legal">
+          ManaCents is unofficial Fan Content permitted under the Wizards of the Coast Fan
+          Content Policy. Not approved/endorsed by Wizards. Portions of the materials used
+          are property of Wizards of the Coast. ©Wizards of the Coast LLC.
+        </div>
+        <div className="legal">
+          Affiliate Disclosure: ManaCents participates in affiliate programs including
+          TCGplayer, Card Kingdom, and Mana Pool. Buying cards through links on this site
+          supports ManaCents at no extra cost to you.
         </div>
         <div className="credit">by Geekbaggage</div>
       </footer>

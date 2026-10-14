@@ -250,6 +250,7 @@ input:focus, select:focus, button:focus-visible {
   color: var(--gray); font-size: 0.82rem; line-height: 1.7;
 }
 .site-footer .credit { opacity: 0.75; }
+.site-footer .legal { color: #64748B; }
 
 /* Receipt */
 .receipt-preview { max-width: 100%; border-radius: var(--radius); border: 1px solid var(--teal); }
