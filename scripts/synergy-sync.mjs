@@ -24,6 +24,17 @@ const EDHREC_DELAY_MS = 300;
 const SCRYFALL_DELAY_MS = 150;
 const D1_BATCH_SIZE = 500;
 
+// Fulfillment mode (daily cron for user-requested commanders):
+// ONLY_PENDING=1 processes only `pending_sync` stubs, ordered by demand
+// (vote_count DESC, created_at ASC), capped per run so a burst of requests
+// can't turn the cron into an EDHREC rate-limit spike.
+const ONLY_PENDING = process.env.ONLY_PENDING === "1";
+const PENDING_LIMIT = parseInt(process.env.PENDING_LIMIT ?? "12", 10);
+const PENDING_JITTER_MIN_MS = 2000;
+const PENDING_JITTER_MAX_MS = 5000;
+const jitter = () =>
+  PENDING_JITTER_MIN_MS + Math.random() * (PENDING_JITTER_MAX_MS - PENDING_JITTER_MIN_MS);
+
 if (!TOKEN || !ACCOUNT_ID) {
   console.error("Missing CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID");
   process.exit(1);
@@ -128,7 +139,20 @@ async function cheapestStandardPrinting(name) {
 
 // Active commanders: prefer D1's registry (populated by prior runs); on a
 // cold start, fall back to the curated seed list.
+// In ONLY_PENDING mode: only user-requested stubs, most-voted first, capped.
 async function getCommanders() {
+  if (ONLY_PENDING) {
+    const rows = await d1Query(
+      `SELECT slug, name, color_identity, deck_count
+       FROM commanders
+       WHERE status = 'pending_sync'
+       ORDER BY vote_count DESC, created_at ASC
+       LIMIT ?`,
+      [PENDING_LIMIT]
+    );
+    console.log(`Fulfillment mode: ${rows.length} pending stub(s) (cap ${PENDING_LIMIT})`);
+    return rows;
+  }
   const rows = await d1Query(
     `SELECT slug, name FROM commanders ORDER BY deck_count DESC LIMIT 1000`
   );
@@ -181,7 +205,7 @@ function extractCommanderMeta(edhrecJson, fallback) {
 }
 
 async function resolveScryfallIds(names) {
-  // name -> {id, type_line, oracle_text, color_identity}
+  // name -> {id, type_line, oracle_text, color_identity, usd, image_url, ...}
   const out = new Map();
   const unique = [...new Set(names)];
   for (let i = 0; i < unique.length; i += 75) {
@@ -196,6 +220,9 @@ async function resolveScryfallIds(names) {
     for (const c of json.data ?? []) {
       // Use the canonical face for double-faced cards.
       const face = c.card_faces?.[0] ?? c;
+      // Price: Scryfall usd, fallback to usd_foil, floored at $0.10.
+      const rawUsd = parseFloat(c.prices?.usd) || parseFloat(c.prices?.usd_foil) || 0;
+      const usd = Math.max(0.1, rawUsd || 0.1);
       out.set(c.name, {
         id: c.id,
         type_line: face.type_line ?? c.type_line ?? "",
@@ -204,6 +231,8 @@ async function resolveScryfallIds(names) {
         set: c.set ?? "",
         set_type: c.set_type ?? "",
         promo: c.promo === true,
+        usd: usd.toFixed(2),
+        image_url: c.image_uris?.normal ?? face.image_uris?.normal ?? null,
       });
     }
     if (json.not_found?.length) {
@@ -222,8 +251,15 @@ async function main() {
   const tuples = [];
   for (const cmd of commanders) {
     const data = await fetchCommanderJson(cmd.slug);
-    await sleep(EDHREC_DELAY_MS);
-    if (!data) continue;
+    // Jittered delay in fulfillment mode so a burst of new commanders
+    // doesn't look like a scraper spike to EDHREC.
+    await sleep(ONLY_PENDING ? jitter() : EDHREC_DELAY_MS);
+    if (!data) {
+      // No EDHREC data yet (e.g. unreleased spoiler) — stays pending_sync
+      // and retries on the next run. Not a failure.
+      if (ONLY_PENDING) console.log(`No EDHREC data for ${cmd.slug} yet — remains queued`);
+      continue;
+    }
     const meta = extractCommanderMeta(data, cmd);
     cmd.name = meta.name;
     cmd.color_identity = meta.color_identity;
@@ -267,6 +303,7 @@ async function main() {
   // Pass 3: per commander, top-150 + top-40 per role.
   const stmts = [];
   const cmdrStmts = [];
+  const cardStmts = []; // fulfillment mode only: immediate card price backfill
   const byCommander = new Map();
   for (const t of tuples) {
     const r = resolved.get(t.name);
@@ -295,11 +332,35 @@ ON CONFLICT(slug) DO UPDATE SET name=excluded.name, color_identity=excluded.colo
 VALUES ('${esc(cmd.slug)}', '${c.id}', ${c.cmdr_rate}, '${c.role}', datetime('now'))
 ON CONFLICT(commander_slug, scryfall_id) DO UPDATE SET cmdr_rate=excluded.cmdr_rate,
   role=excluded.role, updated_at=excluded.updated_at;`);
+      // Fulfillment mode: backfill the cards table immediately so the new
+      // commander is fully functional (priced) without waiting for the
+      // nightly price-sync. Weekly mode leaves this to price-sync.
+      if (ONLY_PENDING) {
+        const usd = parseFloat(c.usd) || 0.1;
+        const priceLog = Math.log(usd + 1.5).toFixed(6);
+        cardStmts.push(`INSERT INTO cards (scryfall_id, name, usd, price_log, type_line, image_url, updated_at)
+VALUES ('${c.id}', '${esc(c.name)}', ${usd.toFixed(2)}, ${priceLog}, '${esc(c.type_line ?? "")}', ${c.image_url ? `'${c.image_url}'` : "NULL"}, datetime('now'))
+ON CONFLICT(scryfall_id) DO NOTHING;`);
+      }
     }
   }
   await d1Batch(cmdrStmts);
   await d1Batch(stmts);
   console.log(`Upserted ${cmdrStmts.length} commanders, ${stmts.length} synergy rows`);
+  if (ONLY_PENDING && cardStmts.length) {
+    await d1Batch(cardStmts);
+    console.log(`Backfilled ${cardStmts.length} card prices`);
+  }
+
+  // Fulfillment mode: flip successfully synced stubs to live. Commanders
+  // with no EDHREC data yet (spoilers) stay pending_sync for the next run.
+  if (ONLY_PENDING) {
+    const fulfilled = [...byCommander.keys()].filter((slug) => (byCommander.get(slug) ?? []).length > 0);
+    for (const slug of fulfilled) {
+      await d1Query(`UPDATE commanders SET status = 'live', updated_at = datetime('now') WHERE slug = ?`, [slug]);
+    }
+    console.log(`Marked ${fulfilled.length} commander(s) live`);
+  }
 
   // Step 1: rebuild global_rates FROM OUR OWN CORPUS (review fix 2026-10-13):
   // per card per full color identity = AVG inclusion across commanders of that identity.

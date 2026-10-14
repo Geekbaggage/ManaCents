@@ -18,3 +18,46 @@ export async function fetchUpgrades(slug, budget, mode, includeUniversal = false
 
 export const money = (n) =>
   `$${Number(n).toFixed(2).replace(/\.00$/, "")}`;
+
+// Commander requests: preview resolves the query via Scryfall without
+// writing; the confirm call creates the pending_sync stub (or votes).
+export async function previewCommanderRequest(query) {
+  const res = await fetch("/api/request-commander", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ query, preview: true }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Request failed.");
+  if (!data.ok) throw new Error(data.error || "Request failed.");
+  return data;
+}
+
+export async function confirmCommanderRequest(query) {
+  const res = await fetch("/api/request-commander", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ query }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Request failed.");
+  if (!data.ok) throw new Error(data.error || "Request failed.");
+  return data;
+}
+
+export async function voteCommander(slug) {
+  const res = await fetch("/api/request-commander/vote", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ slug }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Vote failed.");
+  return data;
+}
+
+export async function checkRequestStatus(oracle_id) {
+  const res = await fetch(`/api/request-commander?oracle_id=${encodeURIComponent(oracle_id)}`);
+  if (!res.ok) return { status: "unknown" };
+  return res.json();
+}

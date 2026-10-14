@@ -7,16 +7,32 @@ export async function onRequestGet({ request, env }) {
   }
   const like = `%${q.replace(/[%_\\]/g, "\\$&")}%`;
   try {
-    const { results } = await env.MANACENTS_DB.prepare(
-      `SELECT slug, name, color_identity, deck_count
-       FROM commanders
-       WHERE name LIKE ? ESCAPE '\\'
-       ORDER BY deck_count DESC
-       LIMIT 20`
-    )
-      .bind(like)
-      .all();
-    const commanders = results ?? [];
+    // status/vote_count exist after the request-commander migration; fall
+    // back to the base columns on a fresh DB where it hasn't run yet.
+    let commanders;
+    try {
+      ({ results: commanders } = await env.MANACENTS_DB.prepare(
+        `SELECT slug, name, color_identity, deck_count, status, vote_count
+         FROM commanders
+         WHERE name LIKE ? ESCAPE '\\'
+         ORDER BY deck_count DESC
+         LIMIT 20`
+      )
+        .bind(like)
+        .all());
+    } catch {
+      ({ results: commanders } = await env.MANACENTS_DB.prepare(
+        `SELECT slug, name, color_identity, deck_count
+         FROM commanders
+         WHERE name LIKE ? ESCAPE '\\'
+         ORDER BY deck_count DESC
+         LIMIT 20`
+      )
+        .bind(like)
+        .all());
+      commanders = (commanders ?? []).map((c) => ({ ...c, status: "live", vote_count: 0 }));
+    }
+    commanders = commanders ?? [];
     // Missed-search logging: a 5+ character query with zero matches almost
     // always means a commander we don't carry yet. This table drives which
     // commanders to add next. Best-effort, never blocks the response.

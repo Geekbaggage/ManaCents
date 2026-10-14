@@ -18,13 +18,22 @@ CREATE INDEX IF NOT EXISTS idx_cards_name ON cards(name);
 
 -- Commander registry. deck_count drives the "active commander" cutoff
 -- (top 1,000 by deck count, or >= 200 decks in the last 2 years).
+-- status: 'live' (full synergy data) or 'pending_sync' (user-requested stub
+-- awaiting the daily fulfillment cron). vote_count tracks request demand.
 CREATE TABLE IF NOT EXISTS commanders (
   slug TEXT PRIMARY KEY,
   name TEXT NOT NULL,
   color_identity TEXT NOT NULL,
   deck_count INTEGER DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'live',
+  oracle_id TEXT,
+  vote_count INTEGER NOT NULL DEFAULT 0,
+  image_url TEXT,
+  created_at TEXT DEFAULT (datetime('now')),
   updated_at TEXT DEFAULT (datetime('now'))
 );
+CREATE INDEX IF NOT EXISTS idx_commanders_oracle ON commanders(oracle_id);
+CREATE INDEX IF NOT EXISTS idx_commanders_status ON commanders(status);
 
 -- Format-wide staple inclusion per card per FULL color identity (all 32).
 -- Powers the 40% universal ceiling and the specificity denominator.

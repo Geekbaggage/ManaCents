@@ -1,7 +1,33 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { searchCommanders, fetchUpgrades, money } from "./api.js";
+import { searchCommanders, fetchUpgrades, money, previewCommanderRequest, confirmCommanderRequest, voteCommander, checkRequestStatus } from "./api.js";
 import CheckoutBar from "./components/CheckoutBar.jsx";
 import Footer from "./components/Footer.jsx";
+
+// localStorage watchlist: requested oracle_ids the user wants to hear about.
+// On app load we check whether any transitioned to live and toast.
+const WATCH_KEY = "manacents-watchlist";
+function loadWatchlist() {
+  try {
+    return JSON.parse(localStorage.getItem(WATCH_KEY) ?? "[]");
+  } catch {
+    return [];
+  }
+}
+function saveWatchlist(list) {
+  try {
+    localStorage.setItem(WATCH_KEY, JSON.stringify(list));
+  } catch {
+    // Private mode etc. — watchlist is best-effort.
+  }
+}
+function addToWatchlist(oracle_id, slug, name) {
+  if (!oracle_id) return;
+  const list = loadWatchlist();
+  if (!list.some((w) => w.oracle_id === oracle_id)) {
+    list.push({ oracle_id, slug, name, seen: false });
+    saveWatchlist(list);
+  }
+}
 
 function useDebounced(value, ms) {
   const [v, setV] = useState(value);
@@ -152,6 +178,11 @@ export default function App() {
   const [includeUniversal, setIncludeUniversal] = useState(false);
   const [including, setIncluding] = useState(false);
   const [toast, setToast] = useState("");
+  // Commander request flow (empty search → Scryfall preview → one-tap request).
+  const [requestPreview, setRequestPreview] = useState(null);
+  const [requestLoading, setRequestLoading] = useState(false);
+  const [requestError, setRequestError] = useState("");
+  const [requestDone, setRequestDone] = useState(null);
   const suggestRef = useRef(null);
 
   const debouncedQuery = useDebounced(cmdrInput, 260);
@@ -174,6 +205,94 @@ export default function App() {
     const t = setTimeout(() => setToast(""), 2600);
     return () => clearTimeout(t);
   }, [toast]);
+
+  // Watchlist: on load, check whether any requested commander went live.
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const list = loadWatchlist().filter((w) => !w.seen && w.oracle_id);
+      if (!list.length) return;
+      let changed = false;
+      for (const w of list) {
+        try {
+          const s = await checkRequestStatus(w.oracle_id);
+          if (!alive) return;
+          if (s.status === "live") {
+            w.seen = true;
+            changed = true;
+            setToast(`🎉 ${w.name} is now live — search for it to see upgrades!`);
+            break; // one toast at a time
+          }
+        } catch {
+          // Status check is best-effort.
+        }
+      }
+      if (changed) saveWatchlist(list);
+    })();
+    return () => { alive = false; };
+  }, []);
+
+  // Empty-search request flow: preview the Scryfall match, then one-tap request.
+  const startRequestPreview = async () => {
+    const q = cmdrInput.trim();
+    if (q.length < 2 || requestLoading) return;
+    setRequestLoading(true);
+    setRequestError("");
+    setRequestPreview(null);
+    try {
+      const data = await previewCommanderRequest(q);
+      setRequestPreview(data);
+    } catch (e) {
+      setRequestError(e.message);
+    } finally {
+      setRequestLoading(false);
+    }
+  };
+
+  const sendCommanderRequest = async () => {
+    const q = cmdrInput.trim();
+    if (requestLoading) return;
+    setRequestLoading(true);
+    setRequestError("");
+    try {
+      const data = await confirmCommanderRequest(q);
+      setRequestDone(data);
+      setRequestPreview(null);
+      if (data.oracle_id) addToWatchlist(data.oracle_id, data.slug, data.name);
+      // If the stub was created, make it selectable immediately.
+      if (data.slug && data.name && !data.alreadyLive) {
+        setSelectedCmdr({ slug: data.slug, name: data.name, status: "pending_sync", vote_count: data.vote_count ?? 1 });
+        setCmdrInput(data.name);
+        setShowSuggest(false);
+      }
+    } catch (e) {
+      setRequestError(e.message);
+    } finally {
+      setRequestLoading(false);
+    }
+  };
+
+  const cancelRequestFlow = () => {
+    setRequestPreview(null);
+    setRequestDone(null);
+    setRequestError("");
+  };
+
+  // Vote on a stub commander page ("+1 / Notify me when ready").
+  const voteForStub = async () => {
+    if (!result?.stub || requestLoading) return;
+    setRequestLoading(true);
+    try {
+      const data = await voteCommander(result.commander.slug);
+      setResult((r) => ({ ...r, vote_count: data.vote_count }));
+      if (data.oracle_id) addToWatchlist(data.oracle_id, data.slug, data.name);
+      setToast(data.already_live ? "This commander is already live!" : "Vote counted — we'll let you know when it's ready! 🎉");
+    } catch (e) {
+      setToast(e.message);
+    } finally {
+      setRequestLoading(false);
+    }
+  };
 
   const pickCommander = (c) => {
     setSelectedCmdr(c);
@@ -356,12 +475,76 @@ export default function App() {
                 />
                 {showSuggest && (
                   <ul role="listbox">
-                    {suggestions.length === 0 && <li><button type="button" disabled>No commanders found.</button></li>}
+                    {suggestions.length === 0 && !requestPreview && !requestDone && (
+                      <li className="request-empty">
+                        {cmdrInput.trim().length >= 5 ? (
+                          <>
+                            <span className="request-prompt">Don't see your commander?</span>
+                            <button type="button" className="ghost" onClick={startRequestPreview} disabled={requestLoading}>
+                              {requestLoading ? "Looking it up…" : `Look up "${cmdrInput.trim().slice(0, 30)}"`}
+                            </button>
+                            {requestError && <span className="form-error">{requestError}</span>}
+                          </>
+                        ) : (
+                          <button type="button" disabled>No commanders found.</button>
+                        )}
+                      </li>
+                    )}
+                    {requestPreview && !requestDone && (
+                      <li className="request-card">
+                        {requestPreview.existing ? (
+                          <>
+                            <span>We already have <strong>{requestPreview.existing.name}</strong>
+                              {requestPreview.existing.status === "pending_sync"
+                                ? ` — indexing now (${requestPreview.existing.vote_count ?? 1} votes). Pick it from the list above once it appears, or vote on its page.`
+                                : " — pick it from the suggestions!"}
+                            </span>
+                            <button type="button" className="ghost" onClick={cancelRequestFlow}>Close</button>
+                          </>
+                        ) : (
+                          <>
+                            {requestPreview.card.image_url && (
+                              <img src={requestPreview.card.image_url} alt={requestPreview.card.name} loading="lazy" />
+                            )}
+                            <div>
+                              <strong>{requestPreview.card.name}</strong>
+                              <span className="request-type">{requestPreview.card.type_line}</span>
+                              {requestPreview.unreleased && (
+                                <span className="request-note">Unreleased spoiler — it'll sync once data is available.</span>
+                              )}
+                              <div className="request-actions">
+                                <button type="button" className="primary" onClick={sendCommanderRequest} disabled={requestLoading}>
+                                  {requestLoading ? "Requesting…" : `Request ${requestPreview.card.front_name}`}
+                                </button>
+                                <button type="button" className="ghost" onClick={cancelRequestFlow}>Cancel</button>
+                              </div>
+                              {requestError && <span className="form-error">{requestError}</span>}
+                            </div>
+                          </>
+                        )}
+                      </li>
+                    )}
+                    {requestDone && (
+                      <li className="request-done">
+                        {requestDone.alreadyLive ? (
+                          <span><strong>{requestDone.name}</strong> is already live — pick it from the suggestions!</span>
+                        ) : requestDone.alreadyRequested ? (
+                          <span>Good news — <strong>{requestDone.name}</strong> was already requested ({requestDone.vote_count} votes). It'll be live within 48 hours.</span>
+                        ) : (
+                          <span>Request received — <strong>{requestDone.name}</strong> will be live within 48 hours. 🎉</span>
+                        )}
+                        <button type="button" className="ghost" onClick={cancelRequestFlow}>Close</button>
+                      </li>
+                    )}
                     {suggestions.map((c) => (
                       <li key={c.slug}>
                         <button type="button" onClick={() => pickCommander(c)}>
                           <span>{c.name}</span>
-                          <span className="decks">{c.deck_count?.toLocaleString?.() ?? ""} decks</span>
+                          {c.status === "pending_sync" ? (
+                            <span className="decks stub-badge">indexing…</span>
+                          ) : (
+                            <span className="decks">{c.deck_count?.toLocaleString?.() ?? ""} decks</span>
+                          )}
                         </button>
                       </li>
                     ))}
@@ -458,6 +641,27 @@ export default function App() {
               </div>
             </div>
 
+            {result.stub ? (
+              <div className="indexing-banner">
+                {result.commander.image_url && (
+                  <img src={result.commander.image_url} alt={result.commander.name} loading="lazy" />
+                )}
+                <div>
+                  <h2>🔨 Indexing synergies</h2>
+                  <p>
+                    <strong>{result.commander.name}</strong> was just requested and we're
+                    building its upgrade list. Full results arrive within 48 hours.
+                  </p>
+                  <p className="vote-count">
+                    {result.vote_count} {result.vote_count === 1 ? "person wants" : "people want"} this commander
+                  </p>
+                  <button type="button" className="primary" onClick={voteForStub} disabled={requestLoading}>
+                    {requestLoading ? "Voting…" : "+1 Notify me when ready"}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
             {result.skipped.length > 0 && !includeUniversal && (
               <div className="smart-banner merged">
                 <p>
@@ -531,15 +735,19 @@ export default function App() {
                 />
               </>
             )}
+              </>
+            )}
 
-            <CheckoutBar
-              commander={result.commander}
-              budget={result.budget}
-              cards={selectedCards}
-              total={total}
-              remaining={remaining}
-              onToast={setToast}
-            />
+            {!result.stub && (
+              <CheckoutBar
+                commander={result.commander}
+                budget={result.budget}
+                cards={selectedCards}
+                total={total}
+                remaining={remaining}
+                onToast={setToast}
+              />
+            )}
           </main>
         )}
 

@@ -1,0 +1,35 @@
+# ManaCents daily commander fulfillment — builds synergy data for
+# user-requested commander stubs (status = 'pending_sync').
+#
+# Processes the most-voted stubs first (vote_count DESC), capped per run
+# with jittered EDHREC delays, so a burst of requests can't trigger a
+# rate limit. Stubs with no EDHREC data yet (unreleased spoilers) stay
+# queued and retry the next day.
+name: fulfill-requests
+
+# Same concurrency group as the other D1 writers: never overlaps with
+# price-sync or the weekly synergy-sync.
+concurrency:
+  group: manacents-d1
+  cancel-in-progress: false
+
+on:
+  schedule:
+    - cron: "0 7 * * *" # Daily 07:00 UTC (after the nightly price-sync)
+  workflow_dispatch: # manual trigger
+
+jobs:
+  fulfill:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Fulfill pending commander requests
+        env:
+CLOUDFLARE_API_TOKEN: <redacted>
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          ONLY_PENDING: "1"
+          PENDING_LIMIT: "12"
+        run: node scripts/synergy-sync.mjs

@@ -112,6 +112,31 @@ input:focus, select:focus, button:focus-visible {
 }
 .cmdr-suggest li button:hover, .cmdr-suggest li button.active { background: var(--teal); }
 .cmdr-suggest .decks { color: var(--gray); font-size: 0.8rem; }
+.cmdr-suggest .stub-badge { color: var(--gold); font-style: italic; }
+
+/* Commander request flow (empty search → Scryfall preview → one-tap). */
+.cmdr-suggest .request-empty { padding: 0.55rem 0.7rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.cmdr-suggest .request-prompt { color: var(--gray); font-size: 0.9rem; }
+.cmdr-suggest .request-card { padding: 0.7rem; display: flex; gap: 0.7rem; align-items: flex-start; }
+.cmdr-suggest .request-card img { width: 64px; border-radius: 8px; flex-shrink: 0; }
+.cmdr-suggest .request-card > div { display: flex; flex-direction: column; gap: 0.35rem; min-width: 0; }
+.cmdr-suggest .request-type { color: var(--gray); font-size: 0.8rem; }
+.cmdr-suggest .request-note { color: var(--gold); font-size: 0.8rem; font-style: italic; }
+.cmdr-suggest .request-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.cmdr-suggest .request-done { padding: 0.7rem; display: flex; flex-direction: column; gap: 0.5rem; }
+
+/* Stub commander page: indexing banner. */
+.indexing-banner {
+  display: flex; gap: 1.2rem; align-items: center;
+  background: var(--slate-2); border: 1px solid var(--gold);
+  border-radius: var(--radius); padding: 1.5rem; margin: 1.5rem 0;
+}
+.indexing-banner img { width: 120px; border-radius: 10px; flex-shrink: 0; }
+.indexing-banner h2 { margin: 0 0 0.5rem; }
+.indexing-banner .vote-count { color: var(--gray); font-size: 0.9rem; margin: 0.5rem 0 1rem; }
+@media (max-width: 560px) {
+  .indexing-banner { flex-direction: column; text-align: center; }
+}
 
 .mode-toggle {
   display: inline-flex; background: var(--slate); border: 1px solid var(--teal);

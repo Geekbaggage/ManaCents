@@ -54,16 +54,48 @@ export async function onRequestGet({ request, env }) {
   }
 
   try {
-    const cmdr = await env.MANACENTS_DB.prepare(
-      `SELECT slug, name, color_identity, deck_count FROM commanders WHERE slug = ?`
-    )
-      .bind(slug)
-      .first();
+    // status/image_url/vote_count come from the request-commander migration;
+    // fall back gracefully on a DB where it hasn't run yet.
+    let cmdr;
+    try {
+      cmdr = await env.MANACENTS_DB.prepare(
+        `SELECT slug, name, color_identity, deck_count, status, vote_count, image_url
+         FROM commanders WHERE slug = ?`
+      )
+        .bind(slug)
+        .first();
+    } catch {
+      cmdr = await env.MANACENTS_DB.prepare(
+        `SELECT slug, name, color_identity, deck_count FROM commanders WHERE slug = ?`
+      )
+        .bind(slug)
+        .first();
+      if (cmdr) cmdr.status = "live";
+    }
     if (!cmdr) {
       return Response.json(
         { error: "That card is not a Commander-eligible card. Pick a name from the suggestions and try again." },
         { status: 404 }
       );
+    }
+
+    // Stage 1 stub: the commander was requested but the daily fulfillment
+    // cron hasn't built synergy data yet. Render the "indexing" state —
+    // never an empty/broken card list.
+    if (cmdr.status === "pending_sync") {
+      return Response.json({
+        stub: true,
+        commander: {
+          slug: cmdr.slug,
+          name: cmdr.name,
+          color_identity: cmdr.color_identity,
+          image_url: cmdr.image_url ?? null,
+        },
+        vote_count: cmdr.vote_count ?? 1,
+        budget,
+        mode,
+        upgrades: [],
+      });
     }
 
     // type_line was added 2026-10-13 and backfills on the next price-sync;
