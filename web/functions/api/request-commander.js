@@ -122,13 +122,42 @@ async function checkRateLimit(db, request) {
   }
 }
 
-async function resolveCard(query) {
+async function searchCommanderCandidates(query) {
+  // Primary lookup: commander-only search, EDHREC-ordered. Filtering by
+  // is:commander BEFORE matching strips out non-commander collisions
+  // ("Captain America's Shield", "Protean Hulk") and never 404s on ambiguous
+  // queries ("hulk") the way /cards/named?fuzzy= does.
+  const res = await fetch(
+    `https://api.scryfall.com/cards/search?q=is%3Acommander+${encodeURIComponent(query)}&order=edhrec&unique=cards`,
+    { headers: API_HEADERS }
+  );
+  if (res.status === 404) return [];
+  if (!res.ok) throw new Error(`Scryfall ${res.status}`);
+  const json = await res.json();
+  const out = [];
+  for (const card of json.data ?? []) {
+    if (out.length >= 4) break;
+    const v = validateCommander(card);
+    if (!v.ok) continue;
+    out.push({ card, unreleased: v.unreleased });
+  }
+  return out;
+}
+
+async function resolveCommanderCandidates(query) {
+  const candidates = await searchCommanderCandidates(query);
+  if (candidates.length) return { candidates };
+  // Fallback: typo tolerance ("Atrexa") — Scryfall's q= search doesn't
+  // fuzzy-correct, so fall back to /cards/named?fuzzy= for misspellings.
   const res = await fetch(`https://api.scryfall.com/cards/named?fuzzy=${encodeURIComponent(query)}`, {
     headers: API_HEADERS,
   });
-  if (res.status === 404) return { error: "We couldn't find that card on Scryfall — check the spelling and try again." };
+  if (res.status === 404) return { error: "We couldn't find that commander on Scryfall — check the spelling and try again." };
   if (!res.ok) throw new Error(`Scryfall ${res.status}`);
-  return { card: await res.json() };
+  const card = await res.json();
+  const v = validateCommander(card);
+  if (!v.ok) return { error: `"${card.name}" ${v.reason}.` };
+  return { candidates: [{ card, unreleased: v.unreleased }] };
 }
 
 function cardPreview(card) {
@@ -216,40 +245,60 @@ export async function onRequestPost({ request, env }) {
     await ensureSchema(env.MANACENTS_DB);
     const db = env.MANACENTS_DB;
 
-    // Resolve via Scryfall fuzzy (handles typos: "Kellan fae blooded").
-    const { card, error } = await resolveCard(query);
+    // Resolve via commander-only Scryfall search (EDHREC-ordered, up to 4
+    // candidates), with fuzzy fallback for typos.
+    const { candidates, error } = await resolveCommanderCandidates(query);
     if (error) return Response.json({ ok: false, error });
-    const preview = cardPreview(card);
+    if (!candidates.length) {
+      return Response.json({ ok: false, error: "We couldn't find that commander on Scryfall — check the spelling and try again." });
+    }
 
-    // Validate commander legality (traps: DFCs, vehicles, spoilers, Backgrounds).
+    // Preview mode: return the candidates for the pick-one UI. No DB writes,
+    // no rate-limit consumption — typing in the search bar never burns quota.
+    if (previewOnly) {
+      const out = [];
+      for (const { card, unreleased } of candidates) {
+        const preview = cardPreview(card);
+        let existing = await db
+          .prepare(`SELECT slug, name, status, vote_count FROM commanders WHERE oracle_id = ?`)
+          .bind(preview.oracle_id)
+          .first();
+        // Fall back to slug match for the pre-existing 300 (oracle_id NULL).
+        if (!existing) {
+          existing = await db
+            .prepare(`SELECT slug, name, status, vote_count FROM commanders WHERE slug = ?`)
+            .bind(preview.slug)
+            .first();
+        }
+        out.push({
+          ...preview,
+          unreleased,
+          existing: existing
+            ? { slug: existing.slug, name: existing.name, status: existing.status ?? "live", vote_count: existing.vote_count }
+            : null,
+        });
+      }
+      return Response.json({ ok: true, preview: true, candidates: out });
+    }
+
+    // Confirm mode: the user picked one candidate. Pin it by oracle_id so a
+    // re-resolve can't drift to a different card ("Captain America's Shield").
+    const oracleId = (body.oracle_id || "").trim();
+    let pick = null;
+    if (oracleId) {
+      pick = candidates.find((c) => c.card.oracle_id === oracleId) ?? null;
+      if (!pick) {
+        return Response.json({ ok: false, error: "That match expired — look it up again." });
+      }
+    } else {
+      // Legacy query-only confirm: take the top candidate.
+      pick = candidates[0];
+    }
+    const card = pick.card;
+    const preview = cardPreview(card);
     const validation = validateCommander(card);
     if (!validation.ok) {
       return Response.json({ ok: false, error: `"${card.name}" ${validation.reason}.` });
-    }
-
-    // Preview mode: return the card for the one-tap confirm UI. No DB writes,
-    // no rate-limit consumption — typing in the search bar never burns quota.
-    if (previewOnly) {
-      let existing = await db
-        .prepare(`SELECT slug, name, status, vote_count FROM commanders WHERE oracle_id = ?`)
-        .bind(preview.oracle_id)
-        .first();
-      // Fall back to slug match for the pre-existing 300 (oracle_id NULL).
-      if (!existing) {
-        existing = await db
-          .prepare(`SELECT slug, name, status, vote_count FROM commanders WHERE slug = ?`)
-          .bind(preview.slug)
-          .first();
-      }
-      return Response.json({
-        ok: true,
-        preview: true,
-        card: preview,
-        unreleased: validation.unreleased,
-        existing: existing
-          ? { slug: existing.slug, name: existing.name, status: existing.status ?? "live", vote_count: existing.vote_count }
-          : null,
-      });
     }
 
     if (!(await checkRateLimit(db, request))) {

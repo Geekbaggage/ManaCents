@@ -143,6 +143,12 @@ input:focus, select:focus, button:focus-visible {
 .cmdr-suggest .request-note { color: var(--gold); font-size: 0.8rem; font-style: italic; }
 .cmdr-suggest .request-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 .cmdr-suggest .request-done { padding: 0.7rem; display: flex; flex-direction: column; gap: 0.5rem; }
+/* Multi-candidate request picker (is:commander disambiguation) */
+.cmdr-suggest .request-candidates { padding: 0.55rem 0.7rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.cmdr-suggest .request-candidate { display: flex; gap: 0.7rem; align-items: flex-start; padding: 0.45rem; border-radius: 8px; }
+.cmdr-suggest .request-candidate:hover { background: var(--slate-2); }
+.cmdr-suggest .request-candidate img { width: 52px; border-radius: 8px; flex-shrink: 0; }
+.cmdr-suggest .request-candidate > div { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }
 
 /* Stub commander page: indexing banner. */
 .indexing-banner {

@@ -327,13 +327,13 @@ export default function App() {
     }
   };
 
-  const sendCommanderRequest = async () => {
+  const sendCommanderRequest = async (candidate) => {
     const q = cmdrInput.trim();
-    if (requestLoading) return;
+    if (requestLoading || !candidate) return;
     setRequestLoading(true);
     setRequestError("");
     try {
-      const data = await confirmCommanderRequest(q);
+      const data = await confirmCommanderRequest({ oracle_id: candidate.oracle_id, query: q });
       setRequestDone(data);
       setRequestPreview(null);
       if (data.oracle_id) addToWatchlist(data.oracle_id, data.slug, data.name);
@@ -589,38 +589,40 @@ export default function App() {
                         )}
                       </li>
                     )}
-                    {requestPreview && !requestDone && (
-                      <li className="request-card">
-                        {requestPreview.existing ? (
-                          <>
-                            <span>We already have <strong>{requestPreview.existing.name}</strong>
-                              {requestPreview.existing.status === "pending_sync"
-                                ? ` — indexing now (${requestPreview.existing.vote_count ?? 1} votes). Pick it from the list above once it appears, or vote on its page.`
-                                : " — pick it from the suggestions!"}
-                            </span>
-                            <button type="button" className="ghost" onClick={cancelRequestFlow}>Close</button>
-                          </>
-                        ) : (
-                          <>
-                            {requestPreview.card.image_url && (
-                              <img src={requestPreview.card.image_url} alt={requestPreview.card.name} loading="lazy" />
+                    {requestPreview && !requestDone && (requestPreview.candidates?.length ?? 0) > 0 && (
+                      <li className="request-candidates">
+                        <span className="request-prompt">
+                          {requestPreview.candidates.length > 1 ? "Which one did you mean?" : "Found it — request it?"}
+                        </span>
+                        {requestPreview.candidates.map((cand) => (
+                          <div key={cand.oracle_id} className="request-candidate">
+                            {cand.image_url && (
+                              <img src={cand.image_url} alt={cand.name} loading="lazy" />
                             )}
                             <div>
-                              <strong>{requestPreview.card.name}</strong>
-                              <span className="request-type">{requestPreview.card.type_line}</span>
-                              {requestPreview.unreleased && (
+                              <strong>{cand.name}</strong>
+                              <span className="request-type">{cand.type_line}</span>
+                              {cand.unreleased && (
                                 <span className="request-note">Unreleased spoiler — it'll sync once data is available.</span>
                               )}
-                              <div className="request-actions">
-                                <button type="button" className="primary" onClick={sendCommanderRequest} disabled={requestLoading}>
-                                  {requestLoading ? "Requesting…" : `Request ${requestPreview.card.front_name}`}
-                                </button>
-                                <button type="button" className="ghost" onClick={cancelRequestFlow}>Cancel</button>
-                              </div>
-                              {requestError && <span className="form-error">{requestError}</span>}
+                              {cand.existing ? (
+                                <span className="request-note">
+                                  {cand.existing.status === "pending_sync"
+                                    ? `Already requested (${cand.existing.vote_count ?? 1} votes) — indexing now.`
+                                    : "Already live — pick it from the suggestions!"}
+                                </span>
+                              ) : (
+                                <div className="request-actions">
+                                  <button type="button" className="primary" onClick={() => sendCommanderRequest(cand)} disabled={requestLoading}>
+                                    {requestLoading ? "Requesting…" : `Request ${cand.front_name}`}
+                                  </button>
+                                </div>
+                              )}
                             </div>
-                          </>
-                        )}
+                          </div>
+                        ))}
+                        {requestError && <span className="form-error">{requestError}</span>}
+                        <button type="button" className="ghost" onClick={cancelRequestFlow}>Cancel</button>
                       </li>
                     )}
                     {requestDone && (

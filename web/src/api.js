@@ -42,11 +42,14 @@ export async function previewCommanderRequest(query) {
   return data;
 }
 
-export async function confirmCommanderRequest(query) {
+export async function confirmCommanderRequest(queryOrSelection) {
+  // String query = legacy top-pick confirm; { oracle_id, query } pins the
+  // exact candidate the user tapped in the disambiguation list.
+  const body = typeof queryOrSelection === "string" ? { query: queryOrSelection } : queryOrSelection;
   const res = await fetch("/api/request-commander", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ query }),
+    body: JSON.stringify(body),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Request failed.");
