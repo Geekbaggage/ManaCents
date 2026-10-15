@@ -131,7 +131,10 @@ async function searchCommanderCandidates(query) {
     `https://api.scryfall.com/cards/search?q=is%3Acommander+${encodeURIComponent(query)}&order=edhrec&unique=cards`,
     { headers: API_HEADERS }
   );
-  if (res.status === 404) return [];
+  // Malformed queries (unmatched parens/quotes) return 400, not 404 —
+  // treat both as "no matches" so we fall back to the typo-tolerant lookup
+  // instead of throwing a 500.
+  if (res.status === 404 || res.status === 400) return [];
   if (!res.ok) throw new Error(`Scryfall ${res.status}`);
   const json = await res.json();
   const out = [];

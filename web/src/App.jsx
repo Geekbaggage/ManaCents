@@ -606,11 +606,17 @@ export default function App() {
                                 <span className="request-note">Unreleased spoiler — it'll sync once data is available.</span>
                               )}
                               {cand.existing ? (
-                                <span className="request-note">
-                                  {cand.existing.status === "pending_sync"
-                                    ? `Already requested (${cand.existing.vote_count ?? 1} votes) — indexing now.`
-                                    : "Already live — pick it from the suggestions!"}
-                                </span>
+                                cand.existing.status === "pending_sync" ? (
+                                  <span className="request-note">
+                                    {`Already requested (${cand.existing.vote_count ?? 1} votes) — indexing now.`}
+                                  </span>
+                                ) : (
+                                  <div className="request-actions">
+                                    <button type="button" className="ghost" onClick={() => pickCommander(cand.existing)}>
+                                      Select {cand.existing.name}
+                                    </button>
+                                  </div>
+                                )
                               ) : (
                                 <div className="request-actions">
                                   <button type="button" className="primary" onClick={() => sendCommanderRequest(cand)} disabled={requestLoading}>
