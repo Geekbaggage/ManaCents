@@ -24,6 +24,9 @@ export default function Footer() {
           TCGplayer, Card Kingdom, and Mana Pool. Buying cards through links on this site
           supports ManaCents at no extra cost to you.
         </div>
+        <div className="legal">
+          Questions or feedback? <a href="mailto:hello@manacents.com">hello@manacents.com</a>
+        </div>
         <div className="credit">by Geekbaggage</div>
       </footer>
     </>
