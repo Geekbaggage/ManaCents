@@ -20,11 +20,6 @@ export default function Footer() {
           are property of Wizards of the Coast. ©Wizards of the Coast LLC.
         </div>
         <div className="legal">
-          Affiliate Disclosure: ManaCents participates in affiliate programs including
-          TCGplayer, Card Kingdom, and Mana Pool. Buying cards through links on this site
-          supports ManaCents at no extra cost to you.
-        </div>
-        <div className="legal">
           Questions or feedback? <a href="mailto:hello@manacents.com">hello@manacents.com</a>
         </div>
         <div className="credit">by Geekbaggage</div>
