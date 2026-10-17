@@ -18,6 +18,16 @@ export default function About({ onBack }) {
         upgrade list. Cards that punch above their price — synergy, ramp, card
         draw, removal — priced with real market data, refreshed nightly.
       </p>
+      <p>
+        Built after years of playing Magic with friends, the way it&apos;s meant
+        to be played.
+      </p>
+      <p className="dedication">
+        <em>
+          In memory of Mortise &ldquo;Tony&rdquo; Addams — my best friend, who
+          taught me Magic. He is gone, but the magic he shared stayed.
+        </em>
+      </p>
       <h2>Say hi</h2>
       <p>
         <a href="mailto:hello@manacents.com">hello@manacents.com</a>
