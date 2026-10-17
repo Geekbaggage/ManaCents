@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function Footer() {
+export default function Footer({ onAbout }) {
   return (
     <>
       <section className="method">
@@ -21,6 +21,8 @@ export default function Footer() {
         </div>
         <div className="legal">
           Questions or feedback? <a href="mailto:hello@manacents.com">hello@manacents.com</a>
+          {" · "}
+          <button type="button" className="linklike" onClick={onAbout}>About</button>
         </div>
         <div className="credit">by Geekbaggage</div>
       </footer>

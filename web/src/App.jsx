@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import Fuse from "fuse.js";
 import { searchCommanders, fetchAllCommanders, fetchUpgrades, money, previewCommanderRequest, confirmCommanderRequest, voteCommander, checkRequestStatus } from "./api.js";
 import CheckoutBar from "./components/CheckoutBar.jsx";
+import About from "./components/About.jsx";
 import Footer from "./components/Footer.jsx";
 
 // Color-identity filter chips. Exact-match semantics: a commander shows only
@@ -177,6 +178,12 @@ function CardTile({ card, selected, onToggle, onSwap }) {
 
 export default function App() {
   const [view, setView] = useState("landing");
+
+  // Scroll to top and set the page title when switching views.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    document.title = view === "about" ? "About — ManaCents" : "ManaCents — Commander upgrades that respect your wallet";
+  }, [view]);
   // Respect reduced-motion: show the poster's still instead of autoplaying.
   const [reducedMotion] = useState(
     () =>
@@ -516,6 +523,10 @@ export default function App() {
             <div className="brand">Mana<span className="brand-cents">Cents</span></div>
           </div>
         </header>
+
+        {view === "about" && (
+          <About onBack={() => setView("landing")} />
+        )}
 
         {view === "landing" && (
           <main className="landing">
@@ -861,7 +872,7 @@ export default function App() {
           </main>
         )}
 
-        <Footer />
+        <Footer onAbout={() => setView("about")} />
       </div>
       {toast && <div className="toast" role="status">{toast}</div>}
     </>

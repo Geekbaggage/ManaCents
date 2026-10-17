@@ -391,3 +391,15 @@ input:focus, select:focus, button:focus-visible {
   .card-grid { grid-template-columns: repeat(2, 1fr); gap: 0.7rem; }
   .checkout-bar .actions button { flex: 1 1 45%; font-size: 0.85rem; padding: 0.6rem 0.4rem; }
 }
+
+/* About page */
+.about { max-width: 42rem; margin: 0 auto; padding: 1rem 1rem 3rem; }
+.about h1 { margin: 0.25rem 0 1rem; }
+.about h2 { margin: 1.75rem 0 0.5rem; }
+.about p { line-height: 1.6; margin: 0.75rem 0; }
+.about-back { margin-bottom: 1rem; }
+.linklike {
+  background: none; border: none; padding: 0; cursor: pointer;
+  color: inherit; text-decoration: underline; font: inherit;
+}
+.linklike:hover { opacity: 0.8; }
