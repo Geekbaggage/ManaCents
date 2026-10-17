@@ -25,6 +25,7 @@ export default function Footer({ onAbout }) {
           <button type="button" className="linklike" onClick={onAbout}>About</button>
         </div>
         <div className="credit">by Geekbaggage</div>
+        <div className="legal memorial">In memory of Mortise &ldquo;Tony&rdquo; Addams</div>
       </footer>
     </>
   );

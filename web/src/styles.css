@@ -403,4 +403,4 @@ input:focus, select:focus, button:focus-visible {
   color: inherit; text-decoration: underline; font: inherit;
 }
 .linklike:hover { opacity: 0.8; }
-.about .dedication { margin-top: 1.5rem; padding-left: 1rem; border-left: 2px solid #64748B; color: #cbd5e1; }
+.site-footer .memorial { opacity: 0.6; font-style: italic; }
