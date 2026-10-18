@@ -22,6 +22,8 @@ export default function Footer({ onAbout }) {
         <div className="legal">
           Questions or feedback? <a href="mailto:hello@manacents.com">hello@manacents.com</a>
           {" · "}
+          <a href="https://www.instagram.com/manacents" target="_blank" rel="noopener noreferrer">Follow us on Instagram</a>
+          {" · "}
           <button type="button" className="linklike" onClick={onAbout}>About</button>
         </div>
         <div className="credit">by Geekbaggage</div>
