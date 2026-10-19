@@ -208,9 +208,15 @@ function ZoomImg({ url, alt, className, onClick }) {
   return <img src={src} alt={alt} className={className} onClick={onClick} />;
 }
 
-function CardLightbox({ card, onClose }) {
+function CardLightbox({ cards, index, onClose, onNav, selected, onToggle }) {
+  const card = cards[index];
+  const touchX = React.useRef(null);
   useEffect(() => {
-    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    const onKey = (e) => {
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowRight") onNav(1);
+      if (e.key === "ArrowLeft") onNav(-1);
+    };
     window.addEventListener("keydown", onKey);
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -218,13 +224,33 @@ function CardLightbox({ card, onClose }) {
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = prev;
     };
-  }, [onClose]);
+  }, [onClose, onNav]);
   if (!card?.image_url) return null;
+  const onTouchStart = (e) => { touchX.current = e.touches[0].clientX; };
+  const onTouchEnd = (e) => {
+    if (touchX.current == null) return;
+    const dx = e.changedTouches[0].clientX - touchX.current;
+    touchX.current = null;
+    if (Math.abs(dx) > 40) onNav(dx < 0 ? 1 : -1);
+  };
   return (
     <div className="lightbox" onClick={onClose} role="dialog" aria-modal="true" aria-label={card.name}>
-      <ZoomImg url={card.image_url} alt={card.name} onClick={(e) => e.stopPropagation()} />
+      <button type="button" className="lightbox-nav prev" aria-label="Previous card"
+        onClick={(e) => { e.stopPropagation(); onNav(-1); }}>‹</button>
+      <div className="lightbox-stage" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+        <ZoomImg url={card.image_url} alt={card.name} onClick={(e) => e.stopPropagation()} />
+      </div>
+      <button type="button" className="lightbox-nav next" aria-label="Next card"
+        onClick={(e) => { e.stopPropagation(); onNav(1); }}>›</button>
       <button type="button" className="lightbox-close" onClick={onClose} aria-label="Close">✕</button>
-      <div className="lightbox-name">{card.name} · {money(card.usd)}</div>
+      <div className="lightbox-meta">
+        <div className="lightbox-count">{index + 1} of {cards.length}</div>
+        <div className="lightbox-name">{card.name} · {money(card.usd)}</div>
+        <button type="button" className={selected ? "ghost" : "primary"}
+          onClick={(e) => { e.stopPropagation(); onToggle(); }}>
+          {selected ? "Remove from list ✓" : "Add to list"}
+        </button>
+      </div>
     </div>
   );
 }
@@ -270,7 +296,7 @@ export default function App() {
   );
   const [hoverCard, setHoverCard] = useState(null);
   const [hoverPos, setHoverPos] = useState({ x: 0, y: 0 });
-  const [zoomCard, setZoomCard] = useState(null);
+  const [zoomIdx, setZoomIdx] = useState(null);
   // Commander request flow (empty search → Scryfall preview → one-tap request).
   const [requestPreview, setRequestPreview] = useState(null);
   const [requestLoading, setRequestLoading] = useState(false);
@@ -881,7 +907,7 @@ export default function App() {
                   <span className="hint">Tap a card image to add or remove it.</span>
                 </div>
                 <div className="card-grid">
-                  {visibleUpgrades.map((c) => (
+                  {visibleUpgrades.map((c, i) => (
                     <CardTile
                       key={c.scryfall_id}
                       card={c}
@@ -891,7 +917,7 @@ export default function App() {
                       canHover={canHover}
                       onHoverCard={setHoverCard}
                       onHoverMove={(x, y) => setHoverPos({ x, y })}
-                      onZoomCard={setZoomCard}
+                      onZoomCard={() => setZoomIdx(i)}
                     />
                   ))}
                 </div>
@@ -949,7 +975,16 @@ export default function App() {
           </div>
         );
       })()}
-      {zoomCard && <CardLightbox card={zoomCard} onClose={() => setZoomCard(null)} />}
+      {zoomIdx != null && visibleUpgrades[zoomIdx] && (
+        <CardLightbox
+          cards={visibleUpgrades}
+          index={zoomIdx}
+          onClose={() => setZoomIdx(null)}
+          onNav={(d) => setZoomIdx((i) => (i + d + visibleUpgrades.length) % visibleUpgrades.length)}
+          selected={!deselected.has(visibleUpgrades[zoomIdx].scryfall_id)}
+          onToggle={() => toggleCard(visibleUpgrades[zoomIdx].scryfall_id)}
+        />
+      )}
     </>
   );
 }
