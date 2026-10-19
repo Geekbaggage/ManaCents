@@ -146,16 +146,25 @@ function FeedbackWidget({ commander, budget, mode, cards }) {
   );
 }
 
-function CardTile({ card, selected, onToggle, onSwap }) {
+function CardTile({ card, selected, onToggle, onSwap, canHover, onHoverCard, onHoverMove, onZoomCard }) {
   return (
     <div className={`card-tile${selected ? " selected" : ""}`}>
       <div className="imgwrap" onClick={onToggle} role="button" tabIndex={0}
         aria-label={`${selected ? "Remove" : "Add"} ${card.name}`}
-        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onToggle(); }}>
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onToggle(); }}
+        onMouseEnter={() => { if (canHover && card.image_url) onHoverCard(card); }}
+        onMouseLeave={() => { if (canHover) onHoverCard(null); }}
+        onMouseMove={(e) => { if (canHover) onHoverMove(e.clientX, e.clientY); }}>
         {card.image_url ? (
           <img className="card-img" src={card.image_url} alt={card.name} loading="lazy" />
         ) : (
           <div className="card-img" style={{ display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8" }}>{card.name}</div>
+        )}
+        {card.image_url && (
+          <button type="button" className="zoom-btn" aria-label={`Enlarge ${card.name}`}
+            onClick={(e) => { e.stopPropagation(); onZoomCard(card); }}>
+            🔍
+          </button>
         )}
       </div>
       <div className="meta">
@@ -172,6 +181,34 @@ function CardTile({ card, selected, onToggle, onSwap }) {
         <span className="role">{card.roleLabel}</span>
         <button className="swap" onClick={onSwap}>Already own this? Swap it</button>
       </div>
+    </div>
+  );
+}
+
+// Scryfall serves the same card art at several sizes under one URL pattern
+// (…/small/…, …/normal/…, …/large/…). The DB stores `normal`; swapping the
+// path segment gets the 672px `large` version, readable without new storage.
+function largeImage(url) {
+  return url ? url.replace("/normal/", "/large/").replace("/small/", "/large/") : url;
+}
+
+function CardLightbox({ card, onClose }) {
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [onClose]);
+  if (!card?.image_url) return null;
+  return (
+    <div className="lightbox" onClick={onClose} role="dialog" aria-modal="true" aria-label={card.name}>
+      <img src={largeImage(card.image_url)} alt={card.name} onClick={(e) => e.stopPropagation()} />
+      <button type="button" className="lightbox-close" onClick={onClose} aria-label="Close">✕</button>
+      <div className="lightbox-name">{card.name} · {money(card.usd)}</div>
     </div>
   );
 }
@@ -211,6 +248,13 @@ export default function App() {
   const [includeUniversal, setIncludeUniversal] = useState(false);
   const [including, setIncluding] = useState(false);
   const [toast, setToast] = useState("");
+  // Card zoom: hover preview (desktop) + tap lightbox (touch).
+  const [canHover] = useState(
+    () => typeof window !== "undefined" && !!window.matchMedia?.("(hover: hover)").matches
+  );
+  const [hoverCard, setHoverCard] = useState(null);
+  const [hoverPos, setHoverPos] = useState({ x: 0, y: 0 });
+  const [zoomCard, setZoomCard] = useState(null);
   // Commander request flow (empty search → Scryfall preview → one-tap request).
   const [requestPreview, setRequestPreview] = useState(null);
   const [requestLoading, setRequestLoading] = useState(false);
@@ -828,6 +872,10 @@ export default function App() {
                       selected={!deselected.has(c.scryfall_id)}
                       onToggle={() => toggleCard(c.scryfall_id)}
                       onSwap={() => swapCard(c)}
+                      canHover={canHover}
+                      onHoverCard={setHoverCard}
+                      onHoverMove={(x, y) => setHoverPos({ x, y })}
+                      onZoomCard={setZoomCard}
                     />
                   ))}
                 </div>
@@ -875,6 +923,17 @@ export default function App() {
         <Footer onAbout={() => setView("about")} />
       </div>
       {toast && <div className="toast" role="status">{toast}</div>}
+      {canHover && hoverCard?.image_url && (() => {
+        const w = 300;
+        const left = Math.min(hoverPos.x + 20, window.innerWidth - w - 12);
+        const top = Math.max(12, Math.min(hoverPos.y - 140, window.innerHeight - 440));
+        return (
+          <div className="card-zoom" style={{ left, top }} aria-hidden="true">
+            <img src={largeImage(hoverCard.image_url)} alt="" />
+          </div>
+        );
+      })()}
+      {zoomCard && <CardLightbox card={zoomCard} onClose={() => setZoomCard(null)} />}
     </>
   );
 }
