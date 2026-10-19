@@ -192,6 +192,22 @@ function largeImage(url) {
   return url ? url.replace("/normal/", "/large/").replace("/small/", "/large/") : url;
 }
 
+// Progressive zoom image: the tile's `/normal/` file is already in the
+// browser cache, so show it instantly while the sharper `/large/` loads
+// in the background — no blank flash on first hover/tap.
+function ZoomImg({ url, alt, className, onClick }) {
+  const large = largeImage(url);
+  const [src, setSrc] = useState(url);
+  useEffect(() => {
+    setSrc(url);
+    if (!large || large === url) return;
+    const img = new Image();
+    img.onload = () => setSrc(large);
+    img.src = large;
+  }, [url, large]);
+  return <img src={src} alt={alt} className={className} onClick={onClick} />;
+}
+
 function CardLightbox({ card, onClose }) {
   useEffect(() => {
     const onKey = (e) => { if (e.key === "Escape") onClose(); };
@@ -206,7 +222,7 @@ function CardLightbox({ card, onClose }) {
   if (!card?.image_url) return null;
   return (
     <div className="lightbox" onClick={onClose} role="dialog" aria-modal="true" aria-label={card.name}>
-      <img src={largeImage(card.image_url)} alt={card.name} onClick={(e) => e.stopPropagation()} />
+      <ZoomImg url={card.image_url} alt={card.name} onClick={(e) => e.stopPropagation()} />
       <button type="button" className="lightbox-close" onClick={onClose} aria-label="Close">✕</button>
       <div className="lightbox-name">{card.name} · {money(card.usd)}</div>
     </div>
@@ -929,7 +945,7 @@ export default function App() {
         const top = Math.max(12, Math.min(hoverPos.y - 140, window.innerHeight - 440));
         return (
           <div className="card-zoom" style={{ left, top }} aria-hidden="true">
-            <img src={largeImage(hoverCard.image_url)} alt="" />
+            <ZoomImg url={hoverCard.image_url} alt="" />
           </div>
         );
       })()}
