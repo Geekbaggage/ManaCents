@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { money } from "../api.js";
 import {
+  AFFILIATE_CODES,
   tcgplayerListText,
   tcgplayerMassEntryUrl,
   cardKingdomSearchUrl,
@@ -145,10 +146,10 @@ export default function CheckoutBar({ commander, budget, cards, total, remaining
     <>
       <div className="checkout-bar">
         <div className="wrap">
-          {total < 35 && cards.length > 0 && (
+          {total < 35 && cards.length > 0 && AFFILIATE_CODES.AMAZON_TAG && (
             <p className="upsell">
               Need {money(35 - total)} more for free shipping?{" "}
-              <a href={SLEEVES_URL()} target="_blank" rel="noreferrer sponsored">Add 100x Dragon Shield Matte Sleeves</a>
+              <a href={SLEEVES_URL()} target="_blank" rel="noopener sponsored">Add 100x Dragon Shield Matte Sleeves</a>
             </p>
           )}
           <div className="row">
@@ -162,19 +163,25 @@ export default function CheckoutBar({ commander, budget, cards, total, remaining
             </div>
             <div className="actions">
               {eu ? (
-                <button className="primary" onClick={buyTcgplayer}>Buy All on TCGplayer</button>
+                <button className="primary" onClick={buyTcgplayer} disabled={!cards.length}>Buy All on TCGplayer</button>
               ) : (
                 <>
-                  <a href={manaPoolDeckUrl(cards)} target="_blank" rel="noreferrer sponsored">
-                    <button className="primary">Buy All on Mana Pool</button>
+                  <a
+                    className={`button primary${!cards.length ? " disabled" : ""}`}
+                    href={cards.length ? manaPoolDeckUrl(cards) : undefined}
+                    target="_blank"
+                    rel="noopener sponsored"
+                    aria-disabled={!cards.length}
+                  >
+                    Buy All on Mana Pool
                   </a>
-                  <button onClick={buyTcgplayer}>Buy All on TCGplayer</button>
+                  <button onClick={buyTcgplayer} disabled={!cards.length}>Buy All on TCGplayer</button>
                 </>
               )}
-              <button onClick={() => setModal("ck")}>Card Kingdom</button>
+              <button onClick={() => setModal("ck")} disabled={!cards.length}>Card Kingdom</button>
               {eu
-                ? <button onClick={() => setModal("ct")}>CardTrader</button>
-                : <button onClick={() => setModal("mp")}>Mana Pool</button>}
+                ? <button onClick={() => setModal("ct")} disabled={!cards.length}>CardTrader</button>
+                : <button onClick={() => setModal("mp")} disabled={!cards.length}>Mana Pool (By Card)</button>}
               <button onClick={() => setModal("share")}>Share &amp; export</button>
             </div>
           </div>
@@ -188,8 +195,8 @@ export default function CheckoutBar({ commander, budget, cards, total, remaining
           {cards.map((c) => (
             <div className="vendor-row" key={c.scryfall_id}>
               <span>{c.name} · {money(c.usd)}</span>
-              <a href={cardKingdomSearchUrl(c.name)} target="_blank" rel="noreferrer sponsored">
-                <button>Open product</button>
+              <a className="button" href={cardKingdomSearchUrl(c.name)} target="_blank" rel="noopener sponsored">
+                Open on Card Kingdom ↗
               </a>
             </div>
           ))}
@@ -203,15 +210,15 @@ export default function CheckoutBar({ commander, budget, cards, total, remaining
         <Modal title="Mana Pool products" onClose={() => setModal(null)}>
           <p className="note">Buy the whole list at once — Mana Pool optimizes sellers and shipping at checkout — or open individual cards below.</p>
           <div style={{ marginBottom: "0.8rem" }}>
-            <a href={manaPoolDeckUrl(cards)} target="_blank" rel="noreferrer sponsored">
-              <button className="primary">Buy all on Mana Pool</button>
+            <a className="button primary" href={manaPoolDeckUrl(cards)} target="_blank" rel="noopener sponsored">
+              Buy All on Mana Pool
             </a>
           </div>
           {cards.map((c) => (
             <div className="vendor-row" key={c.scryfall_id}>
               <span>{c.name} · {money(c.usd)}</span>
-              <a href={manaPoolCardUrl(c.name)} target="_blank" rel="noreferrer sponsored">
-                <button>Open product</button>
+              <a className="button" href={manaPoolCardUrl(c.name)} target="_blank" rel="noopener sponsored">
+                Open on Mana Pool ↗
               </a>
             </div>
           ))}
@@ -226,8 +233,8 @@ export default function CheckoutBar({ commander, budget, cards, total, remaining
           <p className="note">Copy the list, then use CardTrader's marketplace or wishlist import for your EU/UK order.</p>
           <div style={{ display: "flex", gap: "0.6rem", marginTop: "0.6rem", flexWrap: "wrap" }}>
             <button onClick={() => doCopy(decklistText(cards, budget, false), "List copied")}>Copy list</button>
-            <a href={cardTraderUrl()} target="_blank" rel="noreferrer sponsored">
-              <button>Open CardTrader</button>
+            <a className="button" href={cardTraderUrl()} target="_blank" rel="noopener sponsored">
+              Open CardTrader
             </a>
           </div>
         </Modal>
@@ -250,7 +257,7 @@ export default function CheckoutBar({ commander, budget, cards, total, remaining
             <div>
               <img className="receipt-preview" src={receiptUrl} alt="ManaCents upgrade receipt preview" />
               <div style={{ display: "flex", gap: "0.6rem", marginTop: "0.8rem", flexWrap: "wrap" }}>
-                <a href={receiptUrl} download="manacents-receipt.png"><button>Download PNG</button></a>
+                <a className="button" href={receiptUrl} download="manacents-receipt.png">Download PNG</a>
                 <button onClick={shareImage}>Share image</button>
               </div>
             </div>

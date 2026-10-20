@@ -36,6 +36,8 @@ export function cardKingdomSearchUrl(cardName) {
 
 function slugify(name) {
   return name
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "") // strip diacritics: "Lim-Dûl" -> "Lim-Dul"
     .toLowerCase()
     .replace(/['",.:;!?()]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
@@ -59,6 +61,12 @@ function base64UrlEncode(text) {
 export function manaPoolDeckUrl(cards) {
   // Whole-list buy link: https://manapool.com/add-deck?deck=<base64url>&ref=CODE
   // Deck links are Mana Pool's top affiliate revenue driver (per Brin Reed).
+  // Guard: an empty selection links to the Mana Pool home page instead.
+  if (!Array.isArray(cards) || cards.length === 0) {
+    return has(AFFILIATE_CODES.MANAPOOL_REF)
+      ? `https://manapool.com/?ref=${AFFILIATE_CODES.MANAPOOL_REF}`
+      : "https://manapool.com/";
+  }
   const text = cards.map((c) => `1 ${c.name}`).join("\n");
   const url = `https://manapool.com/add-deck?deck=${base64UrlEncode(text)}`;
   return has(AFFILIATE_CODES.MANAPOOL_REF) ? `${url}&ref=${AFFILIATE_CODES.MANAPOOL_REF}` : url;
