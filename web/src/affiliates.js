@@ -6,7 +6,7 @@
 export const AFFILIATE_CODES = {
   IMPACT_TAG: "", // TCGplayer via Impact — applied to outbound TCGplayer links when set
   CK_PARTNER: "", // Card Kingdom ?partner=
-  MANAPOOL_REF: "", // Mana Pool ?ref=
+  MANAPOOL_REF: "manacents", // Mana Pool ?ref= (approved Oct 20, 2026; 5%)
   CARDTRADER_CODE: "", // CardTrader influencer program
   AMAZON_TAG: "", // Amazon Associates tag (e.g. "example-20"); empty = untracked
 };
@@ -46,6 +46,22 @@ export function manaPoolCardUrl(cardName) {
   // Documented by Mana Pool affiliates: https://manapool.com/card/<slug>?ref=CODE
   const url = `https://manapool.com/card/${slugify(cardName)}`;
   return has(AFFILIATE_CODES.MANAPOOL_REF) ? `${url}?ref=${AFFILIATE_CODES.MANAPOOL_REF}` : url;
+}
+
+function base64UrlEncode(text) {
+  // Brin's documented encoding: UTF-8 bytes -> base64 -> URL-safe, no padding.
+  const bytes = new TextEncoder().encode(text);
+  let bin = "";
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+}
+
+export function manaPoolDeckUrl(cards) {
+  // Whole-list buy link: https://manapool.com/add-deck?deck=<base64url>&ref=CODE
+  // Deck links are Mana Pool's top affiliate revenue driver (per Brin Reed).
+  const text = cards.map((c) => `1 ${c.name}`).join("\n");
+  const url = `https://manapool.com/add-deck?deck=${base64UrlEncode(text)}`;
+  return has(AFFILIATE_CODES.MANAPOOL_REF) ? `${url}&ref=${AFFILIATE_CODES.MANAPOOL_REF}` : url;
 }
 
 export function cardTraderUrl() {

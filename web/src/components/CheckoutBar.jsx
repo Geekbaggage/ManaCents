@@ -5,6 +5,7 @@ import {
   tcgplayerMassEntryUrl,
   cardKingdomSearchUrl,
   manaPoolCardUrl,
+  manaPoolDeckUrl,
   cardTraderUrl,
   SLEEVES_URL,
   isEuLocale,
@@ -191,7 +192,12 @@ export default function CheckoutBar({ commander, budget, cards, total, remaining
 
       {modal === "mp" && (
         <Modal title="Mana Pool products" onClose={() => setModal(null)}>
-          <p className="note">Open each card search below. Mana Pool can optimize seller and shipping choices at checkout.</p>
+          <p className="note">Buy the whole list at once — Mana Pool optimizes sellers and shipping at checkout — or open individual cards below.</p>
+          <div style={{ marginBottom: "0.8rem" }}>
+            <a href={manaPoolDeckUrl(cards)} target="_blank" rel="noreferrer sponsored">
+              <button className="primary">Buy all on Mana Pool</button>
+            </a>
+          </div>
           {cards.map((c) => (
             <div className="vendor-row" key={c.scryfall_id}>
               <span>{c.name} · {money(c.usd)}</span>
