@@ -161,7 +161,16 @@ export default function CheckoutBar({ commander, budget, cards, total, remaining
               )}
             </div>
             <div className="actions">
-              <button className="primary" onClick={buyTcgplayer}>Buy All on TCGplayer</button>
+              {eu ? (
+                <button className="primary" onClick={buyTcgplayer}>Buy All on TCGplayer</button>
+              ) : (
+                <>
+                  <a href={manaPoolDeckUrl(cards)} target="_blank" rel="noreferrer sponsored">
+                    <button className="primary">Buy All on Mana Pool</button>
+                  </a>
+                  <button onClick={buyTcgplayer}>Buy All on TCGplayer</button>
+                </>
+              )}
               <button onClick={() => setModal("ck")}>Card Kingdom</button>
               {eu
                 ? <button onClick={() => setModal("ct")}>CardTrader</button>
