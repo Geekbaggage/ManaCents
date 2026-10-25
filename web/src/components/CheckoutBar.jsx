@@ -185,6 +185,7 @@ export default function CheckoutBar({ commander, budget, cards, total, remaining
               <button onClick={() => setModal("share")}>Share &amp; export</button>
             </div>
           </div>
+          <p className="tcg-note">TCGplayer can&apos;t auto-fill your cart. We&apos;ll copy your list, then you paste it into TCGplayer&apos;s mass entry and tap Add to Cart.</p>
           <p className="ftc">Prices updated daily. Buying through these links supports ManaCents at no extra cost to you.</p>
         </div>
       </div>

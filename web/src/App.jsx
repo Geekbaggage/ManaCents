@@ -279,6 +279,23 @@ export default function App() {
   const [selectedCmdr, setSelectedCmdr] = useState(null);
   const [budgetInput, setBudgetInput] = useState("40");
   const [mode, setMode] = useState("tuneup");
+  // Deep links: ?commander=<slug>&budget=<n>&mode=<tuneup|splash> opens with
+  // that list already built (shared from Reddit/Discord/IG). Parsed once.
+  const [deepLink] = useState(() => {
+    try {
+      const p = new URLSearchParams(window.location.search);
+      const slug = p.get("commander");
+      if (!slug) return null;
+      return {
+        slug,
+        budget: p.get("budget") ?? undefined,
+        mode: ["tuneup", "splash"].includes(p.get("mode")) ? p.get("mode") : undefined,
+      };
+    } catch {
+      return null;
+    }
+  });
+  const deepLinkDone = useRef(false);
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState("");
   const [result, setResult] = useState(null);
@@ -325,6 +342,22 @@ export default function App() {
       includeScore: false,
     });
   }, [allCommanders]);
+
+  // Home button (header logo): back to a fresh landing search from any view,
+  // including inside a commander results page. Clears the deep-link URL so a
+  // refresh stays on home instead of rebuilding the last commander list.
+  const goHome = () => {
+    setView("landing");
+    setCmdrInput("");
+    setSelectedCmdr(null);
+    setShowSuggest(false);
+    setSuggestions([]);
+    setResult(null);
+    setResultError("");
+    try {
+      window.history.replaceState(null, "", "/");
+    } catch { /* URL reset is best-effort */ }
+  };
 
   const toggleColorPip = (pip) => {
     setColorFilter((prev) => {
@@ -473,7 +506,8 @@ export default function App() {
 
   const submit = async (withUniversal = false, overrides = {}) => {
     setFormError("");
-    if (!selectedCmdr) { setFormError("Choose a commander first."); return; }
+    const effCmdr = overrides.cmdr ?? selectedCmdr;
+    if (!effCmdr) { setFormError("Choose a commander first."); return; }
     const effMode = overrides.mode ?? mode;
     const effBudgetInput = overrides.budgetInput ?? budgetInput;
     const budget = parseFloat(effBudgetInput);
@@ -485,7 +519,7 @@ export default function App() {
     else setLoading(true);
     setResultError("");
     try {
-      const data = await fetchUpgrades(selectedCmdr.slug, budget, effMode, withUniversal);
+      const data = await fetchUpgrades(effCmdr.slug, budget, effMode, withUniversal);
       setResult(data);
       if (overrides.mode) setMode(overrides.mode);
       if (overrides.budgetInput) setBudgetInput(overrides.budgetInput);
@@ -496,6 +530,12 @@ export default function App() {
       setShowSkipped(false);
       setView("results");
       window.scrollTo(0, 0);
+      // Deep-link support: keep the address bar pointing at this exact list
+      // (?commander=&budget=&mode=) so any results page can be shared as-is.
+      try {
+        const u = new URLSearchParams({ commander: effCmdr.slug, budget: String(budget), mode: effMode });
+        window.history.replaceState(null, "", `?${u.toString()}`);
+      } catch { /* URL update is best-effort */ }
     } catch (e) {
       setFormError(e.message);
     } finally {
@@ -509,6 +549,23 @@ export default function App() {
     if (loading || including) return;
     submit(false, patch);
   };
+
+  // Deep link: once the registry loads, select the linked commander and
+  // build its list automatically. Unknown slugs fall back to the homepage.
+  useEffect(() => {
+    if (!deepLink || deepLinkDone.current || !allCommanders) return;
+    deepLinkDone.current = true;
+    const found = allCommanders.find((c) => c.slug === deepLink.slug);
+    if (!found) return;
+    setSelectedCmdr(found);
+    setCmdrInput(found.name);
+    const patch = { cmdr: found };
+    const b = parseFloat(deepLink.budget);
+    if (Number.isFinite(b) && b >= 1 && b <= 1000) patch.budgetInput = String(b);
+    if (deepLink.mode) patch.mode = deepLink.mode;
+    submit(false, patch);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deepLink, allCommanders]);
 
   const visibleUpgrades = useMemo(() => {
     if (!result) return [];
@@ -604,10 +661,10 @@ export default function App() {
     <>
       <div className="wrap">
         <header className="site-header">
-          <img src="/logo-mark.png" alt="ManaCents" />
-          <div>
-            <div className="brand">Mana<span className="brand-cents">Cents</span></div>
-          </div>
+          <button type="button" className="brand-home" onClick={goHome} aria-label="Go to ManaCents home page">
+            <img src="/logo-mark.png" alt="" />
+            <span className="brand">Mana<span className="brand-cents">Cents</span></span>
+          </button>
         </header>
 
         {view === "about" && (

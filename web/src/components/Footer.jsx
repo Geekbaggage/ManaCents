@@ -20,9 +20,9 @@ export default function Footer({ onAbout }) {
           are property of Wizards of the Coast. ©Wizards of the Coast LLC.
         </div>
         <div className="legal">
-          Affiliate Disclosure: ManaCents participates in the Mana Pool affiliate
-          program. Buying cards through links on this site supports ManaCents at no
-          extra cost to you.
+          Affiliate Disclosure: ManaCents participates in the Mana Pool and
+          TCGplayer affiliate programs. Buying cards through links on this site
+          supports ManaCents at no extra cost to you.
         </div>
         <div className="legal">
           Questions or feedback? <a href="mailto:hello@manacents.com">hello@manacents.com</a>

@@ -96,6 +96,12 @@ input:focus, select:focus, button:focus-visible {
   padding: 0.9rem 0;
 }
 .site-header img { width: 44px; height: 44px; border-radius: 10px; }
+.brand-home {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: none; border: none; padding: 0; margin: 0;
+  color: inherit; font: inherit; text-align: left; cursor: pointer;
+}
+.brand-home:focus-visible { outline: 2px solid #10B981; outline-offset: 4px; border-radius: 10px; }
 .site-header .brand { font-size: 1.35rem; font-weight: 800; letter-spacing: 0.02em; }
 .brand-cents { color: #10B981; }
 .site-header .tagline { color: var(--gray); font-size: 0.85rem; }
@@ -322,6 +328,7 @@ input:focus, select:focus, button:focus-visible {
 .checkout-bar .totals small { display: block; color: var(--gray); font-weight: 400; font-size: 0.8rem; }
 .checkout-bar .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 .ftc { color: #64748b; font-size: 0.75rem; text-align: center; margin: 0.45rem 0 0.2rem; }
+.tcg-note { color: var(--gray); font-size: 0.8rem; text-align: center; margin: 0.35rem 0 0; }
 .upsell {
   text-align: center; font-size: 0.85rem; color: var(--gray); margin: 0 0 0.3rem;
 }
