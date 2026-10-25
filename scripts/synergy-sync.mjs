@@ -395,6 +395,29 @@ ON CONFLICT(scryfall_id) DO NOTHING;`);
     console.log(`Marked ${fulfilled.length} commander(s) live`);
   }
 
+  // Precon membership preservation (companion to upgrades.js v3, Charlie
+  // second review): printing normalization above DELETEs old synergy
+  // rows and INSERTs replacement rows WITHOUT in_base_precon, so a
+  // replacement printing would lose its flag. precon_membership is NEVER
+  // deleted by this script — it is the durable source — so reapply flags
+  // from it by card name after every sync. The engine's membership
+  // NOT EXISTS anti-join protects recommendations even if this reapply
+  // ever fails, but this step keeps the flag layer truthful too.
+  // Note: this UPDATE is best-effort for DBs without the table/column
+  // (older local fixtures); production D1 has both after the v3 migration.
+  try {
+    await d1Query(`UPDATE commander_synergy SET in_base_precon = 1
+WHERE EXISTS (
+  SELECT 1 FROM cards c
+  JOIN precon_membership pm ON pm.card_name = c.name
+    AND pm.commander_slug = commander_synergy.commander_slug
+  WHERE c.scryfall_id = commander_synergy.scryfall_id
+);`);
+    console.log("Precon flags reapplied from precon_membership");
+  } catch (e) {
+    console.log("Precon flag reapply skipped (no precon_membership table?):", String(e.message || e).slice(0, 200));
+  }
+
   // Step 1: rebuild global_rates FROM OUR OWN CORPUS (review fix 2026-10-13):
   // per card per full color identity = AVG inclusion across commanders of that identity.
   await d1Query(`DELETE FROM global_rates;`);

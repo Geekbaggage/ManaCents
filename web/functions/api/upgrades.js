@@ -40,12 +40,32 @@ function tierFor(score) {
   return { tier: "gray", label: "Solid Value" };
 }
 
+// Missing-column parser for the narrow type_line fallback (Charlie second
+// review, Q1). Extract ONLY the identifier the diagnostic reports missing
+// (allowing a qualified name like c.type_line and a D1 prefix, and checking
+// err.cause.message for older Wrangler wrappers). Do NOT ban a word merely
+// because it appears elsewhere in the error string — the SQL text itself
+// naturally mentions in_base_precon. If no missing column can be identified,
+// return null and the caller must fail closed (throw), never fall back.
+export function missingColumnName(err) {
+  const texts = [];
+  if (err?.message) texts.push(String(err.message));
+  if (err?.cause?.message) texts.push(String(err.cause.message));
+  for (const t of texts) {
+    const m = t.match(/no such column:\s*(?:[A-Za-z0-9_]+\.)?([A-Za-z0-9_]+)/i)
+      || t.match(/no column named\s+(?:[A-Za-z0-9_]+\.)?([A-Za-z0-9_]+)/i);
+    if (m) return m[1].toLowerCase();
+  }
+  return null;
+}
+
 export async function onRequestGet({ request, env }) {
   const url = new URL(request.url);
   const slug = (url.searchParams.get("commander") || "").trim().toLowerCase();
   const budget = parseFloat(url.searchParams.get("budget") || "");
   const mode = url.searchParams.get("mode") === "splash" ? "splash" : "tuneup";
-  // "Include them anyway": bypass the universal ceiling (nothing is skipped).
+  // "Include them anyway": bypass the universal ceiling ONLY — precon
+  // exclusion still applies (a precon card is never an upgrade, even here).
   const includeUniversal = url.searchParams.get("includeUniversal") === "1";
 
   if (!slug) return Response.json({ error: "Choose a commander first." }, { status: 400 });
@@ -98,55 +118,155 @@ export async function onRequestGet({ request, env }) {
       });
     }
 
-    // type_line was added 2026-10-13 and backfills on the next price-sync;
-    // if the column doesn't exist yet, fall back to NULL (the splash land
-    // filter treats NULL as "unknown" and skips exclusion).
+    // Precon exclusion, v3 per Charlie's Oct 25 second review (REQUEST
+    // CHANGES again — this version is NOT deployed or approved yet):
+    // DURABLE MEMBERSHIP, not flag-only. precon_membership is a separate
+    // D1 table (commander_slug, card_name) that synergy-sync NEVER
+    // deletes. The engine excludes by membership NAME before the 400-row
+    // LIMIT (NOT EXISTS anti-join), so:
+    //  - an unflagged second printing with the same name is excluded in
+    //    SQL, not only later in JS, and cannot consume the window;
+    //  - deleting a flagged synergy row (printing replacement) cannot
+    //    erase membership, because membership lives outside
+    //    commander_synergy/cards;
+    //  - the audit below reads membership directly, so it survives sync.
+    // The old in_base_precon flag is retained as a defensive layer and
+    // reapplied by the sync companion (see scripts/synergy-sync.mjs),
+    // but the engine no longer depends on it alone.
+    // An empty membership set is LEGITIMATE for commanders without a
+    // backfilled precon (e.g. Arabella). It is NOT, by itself, proof of
+    // coverage loss — coverage state lives in precon_coverage and in the
+    // manifest receipt, not in an empty audit array.
+    // If the membership table/query fails, throw — do NOT substitute an
+    // empty array and continue as though no precon exists.
+    // type_line was added 2026-10-13 and backfills on the next price-sync.
+    const membershipAntiJoin = `AND NOT EXISTS (
+           SELECT 1 FROM precon_membership pm
+           WHERE pm.commander_slug = s.commander_slug
+             AND pm.card_name = c.name
+         )`;
     let rows;
+    const mainSql = `SELECT s.scryfall_id, c.name, c.usd, c.image_url, c.type_line, s.role, s.cmdr_rate, s.raw_score,
+                COALESCE(g.inclusion_rate, 0) AS global_rate,
+                COALESCE(s.in_base_precon, 0) AS in_base_precon
+         FROM commander_synergy s
+         JOIN cards c ON c.scryfall_id = s.scryfall_id
+         JOIN commanders d ON d.slug = s.commander_slug
+         LEFT JOIN global_rates g
+           ON g.scryfall_id = s.scryfall_id AND g.color_identity = d.color_identity
+         WHERE s.commander_slug = ?
+           AND s.cmdr_rate >= ?
+           AND COALESCE(s.in_base_precon, 0) != 1
+           ${membershipAntiJoin}
+         ORDER BY s.raw_score DESC
+         LIMIT 400`;
+    const typeLineFallbackSql = `SELECT s.scryfall_id, c.name, c.usd, c.image_url, NULL AS type_line, s.role, s.cmdr_rate, s.raw_score,
+                COALESCE(g.inclusion_rate, 0) AS global_rate,
+                COALESCE(s.in_base_precon, 0) AS in_base_precon
+         FROM commander_synergy s
+         JOIN cards c ON c.scryfall_id = s.scryfall_id
+         JOIN commanders d ON d.slug = s.commander_slug
+         LEFT JOIN global_rates g
+           ON g.scryfall_id = s.scryfall_id AND g.color_identity = d.color_identity
+         WHERE s.commander_slug = ?
+           AND s.cmdr_rate >= ?
+           AND COALESCE(s.in_base_precon, 0) != 1
+           ${membershipAntiJoin}
+         ORDER BY s.raw_score DESC
+         LIMIT 400`;
     try {
-      ({ results: rows } = await env.MANACENTS_DB.prepare(
-        `SELECT s.scryfall_id, c.name, c.usd, c.image_url, c.type_line, s.role, s.cmdr_rate, s.raw_score,
-                COALESCE(g.inclusion_rate, 0) AS global_rate
-         FROM commander_synergy s
-         JOIN cards c ON c.scryfall_id = s.scryfall_id
-         JOIN commanders d ON d.slug = s.commander_slug
-         LEFT JOIN global_rates g
-           ON g.scryfall_id = s.scryfall_id AND g.color_identity = d.color_identity
-         WHERE s.commander_slug = ?
-           AND s.cmdr_rate >= ?
-         ORDER BY s.raw_score DESC
-         LIMIT 400`
-      )
-        .bind(slug, NOISE_FLOOR)
-        .all());
+      ({ results: rows } = await env.MANACENTS_DB.prepare(mainSql).bind(slug, NOISE_FLOOR).all());
     } catch (e) {
-      ({ results: rows } = await env.MANACENTS_DB.prepare(
-        `SELECT s.scryfall_id, c.name, c.usd, c.image_url, NULL AS type_line, s.role, s.cmdr_rate, s.raw_score,
-                COALESCE(g.inclusion_rate, 0) AS global_rate
-         FROM commander_synergy s
-         JOIN cards c ON c.scryfall_id = s.scryfall_id
-         JOIN commanders d ON d.slug = s.commander_slug
-         LEFT JOIN global_rates g
-           ON g.scryfall_id = s.scryfall_id AND g.color_identity = d.color_identity
-         WHERE s.commander_slug = ?
-           AND s.cmdr_rate >= ?
-         ORDER BY s.raw_score DESC
-         LIMIT 400`
-      )
+      // Narrow fallback: ONLY a missing type_line column, identified by
+      // the diagnostic's reported column (see missingColumnName). A
+      // missing precon_membership table, a missing in_base_precon column,
+      // or any unidentified failure must throw — fail closed.
+      if (missingColumnName(e) !== "type_line") throw e;
+      ({ results: rows } = await env.MANACENTS_DB.prepare(typeLineFallbackSql)
         .bind(slug, NOISE_FLOOR)
         .all());
     }
 
+    // Durable membership audit, separate from the recommendation query.
+    // Reads precon_membership directly (no noise floor, no LIMIT, no
+    // dependence on synergy rows surviving sync). Flagged synergy rows
+    // are merged in only for printing-ID / price / image detail, where
+    // available — a membership name with no surviving synergy row still
+    // appears, with scryfall_id null, rather than vanishing.
+    // If this query fails, throw — do not substitute an empty audit.
+    const { results: membershipRows } = await env.MANACENTS_DB.prepare(
+      `SELECT card_name FROM precon_membership WHERE commander_slug = ? ORDER BY card_name`
+    )
+      .bind(slug)
+      .all();
+    const membershipNames = (membershipRows || []).map((r) => r.card_name).filter(Boolean);
+    const membershipSet = new Set(membershipNames);
+    const { results: flaggedRows } = await env.MANACENTS_DB.prepare(
+      `SELECT s.scryfall_id, c.name, c.usd, c.image_url
+       FROM commander_synergy s
+       LEFT JOIN cards c ON c.scryfall_id = s.scryfall_id
+       WHERE s.commander_slug = ?
+         AND COALESCE(s.in_base_precon, 0) = 1
+       ORDER BY s.scryfall_id`
+    )
+      .bind(slug)
+      .all();
+    const flaggedByName = new Map();
+    for (const r of flaggedRows || []) {
+      if (r.name && !flaggedByName.has(r.name)) flaggedByName.set(r.name, r);
+    }
+    const preconExcluded = membershipNames.map((name) => {
+      const f = flaggedByName.get(name);
+      return {
+        scryfall_id: f ? f.scryfall_id : null,
+        name,
+        usd: f ? f.usd : null,
+        image_url: f ? f.image_url : null,
+      };
+    });
+    const flaggedIds = new Set((flaggedRows || []).map((r) => r.scryfall_id));
+    const flaggedNames = new Set([...membershipSet, ...flaggedByName.keys()]);
+
     if (!rows || rows.length === 0) {
+      // All-precon / thin-pool truthful empty result: if membership exists
+      // for this commander, do NOT claim EDHREC has no data — the data
+      // exists, it is just already owned. Retain the audit in the response.
+      if (membershipNames.length > 0) {
+        const { results: excludedCountRows } = await env.MANACENTS_DB.prepare(
+          `SELECT COUNT(*) AS n FROM commander_synergy s
+           JOIN cards c ON c.scryfall_id = s.scryfall_id
+           WHERE s.commander_slug = ?
+             AND c.name IN (SELECT card_name FROM precon_membership WHERE commander_slug = s.commander_slug)`
+        )
+          .bind(slug)
+          .all();
+        const allPreconExcluded = (excludedCountRows?.[0]?.n ?? 0) > 0;
+        return Response.json({
+          commander: { slug: cmdr.slug, name: cmdr.name, color_identity: cmdr.color_identity },
+          budget,
+          mode,
+          checkedAt: new Date().toISOString(),
+          total: 0,
+          upgrades: [],
+          alternates: [],
+          skipped: [],
+          preconExcluded,
+          budgetBreakers: [],
+          includedUniversalCards: includeUniversal,
+          allPreconExcluded,
+        });
+      }
       return Response.json({
         error: `EDHREC does not have enough data for ${cmdr.name} yet.`,
         commander: { slug: cmdr.slug, name: cmdr.name },
-        budget, mode, upgrades: [], skipped: [],
+        budget, mode, upgrades: [], skipped: [], preconExcluded: [],
       });
     }
 
     // Skipped universal staples (for the quiet pill): global_rate >= ceiling,
     // most-played first, basic lands excluded from this list too.
-    // With includeUniversal, nothing is skipped — the ceiling is bypassed.
+    // With includeUniversal, no popularity skips — the ceiling is bypassed.
+    // Precon exclusion is NOT bypassed by includeUniversal (see above).
     const skipped = includeUniversal
       ? []
       : rows
@@ -155,9 +275,16 @@ export async function onRequestGet({ request, env }) {
           .slice(0, 12)
           .map((r) => ({ scryfall_id: r.scryfall_id, name: r.name, usd: r.usd, image_url: r.image_url }));
 
-    // Candidates: ceiling applied (unless bypassed), basic lands excluded.
+    // Candidates: ceiling applied (unless bypassed), basic lands excluded,
+    // precon cards excluded by printing flag AND by card name (see audit
+    // above — a second printing of a precon card is still already owned).
     const candidates = rows.filter(
-      (r) => (includeUniversal || r.global_rate < UNIVERSAL_CEILING) && !BASIC_LANDS.has(r.name)
+      (r) =>
+        (includeUniversal || r.global_rate < UNIVERSAL_CEILING) &&
+        !BASIC_LANDS.has(r.name) &&
+        (r.in_base_precon ?? 0) !== 1 &&
+        !flaggedIds.has(r.scryfall_id) &&
+        !flaggedNames.has(r.name)
     );
 
     const target = TARGETS[mode];
@@ -428,6 +555,12 @@ export async function onRequestGet({ request, env }) {
       upgrades,
       alternates: alternateItems,
       skipped,
+      // Durable membership audit (see above): every official precon card
+      // name for this commander from precon_membership, not only flagged
+      // rows that survived the recommendation filters. A card may appear
+      // in both skipped and preconExcluded — both reasons apply; neither
+      // reintroduces it into the purchase list.
+      preconExcluded,
       budgetBreakers,
       includedUniversalCards: includeUniversal,
     });
