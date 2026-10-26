@@ -67,7 +67,13 @@ export async function onRequestGet({ request, env }) {
     // Missed-search logging: a 5+ character query with zero matches almost
     // always means a commander we don't carry yet. This table drives which
     // commanders to add next. Best-effort, never blocks the response.
+    // Instant Discord alert (added Oct 25, 2026): ping on the FIRST miss
+    // for a normalized query in 24h only. Repeats in that window are still
+    // logged, but do not re-ping — otherwise autocomplete keystrokes and
+    // repeat searches would flood the channel. Ping failures are silent,
+    // like feedback/request pings; the D1 row is the source of truth.
     if (q.length >= 5 && commanders.length === 0) {
+      let firstMissIn24h = false;
       try {
         await env.MANACENTS_DB.prepare(
           `CREATE TABLE IF NOT EXISTS missed_searches (
@@ -76,6 +82,14 @@ export async function onRequestGet({ request, env }) {
              created_at DATETIME DEFAULT CURRENT_TIMESTAMP
            )`
         ).run();
+        const prior = await env.MANACENTS_DB.prepare(
+          `SELECT COUNT(*) AS n FROM missed_searches
+           WHERE lower(trim(query)) = lower(trim(?))
+           AND created_at >= datetime('now', '-24 hours')`
+        )
+          .bind(q.slice(0, 60))
+          .first();
+        firstMissIn24h = (prior?.n ?? 0) === 0;
         await env.MANACENTS_DB.prepare(
           `INSERT INTO missed_searches (query) VALUES (?)`
         )
@@ -83,6 +97,30 @@ export async function onRequestGet({ request, env }) {
           .run();
       } catch {
         // Analytics is best-effort.
+      }
+      if (firstMissIn24h && env.DISCORD_FEEDBACK_WEBHOOK_URL) {
+        try {
+          await fetch(env.DISCORD_FEEDBACK_WEBHOOK_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              username: "ManaCents Missed Search",
+              embeds: [
+                {
+                  title: `❓ Missed search — ${q.slice(0, 60)}`,
+                  color: 0xf59e0b,
+                  fields: [
+                    { name: "Query", value: q.slice(0, 60), inline: true },
+                    { name: "Note", value: "No commander matched. Repeats in 24h are logged, not re-pinged.", inline: false },
+                  ],
+                  timestamp: new Date().toISOString(),
+                },
+              ],
+            }),
+          });
+        } catch {
+          // Ping failures are silent.
+        }
       }
     }
     return Response.json({ commanders });
