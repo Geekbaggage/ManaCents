@@ -4,8 +4,6 @@ import {
   AFFILIATE_CODES,
   tcgplayerListText,
   tcgplayerMassEntryUrl,
-  cardKingdomSearchUrl,
-  manaPoolCardUrl,
   manaPoolDeckUrl,
   cardTraderUrl,
   SLEEVES_URL,
@@ -102,7 +100,7 @@ function Modal({ title, onClose, children }) {
 }
 
 export default function CheckoutBar({ commander, budget, cards, total, remaining, onToast }) {
-  const [modal, setModal] = useState(null); // 'ck' | 'mp' | 'ct' | 'share'
+  const [modal, setModal] = useState(null); // 'ct' | 'share'
   const [receiptUrl, setReceiptUrl] = useState(null);
   const [buildingReceipt, setBuildingReceipt] = useState(false);
   const eu = isEuLocale();
@@ -178,10 +176,9 @@ export default function CheckoutBar({ commander, budget, cards, total, remaining
                   <button onClick={buyTcgplayer} disabled={!cards.length}>Buy All on TCGplayer</button>
                 </>
               )}
-              <button onClick={() => setModal("ck")} disabled={!cards.length}>Card Kingdom</button>
-              {eu
-                ? <button onClick={() => setModal("ct")} disabled={!cards.length}>CardTrader</button>
-                : <button onClick={() => setModal("mp")} disabled={!cards.length}>Mana Pool (By Card)</button>}
+              {eu && (
+                <button onClick={() => setModal("ct")} disabled={!cards.length}>CardTrader</button>
+              )}
               <button onClick={() => setModal("share")}>Share &amp; export</button>
             </div>
           </div>
@@ -189,45 +186,6 @@ export default function CheckoutBar({ commander, budget, cards, total, remaining
           <p className="ftc">Prices updated daily. Buying through these links supports ManaCents at no extra cost to you.</p>
         </div>
       </div>
-
-      {modal === "ck" && (
-        <Modal title="Card Kingdom products" onClose={() => setModal(null)}>
-          <p className="note">Card Kingdom has no public mass-add link. Open each product below, or copy the list for reference.</p>
-          {cards.map((c) => (
-            <div className="vendor-row" key={c.scryfall_id}>
-              <span>{c.name} · {money(c.usd)}</span>
-              <a className="button" href={cardKingdomSearchUrl(c.name)} target="_blank" rel="noopener sponsored">
-                Open on Card Kingdom ↗
-              </a>
-            </div>
-          ))}
-          <div style={{ marginTop: "0.8rem" }}>
-            <button onClick={() => doCopy(decklistText(cards, budget, false), "List copied")}>Copy list</button>
-          </div>
-        </Modal>
-      )}
-
-      {modal === "mp" && (
-        <Modal title="Mana Pool products" onClose={() => setModal(null)}>
-          <p className="note">Buy the whole list at once — Mana Pool optimizes sellers and shipping at checkout — or open individual cards below.</p>
-          <div style={{ marginBottom: "0.8rem" }}>
-            <a className="button primary" href={manaPoolDeckUrl(cards)} target="_blank" rel="noopener sponsored">
-              Buy All on Mana Pool
-            </a>
-          </div>
-          {cards.map((c) => (
-            <div className="vendor-row" key={c.scryfall_id}>
-              <span>{c.name} · {money(c.usd)}</span>
-              <a className="button" href={manaPoolCardUrl(c.name)} target="_blank" rel="noopener sponsored">
-                Open on Mana Pool ↗
-              </a>
-            </div>
-          ))}
-          <div style={{ marginTop: "0.8rem" }}>
-            <button onClick={() => doCopy(decklistText(cards, budget, false), "List copied")}>Copy list</button>
-          </div>
-        </Modal>
-      )}
 
       {modal === "ct" && (
         <Modal title="CardTrader marketplace" onClose={() => setModal(null)}>
