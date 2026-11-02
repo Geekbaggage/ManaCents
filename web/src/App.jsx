@@ -4,6 +4,7 @@ import { searchCommanders, fetchAllCommanders, fetchUpgrades, money, previewComm
 import CheckoutBar from "./components/CheckoutBar.jsx";
 import About from "./components/About.jsx";
 import Footer from "./components/Footer.jsx";
+import { CombosIndex, ComboDetail, getCombo } from "./components/Combos.jsx";
 
 // Color-identity filter chips. Exact-match semantics: a commander shows only
 // when its color identity is exactly the selected pips (so W+U+R finds Jeskai
@@ -257,12 +258,33 @@ function CardLightbox({ cards, index, onClose, onNav, selected, onToggle }) {
 
 export default function App() {
   const [view, setView] = useState("landing");
+  const [comboSlug, setComboSlug] = useState(null);
 
   // Scroll to top and set the page title when switching views.
+  // Unknown combo slugs get a robots noindex so they stay out of search indexes.
   useEffect(() => {
     window.scrollTo(0, 0);
-    document.title = view === "about" ? "About — ManaCents" : "ManaCents — Commander upgrades that respect your wallet";
-  }, [view]);
+    const setNoindex = (on) => {
+      let tag = document.querySelector('meta[name="robots"]');
+      if (on) {
+        if (!tag) {
+          tag = document.createElement("meta");
+          tag.setAttribute("name", "robots");
+          document.head.appendChild(tag);
+        }
+        tag.setAttribute("content", "noindex");
+      } else if (tag) {
+        tag.remove();
+      }
+    };
+    if (view === "about") { document.title = "About — ManaCents"; setNoindex(false); }
+    else if (view === "combos") { document.title = "Cheap Infinite Combos — ManaCents"; setNoindex(false); }
+    else if (view === "combo") {
+      const c = comboSlug ? getCombo(comboSlug) : null;
+      document.title = c ? `${c.title} — ManaCents Combos` : "Combo not found — ManaCents";
+      setNoindex(!c);
+    } else { document.title = "ManaCents — Commander upgrades that respect your wallet"; setNoindex(false); }
+  }, [view, comboSlug]);
   // Respect reduced-motion: show the poster's still instead of autoplaying.
   const [reducedMotion] = useState(
     () =>
@@ -280,10 +302,14 @@ export default function App() {
   const [budgetInput, setBudgetInput] = useState("40");
   const [mode, setMode] = useState("tuneup");
   // Deep links: ?commander=<slug>&budget=<n>&mode=<tuneup|splash> opens with
-  // that list already built (shared from Reddit/Discord/IG). Parsed once.
+  // that list already built (shared from Reddit/Discord/IG). ?combos opens the
+  // combos index; ?combo=<slug> opens one combo. Parsed once.
   const [deepLink] = useState(() => {
     try {
       const p = new URLSearchParams(window.location.search);
+      if (p.has("combos")) return { combos: true };
+      const cslug = p.get("combo");
+      if (cslug) return { combo: cslug };
       const slug = p.get("commander");
       if (!slug) return null;
       return {
@@ -354,9 +380,27 @@ export default function App() {
     setSuggestions([]);
     setResult(null);
     setResultError("");
+    setComboSlug(null);
     try {
       window.history.replaceState(null, "", "/");
     } catch { /* URL reset is best-effort */ }
+  };
+
+  // Combos navigation. ?combos opens the index; ?combo=<slug> opens one combo
+  // (shared from IG reels). Unknown slugs render a friendly not-found.
+  const goCombos = () => {
+    setComboSlug(null);
+    setView("combos");
+    try {
+      window.history.replaceState(null, "", "/?combos");
+    } catch { /* URL update is best-effort */ }
+  };
+  const openCombo = (slug) => {
+    setComboSlug(slug);
+    setView("combo");
+    try {
+      window.history.replaceState(null, "", `/?combo=${encodeURIComponent(slug)}`);
+    } catch { /* URL update is best-effort */ }
   };
 
   const toggleColorPip = (pip) => {
@@ -552,8 +596,21 @@ export default function App() {
 
   // Deep link: once the registry loads, select the linked commander and
   // build its list automatically. Unknown slugs fall back to the homepage.
+  // ?combos and ?combo=<slug> open the combos views directly.
   useEffect(() => {
-    if (!deepLink || deepLinkDone.current || !allCommanders) return;
+    if (!deepLink || deepLinkDone.current) return;
+    if (deepLink.combos) {
+      deepLinkDone.current = true;
+      setView("combos");
+      return;
+    }
+    if (deepLink.combo) {
+      deepLinkDone.current = true;
+      setComboSlug(deepLink.combo);
+      setView("combo");
+      return;
+    }
+    if (!allCommanders) return;
     deepLinkDone.current = true;
     const found = allCommanders.find((c) => c.slug === deepLink.slug);
     if (!found) return;
@@ -665,10 +722,23 @@ export default function App() {
             <img src="/logo-mark.png" alt="" />
             <span className="brand">Mana<span className="brand-cents">Cents</span></span>
           </button>
+          <nav className="site-nav" aria-label="Site">
+            <button type="button" className="nav-link" onClick={goCombos}>
+              Combos
+            </button>
+          </nav>
         </header>
 
         {view === "about" && (
           <About onBack={() => setView("landing")} />
+        )}
+
+        {view === "combos" && (
+          <CombosIndex onOpen={openCombo} />
+        )}
+
+        {view === "combo" && (
+          <ComboDetail slug={comboSlug} onBack={goCombos} />
         )}
 
         {view === "landing" && (

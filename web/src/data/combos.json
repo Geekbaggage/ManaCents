@@ -1,0 +1,362 @@
+{
+  "combos": [
+    {
+      "caveats": [
+        "Tokens have no haste, so this is not an automatic win",
+        "Needs a payoff or a haste enabler to close"
+      ],
+      "episode": 1,
+      "id": "ondu-secret-arcade",
+      "loop_steps": [
+        "Make a token — Ondu doubles it",
+        "Secret Arcade triggers off the tokens",
+        "Keep the engine fed; tokens are 3/3s with no haste"
+      ],
+      "outcome": "Infinite 3/3 tokens (no haste — not an automatic win)",
+      "pieces": [
+        {
+          "finish": "nonfoil",
+          "name": "Ondu Spiritdancer",
+          "price": 9.73,
+          "printing": "DSC #101",
+          "role": "Doubles your tokens"
+        },
+        {
+          "finish": "nonfoil",
+          "name": "Secret Arcade // Dusty Parlor",
+          "price": 3.11,
+          "printing": "DSC #10",
+          "role": "Makes the tokens"
+        }
+      ],
+      "precon": {
+        "detail": "2024 Duskmourn Jeskai precon led by Aminatou, Veil Piercer",
+        "incremental_cost": 0,
+        "name": "Miracle Worker",
+        "pieces_included": [
+          "Ondu Spiritdancer",
+          "Secret Arcade // Dusty Parlor"
+        ]
+      },
+      "prerequisites": [
+        "Both pieces on the battlefield",
+        "A way to make your first token"
+      ],
+      "reel_url": "https://www.instagram.com/reel/DfA5Vi2jvWo/",
+      "slug": "ondu-spiritdancer-secret-arcade",
+      "title": "Ondu Spiritdancer + Secret Arcade",
+      "total_from_scratch": 12.84,
+      "verified_date": "2026-11-01"
+    },
+    {
+      "caveats": [
+        "Setup costs 12 mana across cast + equip",
+        "Dies to removal on either piece in response"
+      ],
+      "episode": 2,
+      "id": "celebrant-helm",
+      "loop_steps": [
+        "Helm makes a hasty Celebrant token at combat",
+        "Exert the token: untap everything, take another combat",
+        "Each new combat makes another token — repeat forever"
+      ],
+      "outcome": "Infinite combat steps",
+      "pieces": [
+        {
+          "finish": "nonfoil",
+          "name": "Combat Celebrant",
+          "price": 1.53,
+          "printing": "J25 #531",
+          "role": "Extra combats"
+        },
+        {
+          "finish": "nonfoil",
+          "name": "Helm of the Host",
+          "price": 5.69,
+          "printing": "MSC #200",
+          "role": "Copies the Celebrant"
+        }
+      ],
+      "precon": {
+        "detail": "2024 Bloomburrow Jeskai precon led by Zinnia, Valley's Voice",
+        "incremental_cost": 0,
+        "name": "Family Matters",
+        "pieces_included": [
+          "Combat Celebrant",
+          "Helm of the Host"
+        ]
+      },
+      "prerequisites": [
+        "12 mana to cast and equip (3 + 4 + 5)",
+        "Combat Celebrant equipped with Helm of the Host"
+      ],
+      "reel_url": "https://www.instagram.com/reel/DfDAgJ6jo0Z/",
+      "slug": "combat-celebrant-helm-of-the-host",
+      "title": "Combat Celebrant + Helm of the Host",
+      "total_from_scratch": 7.22,
+      "verified_date": "2026-11-01"
+    },
+    {
+      "caveats": [
+        "Needs 6 energy banked before the first attack",
+        "Both creatures must survive their attacks",
+        "Combat-based finish — not instant-speed"
+      ],
+      "episode": 3,
+      "id": "satya-runner",
+      "instagram_media_id": "18072431789784749",
+      "loop_steps": [
+        "Attack with both: Satya banks 2 energy and makes a Runner token; the original Runner banks 2 more (10 total)",
+        "Pay 8 energy: untap everything, take another combat",
+        "Later combats: the accumulating Runner tokens attack too, each banking 2 more — every combat funds the next"
+      ],
+      "outcome": "Infinite combat steps (energy-fueled)",
+      "pieces": [
+        {
+          "finish": "foil",
+          "name": "Satya, Aetherflux Genius",
+          "price": 0.27,
+          "printing": "M3C #3",
+          "role": "Copies the Runner, banks energy"
+        },
+        {
+          "finish": "nonfoil",
+          "name": "Lightning Runner",
+          "price": 0.16,
+          "printing": "M3C #215",
+          "role": "Banks energy on attack"
+        }
+      ],
+      "precon": {
+        "detail": "2024 Modern Horizons 3 Jeskai precon led by Satya, Aetherflux Genius",
+        "incremental_cost": 0,
+        "name": "Creative Energy",
+        "pieces_included": [
+          "Satya, Aetherflux Genius",
+          "Lightning Runner"
+        ]
+      },
+      "prerequisites": [
+        "6 energy banked to start",
+        "Both creatures able to attack and survive"
+      ],
+      "reel_url": null,
+      "slug": "satya-aetherflux-genius-lightning-runner",
+      "title": "Satya, Aetherflux Genius + Lightning Runner",
+      "total_from_scratch": 0.43,
+      "verified_date": "2026-10-29"
+    },
+    {
+      "caveats": [
+        "Bounded by the basics left in your library",
+        "First landfall each turn manifests dread instead of flipping — plan around it"
+      ],
+      "episode": 4,
+      "id": "zimone-loop",
+      "instagram_media_id": "18073724294769500",
+      "loop_steps": [
+        "Sacrifice the Elder: tutor a basic land to the battlefield",
+        "Yedora returns the Elder face-down, as a Forest land",
+        "Zimone's landfall flips it face-up again",
+        "Repeat — every loop is another basic and another landfall trigger"
+      ],
+      "outcome": "Infinite basic lands + infinite landfall triggers",
+      "pieces": [
+        {
+          "finish": "foil",
+          "name": "Zimone, Mystery Unraveler",
+          "price": 0.37,
+          "printing": "DSC #8",
+          "role": "Flips the Elder face-up"
+        },
+        {
+          "finish": "nonfoil",
+          "name": "Yedora, Grave Gardener",
+          "price": 0.18,
+          "printing": "CMM #333",
+          "role": "Returns the Elder as a Forest"
+        },
+        {
+          "finish": "nonfoil",
+          "name": "Sakura-Tribe Elder",
+          "price": 0.31,
+          "printing": "SCD #208",
+          "role": "Sacs to tutor a basic"
+        }
+      ],
+      "precon": {
+        "detail": "2024 Duskmourn Simic precon led by Zimone, Mystery Unraveler",
+        "incremental_cost": 0,
+        "name": "Jump Scare!",
+        "pieces_included": [
+          "Zimone, Mystery Unraveler",
+          "Yedora, Grave Gardener",
+          "Sakura-Tribe Elder"
+        ]
+      },
+      "prerequisites": [
+        "All three on the battlefield",
+        "Sakura-Tribe Elder ready to sacrifice"
+      ],
+      "reel_url": null,
+      "slug": "zimone-yedora-sakura-tribe-elder",
+      "title": "Zimone + Yedora + Sakura-Tribe Elder",
+      "total_from_scratch": 0.86,
+      "verified_date": "2026-10-30"
+    },
+    {
+      "caveats": [
+        "Needs all four pieces — kill any one in response and the loop stops cold",
+        "Graveyard hate ends the recast"
+      ],
+      "episode": 5,
+      "id": "gravecrawler-loop",
+      "instagram_media_id": "17995885649840851",
+      "loop_steps": [
+        "Control Rooftop Storm, Diregraf Captain, and Viscera Seer. Cast Gravecrawler for free — from hand or graveyard",
+        "Sacrifice Gravecrawler to the Seer: scry 1. It dies, so the Captain drains an opponent for 1",
+        "Cast Gravecrawler from your graveyard for free again — you still control a Zombie (the Captain)",
+        "Repeat forever: infinite scry, infinite drain"
+      ],
+      "outcome": "Infinite scry + infinite drain (1 life per loop)",
+      "pieces": [
+        {
+          "finish": "nonfoil",
+          "name": "Gravecrawler",
+          "price": 0.56,
+          "printing": "FDC #104",
+          "role": "The zombie that won't stay dead"
+        },
+        {
+          "finish": "nonfoil",
+          "name": "Rooftop Storm",
+          "price": 2.11,
+          "printing": "INR #83",
+          "role": "Zombie spells cost nothing"
+        },
+        {
+          "finish": "nonfoil",
+          "name": "Diregraf Captain",
+          "price": 0.33,
+          "printing": "DDQ #68",
+          "role": "Drains 1 when a Zombie dies"
+        },
+        {
+          "finish": "nonfoil",
+          "name": "Viscera Seer",
+          "price": 0.57,
+          "printing": "TDC #199",
+          "role": "Free sac outlet, scry 1"
+        }
+      ],
+      "precon": null,
+      "precon_note": "Only Gravecrawler ships in Undead Unleashed — priced from scratch only.",
+      "prerequisites": [
+        "All four pieces on the battlefield",
+        "Gravecrawler in hand or graveyard to start"
+      ],
+      "reel_url": null,
+      "slug": "gravecrawler-rooftop-storm-diregraf-captain-viscera-seer",
+      "title": "Gravecrawler Zombie Loop",
+      "total_from_scratch": 3.57,
+      "verified_date": "2026-10-31"
+    },
+    {
+      "caveats": [
+        "Stella has to survive — removal on her in response kills the loop",
+        "You must cast 3 spells first, and the copy has to stay on the stack while you work"
+      ],
+      "episode": 6,
+      "id": "stella-fealty",
+      "instagram_media_id": "18102520574432551",
+      "loop_steps": [
+        "Cast two spells, then Twisted Fealty targeting Stella",
+        "Tap Stella: copy it while the original is still on the stack — the copy untaps her",
+        "Tap her again. And again. Infinite copies",
+        "Every copy makes a Wicked Role; the old one falls off to the graveyard and drains each opponent for 1"
+      ],
+      "outcome": "Infinite spell copies + infinite drain (1 life per loop)",
+      "pieces": [
+        {
+          "finish": "nonfoil",
+          "name": "Stella Lee, Wild Card",
+          "price": 4.61,
+          "printing": "OTC #3",
+          "role": "Copies the spell, untaps itself"
+        },
+        {
+          "finish": "nonfoil",
+          "name": "Twisted Fealty",
+          "price": 0.29,
+          "printing": "WOE #154",
+          "role": "Untaps Stella, makes the Wicked Role"
+        }
+      ],
+      "precon": {
+        "detail": "2024 Outlaws of Thunder Junction Izzet precon led by Stella Lee, Wild Card",
+        "incremental_cost": 0.29,
+        "incremental_note": "Twisted Fealty is the #1 most-added card to Quick Draw (38.7% of decks per EDHREC) — not in the box.",
+        "name": "Quick Draw",
+        "pieces_included": [
+          "Stella Lee, Wild Card"
+        ],
+        "pieces_not_included": [
+          "Twisted Fealty"
+        ]
+      },
+      "prerequisites": [
+        "Stella Lee on the battlefield",
+        "3 spells cast this turn (unlocks her tap ability)",
+        "Twisted Fealty in hand"
+      ],
+      "reel_url": null,
+      "slug": "stella-lee-twisted-fealty",
+      "title": "Stella Lee + Twisted Fealty",
+      "total_from_scratch": 4.9,
+      "verified_date": "2026-11-01"
+    },
+    {
+      "caveats": [
+        "Infinite tokens is not an immediate win — you need a haste enabler or another outlet",
+        "Needs a green creature entering to get started"
+      ],
+      "episode": 7,
+      "id": "scurry-denizen",
+      "instagram_media_id": "17966258805218296",
+      "loop_steps": [
+        "Both on board. A green creature enters",
+        "The Denizen puts a +1/+1 counter on the Oak",
+        "The Oak makes a 1/1 Squirrel — which entering triggers the Denizen again",
+        "Repeat. Squirrels forever"
+      ],
+      "outcome": "Infinite 1/1 Squirrel tokens (not an immediate win)",
+      "pieces": [
+        {
+          "finish": "nonfoil",
+          "name": "Scurry Oak",
+          "price": 2.39,
+          "printing": "PLST MH2-172",
+          "role": "Makes a Squirrel per counter"
+        },
+        {
+          "finish": "nonfoil",
+          "name": "Ivy Lane Denizen",
+          "price": 0.19,
+          "printing": "CLU #166",
+          "role": "Puts the counter on the Oak"
+        }
+      ],
+      "precon": null,
+      "precon_note": "Priced from scratch only — no precon-residency claim.",
+      "prerequisites": [
+        "Both pieces on the battlefield",
+        "A green creature entering to kick it off"
+      ],
+      "reel_url": null,
+      "slug": "scurry-oak-ivy-lane-denizen",
+      "title": "Scurry Oak + Ivy Lane Denizen",
+      "total_from_scratch": 2.58,
+      "verified_date": "2026-11-01"
+    }
+  ]
+}

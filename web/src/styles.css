@@ -491,3 +491,59 @@ input:focus, select:focus, button:focus-visible {
   color: #e2e8f0; font-size: 0.95rem; text-align: center;
   padding: 0 1rem;
 }
+
+/* ---- Combos page ---- */
+.site-nav { margin-left: auto; display: flex; align-items: center; }
+.nav-link {
+  background: none; border: none; cursor: pointer;
+  color: #e2e8f0; font-size: 1rem; font-weight: 600; padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+}
+.nav-link:hover { color: #10b981; background: rgba(16, 185, 129, 0.08); }
+.combos-page { max-width: 880px; margin: 0 auto; padding: 1.5rem 1rem 3rem; color: #e2e8f0; }
+.combos-page h1 { font-size: 1.9rem; margin: 0.5rem 0; color: #fff; }
+.combos-page h2 { font-size: 1.25rem; margin: 1.75rem 0 0.75rem; color: #fff; }
+.combos-sub { color: #94a3b8; margin: 0 0 1.5rem; }
+.combo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; }
+.combo-card {
+  background: #0f172a; border: 1px solid #1e293b; border-radius: 0.9rem;
+  padding: 1.1rem; text-align: left; cursor: pointer; color: #e2e8f0;
+  display: flex; flex-direction: column; gap: 0.45rem;
+}
+.combo-card:hover { border-color: #10b981; }
+.combo-card-ep { color: #f0743e; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+.combo-card-title { font-size: 1.1rem; font-weight: 700; color: #fff; }
+.combo-card-total { color: #d4af37; font-weight: 700; font-size: 1.05rem; }
+.combo-card-total span { color: #94a3b8; font-weight: 400; font-size: 0.85rem; }
+.combo-card-outcome { color: #94a3b8; font-size: 0.9rem; }
+.combo-precon-badge {
+  display: inline-block; margin-top: 0.25rem; font-size: 0.85rem; font-weight: 600;
+  color: #10b981; background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 999px; padding: 0.25rem 0.7rem;
+}
+.combo-back { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 0.95rem; padding: 0; margin-bottom: 0.5rem; }
+.combo-back:hover { color: #10b981; }
+.combo-pieces { width: 100%; border-collapse: collapse; margin: 0.5rem 0; }
+.combo-pieces td { padding: 0.6rem 0.5rem; border-bottom: 1px solid #1e293b; vertical-align: top; }
+.combo-piece-name { font-weight: 700; color: #fff; }
+.combo-piece-print { color: #94a3b8; font-size: 0.85rem; white-space: nowrap; }
+.combo-piece-role { color: #94a3b8; font-size: 0.9rem; }
+.combo-piece-price { color: #d4af37; font-weight: 700; text-align: right; white-space: nowrap; }
+.combo-precon-note { background: rgba(16, 185, 129, 0.07); border-left: 3px solid #10b981; padding: 0.75rem 1rem; border-radius: 0 0.5rem 0.5rem 0; color: #cbd5e1; }
+.combo-steps, .combo-list { color: #cbd5e1; line-height: 1.6; }
+.combo-steps li, .combo-list li { margin-bottom: 0.5rem; }
+.combo-buybox { background: #0f172a; border: 1px solid #1e293b; border-radius: 0.9rem; padding: 1.25rem; margin-top: 2rem; }
+.combo-buybox h3 { margin: 0 0 0.75rem; color: #fff; }
+.combo-buy-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 0.75rem; }
+.btn-buy, .btn-copy {
+  display: inline-block; padding: 0.6rem 1rem; border-radius: 0.6rem;
+  font-weight: 600; font-size: 0.92rem; cursor: pointer; text-decoration: none;
+}
+.btn-buy { background: #10b981; color: #06281c; border: none; }
+.btn-buy:hover { background: #0da271; }
+.btn-copy { background: transparent; color: #e2e8f0; border: 1px solid #334155; }
+.btn-copy:hover { border-color: #10b981; color: #10b981; }
+.combo-disclosure { color: #64748b; font-size: 0.8rem; margin: 0.5rem 0 0; }
+@media (max-width: 640px) {
+  .combo-piece-print, .combo-piece-role { display: none; }
+}
