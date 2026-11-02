@@ -657,3 +657,9 @@ input:focus, select:focus, button:focus-visible {
   .combos-teaser { flex-direction: column; text-align: center; }
   .combo-eq-card { flex: 1 1 40%; }
 }
+
+/* ---- Combos: color identity banner bar ---- */
+.combo-card-ci-bar {
+  display: block; height: 8px; border-radius: 999px;
+  margin: -0.35rem -0.35rem 0.65rem;
+}

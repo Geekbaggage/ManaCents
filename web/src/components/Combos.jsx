@@ -17,7 +17,16 @@ export function getCombo(slug) {
   return combos.find((c) => c.slug === slug) ?? null;
 }
 
-export function ColorPips({ identity, size = 22 }) {
+const PIP_BG = { W: "#f8f6d8", U: "#0e68ab", B: "#3b2f2f", R: "#d3202a", G: "#00733e" };
+
+function ciGradient(identity) {
+  const ids = identity.length > 0 ? identity : ["C"];
+  const bg = (id) => PIP_BG[id] ?? "#475569";
+  const segs = ids.map((id, i) => `${bg(id)} ${(i / ids.length) * 100}%, ${bg(id)} ${((i + 1) / ids.length) * 100}%`);
+  return `linear-gradient(90deg, ${segs.join(", ")})`;
+}
+
+export function ColorPips({ identity, size = 26 }) {
   if (!identity || identity.length === 0) return <span className="combo-pips" title="Colorless">◯</span>;
   return (
     <span className="combo-pips" aria-label={`Color identity ${identity.join("")}`}>
@@ -181,6 +190,12 @@ export function CombosIndex({ onOpen }) {
         <div className="combo-grid">
           {filtered.map((c) => (
             <button key={c.slug} type="button" className="combo-card" onClick={() => onOpen(c.slug)}>
+              <span
+                className="combo-card-ci-bar"
+                style={{ background: ciGradient(c.color_identity) }}
+                aria-hidden="true"
+                title={`Colors: ${c.color_identity.join("") || "Colorless"}`}
+              />
               <div className="combo-card-art">
                 {c.pieces.slice(0, 3).map((p, i) => (
                   <img
