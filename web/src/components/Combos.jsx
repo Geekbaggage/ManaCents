@@ -92,7 +92,7 @@ export function CombosIndex({ onOpen }) {
     () =>
       combos.filter((c) => {
         if (typeTab !== "all" && c.combo_type !== typeTab) return false;
-        if (colors.size > 0 && !c.color_identity.every((ci) => colors.has(ci))) return false;
+        if (colors.size > 0 && !c.color_identity.some((ci) => colors.has(ci))) return false;
         const q = query.trim().toLowerCase();
         if (q && !matchesQuery(c, q)) return false;
         return true;
@@ -141,7 +141,7 @@ export function CombosIndex({ onOpen }) {
           ))}
         </div>
         <div className="combo-color-filter" role="group" aria-label="Show combos that fit your deck colors">
-          <span className="combo-color-label">Fits my deck colors:</span>
+          <span className="combo-color-label">Includes color:</span>
           {COLOR_PIPS.map((pip) => (
             <button
               key={pip.id}
