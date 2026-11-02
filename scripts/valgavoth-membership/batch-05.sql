@@ -1,0 +1,6 @@
+INSERT OR IGNORE INTO precon_membership (commander_slug, card_name, source) VALUES ('valgavoth-harrower-of-souls', 'Geothermal Bog', 'Wizards official Duskmourn: House of Horror Commander Decklists - Endless Punishment');
+INSERT OR IGNORE INTO precon_membership (commander_slug, card_name, source) VALUES ('valgavoth-harrower-of-souls', 'Leechridden Swamp', 'Wizards official Duskmourn: House of Horror Commander Decklists - Endless Punishment');
+INSERT OR IGNORE INTO precon_membership (commander_slug, card_name, source) VALUES ('valgavoth-harrower-of-souls', 'Tainted Peak', 'Wizards official Duskmourn: House of Horror Commander Decklists - Endless Punishment');
+INSERT OR IGNORE INTO precon_membership (commander_slug, card_name, source) VALUES ('valgavoth-harrower-of-souls', 'Temple of the False God', 'Wizards official Duskmourn: House of Horror Commander Decklists - Endless Punishment');
+INSERT OR IGNORE INTO precon_membership (commander_slug, card_name, source) VALUES ('valgavoth-harrower-of-souls', 'Swamp', 'Wizards official Duskmourn: House of Horror Commander Decklists - Endless Punishment');
+INSERT OR IGNORE INTO precon_membership (commander_slug, card_name, source) VALUES ('valgavoth-harrower-of-souls', 'Mountain', 'Wizards official Duskmourn: House of Horror Commander Decklists - Endless Punishment');

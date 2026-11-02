@@ -5,8 +5,36 @@ import { manaPoolCardUrl, tcgplayerListText, tcgplayerMassEntryUrl } from "../af
 
 const combos = combosData.combos;
 
+const COLOR_PIPS = [
+  { id: "W", label: "White", bg: "#f8f6d8", fg: "#1e293b" },
+  { id: "U", label: "Blue", bg: "#0e68ab", fg: "#f8fafc" },
+  { id: "B", label: "Black", bg: "#3b2f2f", fg: "#f8fafc" },
+  { id: "R", label: "Red", bg: "#d3202a", fg: "#f8fafc" },
+  { id: "G", label: "Green", bg: "#00733e", fg: "#f8fafc" },
+];
+
 export function getCombo(slug) {
   return combos.find((c) => c.slug === slug) ?? null;
+}
+
+export function ColorPips({ identity, size = 22 }) {
+  if (!identity || identity.length === 0) return <span className="combo-pips" title="Colorless">◯</span>;
+  return (
+    <span className="combo-pips" aria-label={`Color identity ${identity.join("")}`}>
+      {identity.map((pip) => {
+        const def = COLOR_PIPS.find((p) => p.id === pip);
+        return (
+          <span
+            key={pip}
+            className="combo-pip"
+            style={{ background: def.bg, color: def.fg, width: size, height: size, fontSize: size * 0.55 }}
+          >
+            {pip}
+          </span>
+        );
+      })}
+    </span>
+  );
 }
 
 function PreconBadge({ combo }) {
@@ -19,6 +47,172 @@ function PreconBadge({ combo }) {
     <span className="combo-precon-badge" title={combo.precon.detail}>
       🎯 {label}
     </span>
+  );
+}
+
+function TypePill({ combo }) {
+  const label = combo.combo_type === "infinite" ? "∞ Infinite" : "Non-infinite";
+  return <span className={`combo-type-pill ${combo.combo_type}`}>{label}</span>;
+}
+
+// Homepage discovery panel — compact, subordinate to the builder.
+export function CombosTeaser({ onOpen }) {
+  return (
+    <section className="combos-teaser" aria-label="Commander combos">
+      <div className="combos-teaser-text">
+        <h2>⚡ Commander Combos</h2>
+        <p>Discover infinite loops and clever interactions that fit your colors. Verified cards, clear steps, estimated costs.</p>
+      </div>
+      <button type="button" className="btn-buy" onClick={onOpen}>
+        Find combos
+      </button>
+    </section>
+  );
+}
+
+function matchesQuery(c, q) {
+  const hay = [c.title, c.outcome, c.precon?.name ?? "", ...c.pieces.map((p) => p.name)].join(" ").toLowerCase();
+  return hay.includes(q);
+}
+
+export function CombosIndex({ onOpen }) {
+  const [query, setQuery] = useState("");
+  const [typeTab, setTypeTab] = useState("all");
+  const [colors, setColors] = useState(new Set());
+  const toggleColor = (id) => {
+    setColors((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const filtered = useMemo(
+    () =>
+      combos.filter((c) => {
+        if (typeTab !== "all" && c.combo_type !== typeTab) return false;
+        if (colors.size > 0 && !c.color_identity.every((ci) => colors.has(ci))) return false;
+        const q = query.trim().toLowerCase();
+        if (q && !matchesQuery(c, q)) return false;
+        return true;
+      }),
+    [query, typeTab, colors]
+  );
+  const hasFilters = query.trim() !== "" || typeTab !== "all" || colors.size > 0;
+  const reset = () => {
+    setQuery("");
+    setTypeTab("all");
+    setColors(new Set());
+  };
+
+  return (
+    <div className="combos-page">
+      <h1>Commander Combos</h1>
+      <p className="combos-sub">
+        A growing library of human-verified Commander combos — infinite loops and clever interactions.
+        Every entry: real Oracle text, cheapest-printing prices, and the honest catches.
+      </p>
+
+      <div className="combo-filters">
+        <input
+          type="search"
+          className="combo-search"
+          placeholder="Search card or combo name"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          aria-label="Search combos by card or combo name"
+        />
+        <div className="combo-type-tabs" role="group" aria-label="Filter by combo type">
+          {[
+            ["all", "All"],
+            ["infinite", "∞ Infinite"],
+            ["non-infinite", "Non-infinite"],
+          ].map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              className={typeTab === id ? "on" : ""}
+              onClick={() => setTypeTab(id)}
+              aria-pressed={typeTab === id}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <div className="combo-color-filter" role="group" aria-label="Show combos that fit your deck colors">
+          <span className="combo-color-label">Fits my deck colors:</span>
+          {COLOR_PIPS.map((pip) => (
+            <button
+              key={pip.id}
+              type="button"
+              className={colors.has(pip.id) ? "pip on" : "pip"}
+              style={{ "--pip-bg": pip.bg, "--pip-fg": pip.fg }}
+              onClick={() => toggleColor(pip.id)}
+              aria-pressed={colors.has(pip.id)}
+              aria-label={`${pip.label} ${colors.has(pip.id) ? "on" : "off"}`}
+              title={pip.label}
+            >
+              {pip.id}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <p className="combo-result-count" role="status">
+        {filtered.length} matching {filtered.length === 1 ? "combo" : "combos"}
+        {hasFilters && (
+          <button type="button" className="combo-reset" onClick={reset}>
+            Reset filters
+          </button>
+        )}
+      </p>
+
+      {filtered.length === 0 ? (
+        <p className="combo-empty">
+          No matching verified combos yet.{" "}
+          {hasFilters && (
+            <button type="button" className="combo-reset" onClick={reset}>
+              Reset filters
+            </button>
+          )}
+        </p>
+      ) : (
+        <div className="combo-grid">
+          {filtered.map((c) => (
+            <button key={c.slug} type="button" className="combo-card" onClick={() => onOpen(c.slug)}>
+              <div className="combo-card-art">
+                {c.pieces.slice(0, 3).map((p, i) => (
+                  <img
+                    key={p.name}
+                    src={p.art}
+                    alt=""
+                    loading="lazy"
+                    style={{ transform: `rotate(${(i - (c.pieces.length - 1) / 2) * 7}deg)` }}
+                  />
+                ))}
+                {c.pieces.length > 1 && <span className="combo-card-plus">+</span>}
+              </div>
+              <div className="combo-card-ep">Episode {c.episode}</div>
+              <div className="combo-card-title">{c.title}</div>
+              <div className="combo-card-meta">
+                <ColorPips identity={c.color_identity} />
+                <TypePill combo={c} />
+              </div>
+              <div className="combo-card-outcome">{c.outcome}</div>
+              <div className="combo-card-foot">
+                <span className="combo-card-count">
+                  {c.pieces.length} {c.pieces.length === 1 ? "card" : "cards"}
+                </span>
+                <span className="combo-card-total">{money(c.total_from_scratch)}</span>
+              </div>
+              <PreconBadge combo={c} />
+              <span className="combo-card-cta">See how it works →</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -60,31 +254,6 @@ function BuyBox({ combo }) {
   );
 }
 
-export function CombosIndex({ onOpen }) {
-  return (
-    <div className="combos-page">
-      <h1>Cheap Infinite Combos for Commander</h1>
-      <p className="combos-sub">
-        Every loop below is human-verified: real Oracle text, real cheapest-printing prices, and the honest
-        catches. New combos land here after their reel ships.
-      </p>
-      <div className="combo-grid">
-        {combos.map((c) => (
-          <button key={c.slug} type="button" className="combo-card" onClick={() => onOpen(c.slug)}>
-            <div className="combo-card-ep">Episode {c.episode}</div>
-            <div className="combo-card-title">{c.title}</div>
-            <div className="combo-card-total">
-              {money(c.total_from_scratch)} <span>from scratch</span>
-            </div>
-            <div className="combo-card-outcome">{c.outcome}</div>
-            <PreconBadge combo={c} />
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export function ComboDetail({ slug, onBack }) {
   const combo = getCombo(slug);
   if (!combo) {
@@ -105,24 +274,33 @@ export function ComboDetail({ slug, onBack }) {
       </button>
       <div className="combo-card-ep">Episode {combo.episode}</div>
       <h1>{combo.title}</h1>
-      <p className="combos-sub">{combo.outcome}</p>
+      <div className="combo-detail-meta">
+        <ColorPips identity={combo.color_identity} size={26} />
+        <TypePill combo={combo} />
+      </div>
       <PreconBadge combo={combo} />
 
       <h2>The pieces — {money(combo.total_from_scratch)} from scratch</h2>
-      <table className="combo-pieces">
-        <tbody>
-          {combo.pieces.map((p) => (
-            <tr key={p.name}>
-              <td className="combo-piece-name">{p.name}</td>
-              <td className="combo-piece-print">
+      <div className="combo-equation" aria-label={`${combo.title}: ${combo.outcome}`}>
+        {combo.pieces.map((p, i) => (
+          <React.Fragment key={p.name}>
+            {i > 0 && <span className="combo-eq-plus" aria-hidden="true">+</span>}
+            <div className="combo-eq-card">
+              {p.art && <img src={p.art} alt={`${p.name} card art`} loading="lazy" />}
+              <div className="combo-eq-name">{p.name}</div>
+              <div className="combo-eq-print">
                 {p.printing} · {p.finish}
-              </td>
-              <td className="combo-piece-role">{p.role}</td>
-              <td className="combo-piece-price">{money(p.price)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              </div>
+              <div className="combo-eq-price">{money(p.price)}</div>
+              <a className="btn-copy combo-eq-buy" href={manaPoolCardUrl(p.name)} target="_blank" rel="noopener noreferrer">
+                Buy this card
+              </a>
+            </div>
+          </React.Fragment>
+        ))}
+      </div>
+      <div className="combo-eq-outcome">= {combo.outcome}</div>
+
       {combo.precon && (
         <p className="combo-precon-note">
           <strong>{combo.precon.name}</strong> ({combo.precon.detail}) ships{" "}

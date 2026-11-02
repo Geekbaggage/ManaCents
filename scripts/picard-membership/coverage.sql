@@ -1,0 +1,1 @@
+INSERT OR REPLACE INTO precon_coverage (commander_slug, precon_name, source_url, distinct_names, verified_at) VALUES ('jean-luc-picard-luminary', 'Federation Fleet', 'https://magic.wizards.com/en/news/announcements/star-trek-commander-decklists', 90, '2026-10-28');

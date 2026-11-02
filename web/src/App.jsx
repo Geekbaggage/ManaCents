@@ -4,7 +4,7 @@ import { searchCommanders, fetchAllCommanders, fetchUpgrades, money, previewComm
 import CheckoutBar from "./components/CheckoutBar.jsx";
 import About from "./components/About.jsx";
 import Footer from "./components/Footer.jsx";
-import { CombosIndex, ComboDetail, getCombo } from "./components/Combos.jsx";
+import { CombosIndex, ComboDetail, CombosTeaser, getCombo } from "./components/Combos.jsx";
 
 // Color-identity filter chips. Exact-match semantics: a commander shows only
 // when its color identity is exactly the selected pips (so W+U+R finds Jeskai
@@ -278,7 +278,7 @@ export default function App() {
       }
     };
     if (view === "about") { document.title = "About — ManaCents"; setNoindex(false); }
-    else if (view === "combos") { document.title = "Cheap Infinite Combos — ManaCents"; setNoindex(false); }
+    else if (view === "combos") { document.title = "Commander Combos — ManaCents"; setNoindex(false); }
     else if (view === "combo") {
       const c = comboSlug ? getCombo(comboSlug) : null;
       document.title = c ? `${c.title} — ManaCents Combos` : "Combo not found — ManaCents";
@@ -723,8 +723,13 @@ export default function App() {
             <span className="brand">Mana<span className="brand-cents">Cents</span></span>
           </button>
           <nav className="site-nav" aria-label="Site">
-            <button type="button" className="nav-link" onClick={goCombos}>
-              Combos
+            <button
+              type="button"
+              className={`nav-link${view === "combos" || view === "combo" ? " active" : ""}`}
+              onClick={goCombos}
+              aria-current={view === "combos" || view === "combo" ? "page" : undefined}
+            >
+              ⚡ Combos
             </button>
           </nav>
         </header>
@@ -908,6 +913,7 @@ export default function App() {
               </button>
             </div>
             <p className="form-error" role="alert">{formError}</p>
+            <CombosTeaser onOpen={goCombos} />
           </main>
         )}
 

@@ -19,14 +19,16 @@
           "name": "Ondu Spiritdancer",
           "price": 9.73,
           "printing": "DSC #101",
-          "role": "Doubles your tokens"
+          "role": "Doubles your tokens",
+          "art": "https://cards.scryfall.io/art_crop/front/e/e/ee1c6432-54d7-4b57-a554-f7194d74e03c.jpg?1783909632"
         },
         {
           "finish": "nonfoil",
           "name": "Secret Arcade // Dusty Parlor",
           "price": 3.11,
           "printing": "DSC #10",
-          "role": "Makes the tokens"
+          "role": "Makes the tokens",
+          "art": "https://cards.scryfall.io/art_crop/front/f/e/fe050c16-9be5-42ef-988f-0531a8bb2352.jpg?1783909661"
         }
       ],
       "precon": {
@@ -46,7 +48,11 @@
       "slug": "ondu-spiritdancer-secret-arcade",
       "title": "Ondu Spiritdancer + Secret Arcade",
       "total_from_scratch": 12.84,
-      "verified_date": "2026-11-01"
+      "verified_date": "2026-11-01",
+      "color_identity": [
+        "W"
+      ],
+      "combo_type": "infinite"
     },
     {
       "caveats": [
@@ -67,14 +73,16 @@
           "name": "Combat Celebrant",
           "price": 1.53,
           "printing": "J25 #531",
-          "role": "Extra combats"
+          "role": "Extra combats",
+          "art": "https://cards.scryfall.io/art_crop/front/e/e/ee9d77bb-ed05-49d9-8ced-d956101d3c65.jpg?1793197493"
         },
         {
           "finish": "nonfoil",
           "name": "Helm of the Host",
           "price": 5.69,
           "printing": "MSC #200",
-          "role": "Copies the Celebrant"
+          "role": "Copies the Celebrant",
+          "art": "https://cards.scryfall.io/art_crop/front/7/0/70ffc71f-328d-421d-926b-6f2e45ffb812.jpg?1783903218"
         }
       ],
       "precon": {
@@ -94,7 +102,11 @@
       "slug": "combat-celebrant-helm-of-the-host",
       "title": "Combat Celebrant + Helm of the Host",
       "total_from_scratch": 7.22,
-      "verified_date": "2026-11-01"
+      "verified_date": "2026-11-01",
+      "color_identity": [
+        "R"
+      ],
+      "combo_type": "infinite"
     },
     {
       "caveats": [
@@ -117,14 +129,16 @@
           "name": "Satya, Aetherflux Genius",
           "price": 0.27,
           "printing": "M3C #3",
-          "role": "Copies the Runner, banks energy"
+          "role": "Copies the Runner, banks energy",
+          "art": "https://cards.scryfall.io/art_crop/front/3/b/3b964bbe-54cc-425c-9cc6-c877f82af7ba.jpg?1783911437"
         },
         {
           "finish": "nonfoil",
           "name": "Lightning Runner",
           "price": 0.16,
           "printing": "M3C #215",
-          "role": "Banks energy on attack"
+          "role": "Banks energy on attack",
+          "art": "https://cards.scryfall.io/art_crop/front/e/5/e5d9c7eb-dca4-4471-a91f-a5aad3a69c2f.jpg?1783936753"
         }
       ],
       "precon": {
@@ -144,7 +158,13 @@
       "slug": "satya-aetherflux-genius-lightning-runner",
       "title": "Satya, Aetherflux Genius + Lightning Runner",
       "total_from_scratch": 0.43,
-      "verified_date": "2026-10-29"
+      "verified_date": "2026-10-29",
+      "color_identity": [
+        "W",
+        "U",
+        "R"
+      ],
+      "combo_type": "infinite"
     },
     {
       "caveats": [
@@ -167,21 +187,24 @@
           "name": "Zimone, Mystery Unraveler",
           "price": 0.37,
           "printing": "DSC #8",
-          "role": "Flips the Elder face-up"
+          "role": "Flips the Elder face-up",
+          "art": "https://cards.scryfall.io/art_crop/front/3/0/30f23588-5064-48d9-a271-039df757f8d2.jpg?1783909663"
         },
         {
           "finish": "nonfoil",
           "name": "Yedora, Grave Gardener",
           "price": 0.18,
           "printing": "CMM #333",
-          "role": "Returns the Elder as a Forest"
+          "role": "Returns the Elder as a Forest",
+          "art": "https://cards.scryfall.io/art_crop/front/7/b/7b852b55-bee1-46fc-87e4-5c01b90bbd43.jpg?1783909598"
         },
         {
           "finish": "nonfoil",
           "name": "Sakura-Tribe Elder",
           "price": 0.31,
           "printing": "SCD #208",
-          "role": "Sacs to tutor a basic"
+          "role": "Sacs to tutor a basic",
+          "art": "https://cards.scryfall.io/art_crop/front/7/a/7a8b1c49-8594-426d-b585-41140235bb0e.jpg?1783903761"
         }
       ],
       "precon": {
@@ -202,7 +225,12 @@
       "slug": "zimone-yedora-sakura-tribe-elder",
       "title": "Zimone + Yedora + Sakura-Tribe Elder",
       "total_from_scratch": 0.86,
-      "verified_date": "2026-10-30"
+      "verified_date": "2026-10-30",
+      "color_identity": [
+        "U",
+        "G"
+      ],
+      "combo_type": "infinite"
     },
     {
       "caveats": [
@@ -225,28 +253,32 @@
           "name": "Gravecrawler",
           "price": 0.56,
           "printing": "FDC #104",
-          "role": "The zombie that won't stay dead"
+          "role": "The zombie that won't stay dead",
+          "art": "https://cards.scryfall.io/art_crop/front/6/9/6987d609-ba0f-42bf-9b61-bdfb943c03b5.jpg?1783907138"
         },
         {
           "finish": "nonfoil",
           "name": "Rooftop Storm",
           "price": 2.11,
           "printing": "INR #83",
-          "role": "Zombie spells cost nothing"
+          "role": "Zombie spells cost nothing",
+          "art": "https://cards.scryfall.io/art_crop/front/3/1/31146f03-cb5e-4f33-aad7-ce970b914d90.jpg?1783908155"
         },
         {
           "finish": "nonfoil",
           "name": "Diregraf Captain",
           "price": 0.33,
           "printing": "DDQ #68",
-          "role": "Drains 1 when a Zombie dies"
+          "role": "Drains 1 when a Zombie dies",
+          "art": "https://cards.scryfall.io/art_crop/front/1/5/158407ad-35a9-40e1-9762-1c0572b56ecb.jpg?1783925325"
         },
         {
           "finish": "nonfoil",
           "name": "Viscera Seer",
           "price": 0.57,
           "printing": "TDC #199",
-          "role": "Free sac outlet, scry 1"
+          "role": "Free sac outlet, scry 1",
+          "art": "https://cards.scryfall.io/art_crop/front/f/5/f511830b-1c1f-4d30-aa5d-4314726d142e.jpg?1783903780"
         }
       ],
       "precon": null,
@@ -259,7 +291,12 @@
       "slug": "gravecrawler-rooftop-storm-diregraf-captain-viscera-seer",
       "title": "Gravecrawler Zombie Loop",
       "total_from_scratch": 3.57,
-      "verified_date": "2026-10-31"
+      "verified_date": "2026-10-31",
+      "color_identity": [
+        "U",
+        "B"
+      ],
+      "combo_type": "infinite"
     },
     {
       "caveats": [
@@ -282,14 +319,16 @@
           "name": "Stella Lee, Wild Card",
           "price": 4.61,
           "printing": "OTC #3",
-          "role": "Copies the spell, untaps itself"
+          "role": "Copies the spell, untaps itself",
+          "art": "https://cards.scryfall.io/art_crop/front/5/4/54820d80-f32e-4e2f-a0e2-4db781444217.jpg?1793187478"
         },
         {
           "finish": "nonfoil",
           "name": "Twisted Fealty",
           "price": 0.29,
           "printing": "WOE #154",
-          "role": "Untaps Stella, makes the Wicked Role"
+          "role": "Untaps Stella, makes the Wicked Role",
+          "art": "https://cards.scryfall.io/art_crop/front/3/8/382d6085-79b9-48f7-8949-9f44dde2c753.jpg?1783915087"
         }
       ],
       "precon": {
@@ -313,7 +352,12 @@
       "slug": "stella-lee-twisted-fealty",
       "title": "Stella Lee + Twisted Fealty",
       "total_from_scratch": 4.9,
-      "verified_date": "2026-11-01"
+      "verified_date": "2026-11-01",
+      "color_identity": [
+        "U",
+        "R"
+      ],
+      "combo_type": "infinite"
     },
     {
       "caveats": [
@@ -336,14 +380,16 @@
           "name": "Scurry Oak",
           "price": 2.39,
           "printing": "PLST MH2-172",
-          "role": "Makes a Squirrel per counter"
+          "role": "Makes a Squirrel per counter",
+          "art": "https://cards.scryfall.io/art_crop/front/0/f/0fb48c2e-ee0f-4fae-9c22-247870c10d5b.jpg?1783926825"
         },
         {
           "finish": "nonfoil",
           "name": "Ivy Lane Denizen",
           "price": 0.19,
           "printing": "CLU #166",
-          "role": "Puts the counter on the Oak"
+          "role": "Puts the counter on the Oak",
+          "art": "https://cards.scryfall.io/art_crop/front/b/6/b6936a91-db5d-4977-a851-2dc6a4141ceb.jpg?1783912530"
         }
       ],
       "precon": null,
@@ -356,7 +402,11 @@
       "slug": "scurry-oak-ivy-lane-denizen",
       "title": "Scurry Oak + Ivy Lane Denizen",
       "total_from_scratch": 2.58,
-      "verified_date": "2026-11-01"
+      "verified_date": "2026-11-01",
+      "color_identity": [
+        "G"
+      ],
+      "combo_type": "infinite"
     }
   ]
 }

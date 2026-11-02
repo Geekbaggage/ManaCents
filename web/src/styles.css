@@ -547,3 +547,113 @@ input:focus, select:focus, button:focus-visible {
 @media (max-width: 640px) {
   .combo-piece-print, .combo-piece-role { display: none; }
 }
+
+/* ---- Combos: nav pill + teaser ---- */
+.nav-link {
+  background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.45);
+  color: #e2e8f0; border-radius: 999px; padding: 0.4rem 0.85rem;
+}
+.nav-link:hover { border-color: #10b981; color: #fff; }
+.nav-link.active { background: rgba(16, 185, 129, 0.18); border-color: #10b981; color: #fff; box-shadow: 0 2px 0 #10b981; }
+.combos-teaser {
+  margin: 1.75rem auto 0; max-width: 640px; padding: 1.1rem 1.25rem;
+  background: #0f172a; border: 1px solid #115e59; border-radius: 0.9rem;
+  display: flex; align-items: center; gap: 1.25rem; text-align: left;
+}
+.combos-teaser-text h2 { margin: 0 0 0.35rem; font-size: 1.15rem; color: #fff; }
+.combos-teaser-text p { margin: 0; color: #94a3b8; font-size: 0.92rem; }
+.combos-teaser .btn-buy { white-space: nowrap; }
+
+/* ---- Combos: filters ---- */
+.combo-filters { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 0.5rem; }
+.combo-search {
+  padding: 0.65rem 0.9rem; border-radius: 0.6rem; font-size: 1rem;
+  background: #0f172a; border: 1px solid #334155; color: #e2e8f0; width: 100%;
+}
+.combo-search:focus { outline: none; border-color: #10b981; }
+.combo-type-tabs { display: flex; gap: 0.5rem; }
+.combo-type-tabs button {
+  background: transparent; border: 1px solid #334155; color: #94a3b8;
+  border-radius: 999px; padding: 0.4rem 0.9rem; cursor: pointer; font-weight: 600;
+}
+.combo-type-tabs button.on { border-color: #10b981; color: #fff; background: rgba(16, 185, 129, 0.12); }
+.combo-color-filter { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+.combo-color-label { color: #94a3b8; font-size: 0.9rem; margin-right: 0.25rem; }
+.combo-color-filter .pip {
+  width: 32px; height: 32px; border-radius: 50%; border: 2px solid transparent;
+  background: var(--pip-bg); color: var(--pip-fg); font-weight: 700; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.combo-color-filter .pip.on { border-color: #10b981; box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35); }
+.combo-result-count { color: #94a3b8; font-size: 0.9rem; }
+.combo-reset { background: none; border: none; color: #10b981; cursor: pointer; font-size: 0.9rem; margin-left: 0.5rem; text-decoration: underline; }
+.combo-empty { color: #94a3b8; padding: 2rem 0; text-align: center; }
+
+/* ---- Combos: upgraded index cards ---- */
+.combo-card-art { display: flex; align-items: center; justify-content: center; height: 86px; margin-bottom: 0.25rem; position: relative; }
+.combo-card-art img {
+  width: 76px; height: 76px; object-fit: cover; object-position: center 22%;
+  border-radius: 12px; border: 2px solid #1e293b; margin: 0 -10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+.combo-card-plus {
+  position: absolute; right: 8px; bottom: -6px; width: 26px; height: 26px;
+  background: #115e59; color: #fff; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-weight: 700;
+}
+.combo-card-meta { display: flex; align-items: center; gap: 0.5rem; }
+.combo-pips { display: inline-flex; gap: 3px; align-items: center; }
+.combo-pip { border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; }
+.combo-type-pill {
+  font-size: 0.75rem; font-weight: 700; border-radius: 999px; padding: 0.15rem 0.6rem;
+  color: #34d399; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35);
+}
+.combo-type-pill.non-infinite { color: #93c5fd; background: rgba(59, 130, 246, 0.12); border-color: rgba(59, 130, 246, 0.35); }
+.combo-card-foot { display: flex; justify-content: space-between; align-items: center; }
+.combo-card-count { color: #94a3b8; font-size: 0.85rem; }
+.combo-card-total {
+  color: #d4af37; font-weight: 700; background: #0f172a;
+  border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 999px; padding: 0.2rem 0.7rem;
+}
+.combo-card-cta { color: #10b981; font-weight: 600; font-size: 0.9rem; }
+.combo-card { transition: transform 0.15s ease, border-color 0.15s ease; }
+.combo-card:hover, .combo-card:focus-visible { transform: translateY(-2px); border-color: #10b981; }
+
+/* ---- Combos: detail equation ---- */
+.combo-detail-meta { display: flex; align-items: center; gap: 0.6rem; margin: 0.5rem 0; }
+.combo-equation { display: flex; align-items: stretch; justify-content: center; gap: 0.5rem; margin: 1rem 0 0.25rem; flex-wrap: wrap; }
+.combo-eq-card {
+  background: #0f172a; border: 1px solid #1e293b; border-radius: 0.9rem;
+  padding: 0.75rem; text-align: center; flex: 1 1 150px; max-width: 220px;
+}
+.combo-eq-card img { width: 100%; aspect-ratio: 1; object-fit: cover; object-position: center 22%; border-radius: 0.6rem; }
+.combo-eq-name { font-weight: 700; color: #fff; margin-top: 0.5rem; font-size: 0.95rem; }
+.combo-eq-print { color: #94a3b8; font-size: 0.78rem; }
+.combo-eq-price { color: #d4af37; font-weight: 700; margin: 0.25rem 0 0.5rem; }
+.combo-eq-buy { font-size: 0.85rem; padding: 0.45rem 0.8rem; }
+.combo-eq-plus {
+  align-self: center; width: 36px; height: 36px; flex: none;
+  background: #1e293b; border: 1px solid #10b981; color: #10b981; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 700;
+}
+.combo-eq-outcome {
+  text-align: center; font-size: 1.25rem; font-weight: 700; color: #fff;
+  background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 0.75rem; padding: 0.75rem; margin: 0.5rem 0 0;
+}
+.combo-steps { counter-reset: step; list-style: none; padding: 0; }
+.combo-steps li {
+  position: relative; padding: 0.6rem 0 0.6rem 3rem; color: #cbd5e1; line-height: 1.55;
+  border-left: 2px solid #115e59; margin-left: 1rem;
+}
+.combo-steps li::before {
+  counter-increment: step; content: counter(step);
+  position: absolute; left: -1.05rem; top: 0.55rem;
+  width: 2rem; height: 2rem; border-radius: 50%;
+  background: #10b981; color: #06281c; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+@media (max-width: 640px) {
+  .combos-teaser { flex-direction: column; text-align: center; }
+  .combo-eq-card { flex: 1 1 40%; }
+}

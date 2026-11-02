@@ -1,0 +1,1 @@
+INSERT OR REPLACE INTO precon_coverage (commander_slug, precon_name, source_url, distinct_names, verified_at) VALUES ('valgavoth-harrower-of-souls', 'Endless Punishment', 'https://magic.wizards.com/en/news/announcements/duskmourn-house-of-horror-commander-decklists', 86, '2026-10-27');
