@@ -4,19 +4,19 @@
   "prices": {
     "Plains": {
       "price": 0.08,
-      "printing": "THS #231 (usd)",
-      "scryfallId": "e891d622-9369-4eeb-b7e2-183c60ec54d2",
-      "scryfallUri": "https://scryfall.com/card/ths/231/plains?utm_source=api",
+      "printing": "WAR #252 (usd)",
+      "scryfallId": "0d7ae52e-9ea7-4e9d-a9c9-c819cc768cd6",
+      "scryfallUri": "https://scryfall.com/card/war/252/plains?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:54:23.658Z"
+      "sourceTime": "2026-11-05T15:40:48.761Z"
     },
     "Island": {
-      "price": 0.08,
-      "printing": "M12 #235 (usd)",
-      "scryfallId": "81a585d9-abf8-41ff-b6f6-c9396d36906b",
-      "scryfallUri": "https://scryfall.com/card/m12/235/island?utm_source=api",
+      "price": 0.07,
+      "printing": "DDM #37 (usd)",
+      "scryfallId": "b4a728fd-e564-4a7c-9dde-e3e8b70c1f68",
+      "scryfallUri": "https://scryfall.com/card/ddm/37/island?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:54:25.985Z"
+      "sourceTime": "2026-11-05T15:40:55.132Z"
     },
     "Swamp": {
       "price": 0.1,
@@ -24,7 +24,7 @@
       "scryfallId": "d7148e45-3163-4cf3-a729-600729f671a5",
       "scryfallUri": "https://scryfall.com/card/m15/259/swamp?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:54:28.603Z"
+      "sourceTime": "2026-11-05T15:41:02.455Z"
     },
     "Mountain": {
       "price": 0.09,
@@ -32,7 +32,7 @@
       "scryfallId": "95083e1d-faf5-40e4-9be5-909cd01cc2b5",
       "scryfallUri": "https://scryfall.com/card/bro/274/mountain?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:54:41.906Z"
+      "sourceTime": "2026-11-05T15:41:10.722Z"
     },
     "Forest": {
       "price": 0.1,
@@ -40,15 +40,15 @@
       "scryfallId": "56caba21-b773-4245-b3f8-3ae62725c14f",
       "scryfallUri": "https://scryfall.com/card/m20/279/forest?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:54:53.590Z"
+      "sourceTime": "2026-11-05T15:41:26.764Z"
     },
     "Wastes": {
-      "price": 0.63,
+      "price": 0.62,
       "printing": "OGW #183 (usd)",
       "scryfallId": "7019912c-bd9b-4b96-9388-400794909aa1",
       "scryfallUri": "https://scryfall.com/card/ogw/183/wastes?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:54:53.985Z"
+      "sourceTime": "2026-11-05T15:41:27.926Z"
     },
     "Adarkar Wastes": {
       "price": 0.23,
@@ -56,31 +56,31 @@
       "scryfallId": "7b06c8a8-6e6d-40a2-b843-e3d6aac3f399",
       "scryfallUri": "https://scryfall.com/card/plst/DMU-243/adarkar-wastes?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:54:54.420Z"
+      "sourceTime": "2026-11-05T15:41:28.199Z"
     },
     "Underground River": {
-      "price": 0.48,
+      "price": 0.45,
       "printing": "PLST #BRO-267 (usd)",
       "scryfallId": "904f3dc9-8935-4982-be62-6d5d5dd79b97",
       "scryfallUri": "https://scryfall.com/card/plst/BRO-267/underground-river?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:54:54.808Z"
+      "sourceTime": "2026-11-05T15:41:29.234Z"
     },
     "Sulfurous Springs": {
-      "price": 0.49,
+      "price": 0.51,
       "printing": "FRC #85 (usd)",
       "scryfallId": "be340a1c-f1e7-446e-ae91-86ecb884479c",
       "scryfallUri": "https://scryfall.com/card/frc/85/sulfurous-springs?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:54:55.203Z"
+      "sourceTime": "2026-11-05T15:41:29.983Z"
     },
     "Karplusan Forest": {
-      "price": 0.48,
+      "price": 0.49,
       "printing": "EOC #164 (usd)",
       "scryfallId": "67198b97-bac2-480f-aea8-12841e8884de",
       "scryfallUri": "https://scryfall.com/card/eoc/164/karplusan-forest?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:54:55.596Z"
+      "sourceTime": "2026-11-05T15:41:31.079Z"
     },
     "Brushland": {
       "price": 0.59,
@@ -88,7 +88,7 @@
       "scryfallId": "808c2748-65c5-407f-bb09-1e82dd1a4efb",
       "scryfallUri": "https://scryfall.com/card/plst/M3C-324/brushland?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:54:55.976Z"
+      "sourceTime": "2026-11-05T15:41:31.524Z"
     },
     "Battlefield Forge": {
       "price": 0.21,
@@ -96,15 +96,15 @@
       "scryfallId": "a2de3346-9647-4540-ba41-e67c24ddf141",
       "scryfallUri": "https://scryfall.com/card/fic/375/battlefield-forge?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:54:56.357Z"
+      "sourceTime": "2026-11-05T15:41:32.759Z"
     },
     "Glacial Fortress": {
-      "price": 0.22,
+      "price": 0.24,
       "printing": "PLST #BLC-307 (usd)",
       "scryfallId": "ff07df55-dadf-45ac-bd21-41aa58909c22",
       "scryfallUri": "https://scryfall.com/card/plst/BLC-307/glacial-fortress?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:54:56.780Z"
+      "sourceTime": "2026-11-05T15:41:34.006Z"
     },
     "Drowned Catacomb": {
       "price": 0.36,
@@ -112,7 +112,7 @@
       "scryfallId": "4acb0f92-74be-40e8-b70e-61c4aaaeb47b",
       "scryfallUri": "https://scryfall.com/card/frc/69/drowned-catacomb?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:54:57.179Z"
+      "sourceTime": "2026-11-05T15:41:34.290Z"
     },
     "Dragonskull Summit": {
       "price": 0.46,
@@ -120,47 +120,47 @@
       "scryfallId": "d20e433a-eb62-4301-bc20-bfe27468b033",
       "scryfallUri": "https://scryfall.com/card/msc/238/dragonskull-summit?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:54:57.645Z"
+      "sourceTime": "2026-11-05T15:41:34.566Z"
     },
     "Hallowed Fountain": {
-      "price": 7.61,
-      "printing": "PECL #265p (usd)",
-      "scryfallId": "805316fb-a96f-4770-abf2-8ad2572b9b5c",
-      "scryfallUri": "https://scryfall.com/card/pecl/265p/hallowed-fountain?utm_source=api",
+      "price": 7.58,
+      "printing": "ECL #265 (usd)",
+      "scryfallId": "e056b55f-82ed-4fe0-ab0c-bb20fa4a218a",
+      "scryfallUri": "https://scryfall.com/card/ecl/265/hallowed-fountain?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:54:58.105Z"
+      "sourceTime": "2026-11-05T15:41:35.280Z"
     },
     "Watery Grave": {
-      "price": 8.62,
+      "price": 4.46,
       "printing": "TRK #306 (usd)",
       "scryfallId": "5525d6a6-e532-4047-9da4-bfae7927fecc",
       "scryfallUri": "https://scryfall.com/card/trk/306/watery-grave?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:54:58.425Z"
+      "sourceTime": "2026-11-05T15:41:36.003Z"
     },
     "Blood Crypt": {
-      "price": 9,
+      "price": 8.96,
       "printing": "ECL #262 (usd)",
       "scryfallId": "6da63cc5-4624-4491-abd9-9b600c3fefe2",
       "scryfallUri": "https://scryfall.com/card/ecl/262/blood-crypt?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:54:58.914Z"
+      "sourceTime": "2026-11-05T15:41:36.807Z"
     },
     "Sea of Clouds": {
-      "price": 11.3,
+      "price": 11.67,
       "printing": "TRC #555 (usd)",
       "scryfallId": "f74c8ecf-cc03-40b5-9fad-15a2952727f7",
       "scryfallUri": "https://scryfall.com/card/trc/555/sea-of-clouds?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:54:59.302Z"
+      "sourceTime": "2026-11-05T15:41:37.885Z"
     },
     "Morphic Pool": {
-      "price": 11.59,
+      "price": 11.91,
       "printing": "TRC #540 (usd)",
       "scryfallId": "5667b84e-38d1-4583-80ec-2c4584a81ee8",
       "scryfallUri": "https://scryfall.com/card/trc/540/morphic-pool?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:54:59.794Z"
+      "sourceTime": "2026-11-05T15:41:38.621Z"
     },
     "Luxury Suite": {
       "price": 8.61,
@@ -168,15 +168,15 @@
       "scryfallId": "3c409d1e-f634-44a2-8fcf-dcdcb0babc3f",
       "scryfallUri": "https://scryfall.com/card/msc/252/luxury-suite?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:55:00.208Z"
+      "sourceTime": "2026-11-05T15:41:38.892Z"
     },
     "Command Tower": {
-      "price": 0.15,
+      "price": 0.1,
       "printing": "TDC #107 (usd)",
       "scryfallId": "5fc770b6-03ac-45c3-a2ca-bd508096384e",
       "scryfallUri": "https://scryfall.com/card/tdc/107/command-tower?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:55:00.616Z"
+      "sourceTime": "2026-11-05T15:41:41.508Z"
     },
     "Exotic Orchard": {
       "price": 0.21,
@@ -184,7 +184,7 @@
       "scryfallId": "cc14b1ee-5def-42df-8ef6-0d91dba39e3a",
       "scryfallUri": "https://scryfall.com/card/frc/70/exotic-orchard?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:55:01.185Z"
+      "sourceTime": "2026-11-05T15:41:42.882Z"
     },
     "Mana Confluence": {
       "price": 33.79,
@@ -192,15 +192,15 @@
       "scryfallId": "504a69eb-3c2d-4bb1-b117-252b15acf0c2",
       "scryfallUri": "https://scryfall.com/card/jou/163/mana-confluence?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:55:01.662Z"
+      "sourceTime": "2026-11-05T15:41:43.319Z"
     },
     "City of Brass": {
-      "price": 11.36,
+      "price": 11.32,
       "printing": "TMC #62 (usd)",
       "scryfallId": "c21565d0-fc40-4d89-9b27-87c03385e0af",
       "scryfallUri": "https://scryfall.com/card/tmc/62/city-of-brass?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:55:02.060Z"
+      "sourceTime": "2026-11-05T15:41:44.564Z"
     },
     "Floodfarm Verge": {
       "price": 8.55,
@@ -208,7 +208,7 @@
       "scryfallId": "d53ed0db-1199-44b3-8eda-8189dfcf53d1",
       "scryfallUri": "https://scryfall.com/card/dsk/259/floodfarm-verge?utm_source=api",
       "finish": "foil",
-      "sourceTime": "2026-11-05T05:55:02.459Z"
+      "sourceTime": "2026-11-05T15:41:45.270Z"
     },
     "Gloomlake Verge": {
       "price": 10.64,
@@ -216,39 +216,39 @@
       "scryfallId": "d3a90c5d-b21e-4554-84e1-c8addf18937d",
       "scryfallUri": "https://scryfall.com/card/pdsk/260p/gloomlake-verge?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:55:02.843Z"
+      "sourceTime": "2026-11-05T15:41:45.989Z"
     },
     "Mystic Gate": {
-      "price": 0.5,
+      "price": 0.51,
       "printing": "PLST #M3C-359 (usd)",
       "scryfallId": "aeede3be-9191-4f74-81d8-f487b5658315",
       "scryfallUri": "https://scryfall.com/card/plst/M3C-359/mystic-gate?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:55:03.228Z"
+      "sourceTime": "2026-11-05T15:41:46.768Z"
     },
     "Sunken Ruins": {
-      "price": 0.45,
+      "price": 0.43,
       "printing": "FRC #86 (usd)",
       "scryfallId": "b8652a52-d9f6-42ad-9746-6827845b540e",
       "scryfallUri": "https://scryfall.com/card/frc/86/sunken-ruins?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:55:03.742Z"
+      "sourceTime": "2026-11-05T15:41:47.477Z"
     },
     "Flooded Strand": {
-      "price": 15.67,
+      "price": 15.83,
       "printing": "KTK #233 (usd)",
       "scryfallId": "8c2996d9-3287-4480-8c04-7a378e37e3cf",
       "scryfallUri": "https://scryfall.com/card/ktk/233/flooded-strand?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:55:04.132Z"
+      "sourceTime": "2026-11-05T15:41:48.423Z"
     },
     "Polluted Delta": {
-      "price": 20.25,
+      "price": 20.21,
       "printing": "KTK #239 (usd)",
       "scryfallId": "ff2f5f58-9a95-4ca6-93a0-813738f0072f",
       "scryfallUri": "https://scryfall.com/card/ktk/239/polluted-delta?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:55:04.541Z"
+      "sourceTime": "2026-11-05T15:41:49.579Z"
     },
     "Azorius Chancery": {
       "price": 0.16,
@@ -256,7 +256,7 @@
       "scryfallId": "b016251f-e9f2-4c23-90f2-d8675e55dd9b",
       "scryfallUri": "https://scryfall.com/card/ddi/33/azorius-chancery?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:55:15.171Z"
+      "sourceTime": "2026-11-05T15:41:50.828Z"
     },
     "Dimir Aqueduct": {
       "price": 0.22,
@@ -264,15 +264,15 @@
       "scryfallId": "703b68dd-9a83-4e6e-9e34-53eb80311425",
       "scryfallUri": "https://scryfall.com/card/mm2/239/dimir-aqueduct?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:55:15.608Z"
+      "sourceTime": "2026-11-05T15:41:51.097Z"
     },
     "Seachrome Coast": {
-      "price": 0.37,
+      "price": 0.36,
       "printing": "BLC #328 (usd)",
       "scryfallId": "88ec4d3b-f1f1-489c-b41e-0206e5e59fbd",
       "scryfallUri": "https://scryfall.com/card/blc/328/seachrome-coast?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:55:16.059Z"
+      "sourceTime": "2026-11-05T15:41:51.778Z"
     },
     "Darkslick Shores": {
       "price": 1.77,
@@ -280,15 +280,15 @@
       "scryfallId": "2b95c400-8fa0-489d-b401-5e2ec4241942",
       "scryfallUri": "https://scryfall.com/card/one/372/darkslick-shores?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:55:16.423Z"
+      "sourceTime": "2026-11-05T15:41:52.050Z"
     },
     "Deserted Beach": {
-      "price": 1.28,
+      "price": 1.26,
       "printing": "FRA #176 (usd)",
       "scryfallId": "56dae4c4-3e71-4a32-979b-4e26d9c9e96c",
       "scryfallUri": "https://scryfall.com/card/fra/176/deserted-beach?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:55:16.902Z"
+      "sourceTime": "2026-11-05T15:41:52.758Z"
     },
     "Shipwreck Marsh": {
       "price": 1.42,
@@ -296,39 +296,39 @@
       "scryfallId": "9e944c5b-68ac-4a30-bbd4-09a4288319ce",
       "scryfallUri": "https://scryfall.com/card/fra/189/shipwreck-marsh?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:55:17.303Z"
+      "sourceTime": "2026-11-05T15:41:53.199Z"
     },
     "Undercity Sewers": {
-      "price": 9.63,
+      "price": 9.41,
       "printing": "PZA #20 (usd)",
       "scryfallId": "19545db3-8be5-41e5-8d13-dec4f96fe624",
       "scryfallUri": "https://scryfall.com/card/pza/20/undercity-sewers?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:55:17.775Z"
+      "sourceTime": "2026-11-05T15:41:53.885Z"
     },
     "Shadowy Backstreet": {
-      "price": 10.58,
+      "price": 10.55,
       "printing": "MKM #268 (usd)",
       "scryfallId": "69c1b656-1d67-499c-bf0f-417682a86c7d",
       "scryfallUri": "https://scryfall.com/card/mkm/268/shadowy-backstreet?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:55:18.114Z"
+      "sourceTime": "2026-11-05T15:41:54.576Z"
     },
     "Raugrin Triome": {
-      "price": 16.19,
+      "price": 16.29,
       "printing": "IKO #251 (usd)",
       "scryfallId": "02138fbb-3962-4348-8d31-faaefba0b8b2",
       "scryfallUri": "https://scryfall.com/card/iko/251/raugrin-triome?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:55:18.586Z"
+      "sourceTime": "2026-11-05T15:41:55.317Z"
     },
     "Zagoth Triome": {
-      "price": 20.23,
+      "price": 20.21,
       "printing": "IKO #259 (usd)",
       "scryfallId": "cc520518-2063-4b57-a0d4-10cf62a7175e",
       "scryfallUri": "https://scryfall.com/card/iko/259/zagoth-triome?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:55:18.946Z"
+      "sourceTime": "2026-11-05T15:41:56.027Z"
     },
     "Horizon Canopy": {
       "price": 2.82,
@@ -336,23 +336,23 @@
       "scryfallId": "241ae31a-3109-4f55-9f2d-cccb3af5d123",
       "scryfallUri": "https://scryfall.com/card/who/1094/horizon-canopy?utm_source=api",
       "finish": "foil",
-      "sourceTime": "2026-11-05T05:55:19.395Z"
+      "sourceTime": "2026-11-05T15:41:56.308Z"
     },
     "Waterlogged Grove": {
-      "price": 1.09,
+      "price": 0.99,
       "printing": "WHO #331 (usd)",
       "scryfallId": "46931098-ae3c-409a-8789-7071205e11ee",
       "scryfallUri": "https://scryfall.com/card/who/331/waterlogged-grove?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:55:19.752Z"
+      "sourceTime": "2026-11-05T15:41:57.043Z"
     },
     "Prairie Stream": {
-      "price": 0.17,
+      "price": 0.16,
       "printing": "SCD #314 (usd)",
       "scryfallId": "88b20980-f672-41f6-97ab-f8353d2bbbae",
       "scryfallUri": "https://scryfall.com/card/scd/314/prairie-stream?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:55:20.103Z"
+      "sourceTime": "2026-11-05T15:41:58.284Z"
     },
     "Sunken Hollow": {
       "price": 0.29,
@@ -360,7 +360,7 @@
       "scryfallId": "0dd1726f-b899-491a-8b0e-8e3d25f17d3d",
       "scryfallUri": "https://scryfall.com/card/bfz/249/sunken-hollow?utm_source=api",
       "finish": "nonfoil",
-      "sourceTime": "2026-11-05T05:55:20.640Z"
+      "sourceTime": "2026-11-05T15:41:58.566Z"
     }
   }
 }
