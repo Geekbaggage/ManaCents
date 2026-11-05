@@ -801,3 +801,13 @@ input:focus, select:focus, button:focus-visible {
 .mb-cycle-arrow { color: #22d3ee; }
 .mb-cycle-body { padding: 0 1rem 1rem; }
 .mb-cycle-trait { color: #94a3b8; font-size: 0.85rem; margin: 0 0 0.8rem; }
+
+/* ---- ManaBase shortfalls + status ---- */
+.mb-shortfalls { display: flex; gap: 8px; flex-wrap: wrap; margin: 0.5rem 0 1rem; }
+.mb-short {
+  border: 1px solid #334155; border-radius: 6px;
+  font-size: 0.82rem; padding: 3px 10px; color: #94a3b8;
+}
+.mb-short.met { border-color: #10b981; color: #10b981; }
+.mb-short.unmet { border-color: #f43f85; color: #f43f85; }
+.mb-status-best_found, .mb-status-interrupted_without_result { color: #f59e0b; border-color: #f59e0b; }

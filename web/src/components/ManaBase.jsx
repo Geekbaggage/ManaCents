@@ -45,6 +45,15 @@ function ColorToggle({ color, selected, priority, onToggle, onPriority }) {
   );
 }
 
+function finishLabel(printing) {
+  // "PLST #DMU-243 (usd)" → "PLST #DMU-243 · nonfoil"
+  if (!printing) return "";
+  return printing
+    .replace(" (usd_foil)", " · foil")
+    .replace(" (usd_etched)", " · etched")
+    .replace(" (usd)", " · nonfoil");
+}
+
 function LandGallery() {
   const [lands, setLands] = useState(null);
   const [open, setOpen] = useState(null);
@@ -150,10 +159,6 @@ export function ManaBase() {
   };
 
   const run = async () => {
-    if (colors.length === 0) {
-      setError("Pick at least one color first.");
-      return;
-    }
     setLoading(true);
     setError(null);
     try {
@@ -166,6 +171,9 @@ export function ManaBase() {
         bracket: "3",
       });
       const res = await fetch(`/api/manabase?${params}`);
+      if (res.status === 429) {
+        throw new Error("Too many requests — please wait a moment and try again.");
+      }
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Solver failed");
       setResult(data);
@@ -219,30 +227,29 @@ export function ManaBase() {
         ))}
       </div>
 
-      {colors.length > 0 && (
-        <>
-          <h2>2. Budget &amp; size</h2>
-          <div className="mb-controls">
-            <label>
-              Budget: <strong>{money(budget)}</strong>
-              <input
-                type="range" min="5" max="500" step="5" value={budget}
-                onChange={(e) => setBudget(Number(e.target.value))}
-              />
-            </label>
-            <label>
-              Max lands: <strong>{slots}</strong>
-              <input
-                type="range" min="1" max="20" step="1" value={slots}
-                onChange={(e) => setSlots(Number(e.target.value))}
-              />
-            </label>
-          </div>
+      <h2>2. Budget &amp; size</h2>
+      <div className="mb-controls">
+        <label>
+          Budget: <strong>{money(budget)}</strong>
+          <input
+            type="range" min="5" max="500" step="5" value={budget}
+            onChange={(e) => setBudget(Number(e.target.value))}
+          />
+        </label>
+        <label>
+          Max lands: <strong>{slots}</strong>
+          <input
+            type="range" min="1" max="20" step="1" value={slots}
+            onChange={(e) => setSlots(Number(e.target.value))}
+          />
+        </label>
+      </div>
 
-          <button type="button" className="mb-run" onClick={run} disabled={loading}>
-            {loading ? "Solving…" : "Find my lands 💎"}
-          </button>
-        </>
+      <button type="button" className="mb-run" onClick={run} disabled={loading}>
+        {loading ? "Solving…" : colors.length === 0 ? "Find colorless lands 💎" : "Find my lands 💎"}
+      </button>
+      {colors.length === 0 && (
+        <p className="combos-sub">No colors picked — this searches colorless-producing lands only.</p>
       )}
 
       {error && <p className="mb-error">{error}</p>}
@@ -251,12 +258,30 @@ export function ManaBase() {
         <div className="mb-results">
           <h2>
             Your package — {money(result.score.priceDollars)}
-            <span className="mb-status">{result.stats.status}</span>
+            <span className={`mb-status mb-status-${result.stats.status}`}>
+              {result.stats.status === "optimal"
+                ? "Optimal"
+                : result.stats.status === "best_found"
+                  ? `Best found (interrupted: ${result.stats.interruptReason || "node budget"})`
+                  : result.stats.status === "interrupted_without_result"
+                    ? "No result before interruption"
+                    : result.stats.status}
+            </span>
           </h2>
           <p className="combos-sub">
             {result.lands.length} lands · penalty {result.score.penalty} ·
             {result.stats.nodesVisited.toLocaleString()} nodes searched
           </p>
+          {result.perColor && Object.keys(result.perColor).length > 0 && (
+            <div className="mb-shortfalls">
+              {Object.entries(result.perColor).map(([c, v]) => (
+                <span key={c} className={`mb-short${v.shortfall > 0 ? " unmet" : " met"}`}>
+                  {c}: {v.qualifying}/{v.target}
+                  {v.shortfall > 0 ? ` (short ${v.shortfall})` : " ✓"}
+                </span>
+              ))}
+            </div>
+          )}
           <div className="mb-lands">
             {result.lands.map((l) => (
               <div key={l.name} className="mb-land">
@@ -270,7 +295,7 @@ export function ManaBase() {
                   )}
                   {l.conditional && <span className="mb-land-cond">conditional</span>}
                 </div>
-                <div className="mb-land-print">{l.pricePrinting}</div>
+                <div className="mb-land-print">{finishLabel(l.pricePrinting)}</div>
                 <a
                   className="btn-copy combo-eq-buy"
                   href={manaPoolCardUrl(l.name)}
@@ -283,8 +308,12 @@ export function ManaBase() {
             ))}
           </div>
           <p className="mb-disclaimer">
-            Prototype: 43 lands, scoring policy v1, bond lands assume 3 opponents.
-            Prices are a snapshot — verify at checkout. Not financial advice.
+            Suggested land purchases optimized for your selected colors,
+            priorities and budget under the stated assumptions. Prototype:
+            43 lands, scoring policy v1, bond lands resolved for 3 opponents.
+            Prices are a {result.meta?.priceSnapshot || "2026-11-04"} snapshot
+            of cheapest printings — verify at checkout. Life costs are modeled
+            scoring values, not measured per-game loss.
           </p>
         </div>
       )}

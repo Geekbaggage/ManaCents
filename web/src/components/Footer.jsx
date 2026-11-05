@@ -1,8 +1,9 @@
 import React from "react";
 
-export default function Footer({ onAbout }) {
+export default function Footer({ onAbout, onPrivacy, hideMethod = false }) {
   return (
     <>
+      {!hideMethod && (
       <section className="method">
         <div className="kicker">How the math works</div>
         <h2>Proven value, balanced deck.</h2>
@@ -13,6 +14,7 @@ export default function Footer({ onAbout }) {
           $0.10 floor. Prices refresh nightly.
         </p>
       </section>
+      )}
       <footer className="site-footer">
         <div className="legal">
           ManaCents is unofficial Fan Content permitted under the Wizards of the Coast Fan
@@ -30,6 +32,8 @@ export default function Footer({ onAbout }) {
           <a href="https://www.instagram.com/manacents" target="_blank" rel="noopener noreferrer">Follow us on Instagram</a>
           {" · "}
           <button type="button" className="linklike" onClick={onAbout}>About</button>
+          {" · "}
+          <button type="button" className="linklike" onClick={onPrivacy}>Privacy</button>
         </div>
         <div className="credit">by Geekbaggage</div>
         <div className="legal memorial">In memory of Mortise &ldquo;Tony&rdquo; Addams</div>

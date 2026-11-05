@@ -1147,7 +1147,7 @@ export default function App() {
           </main>
         )}
 
-        <Footer onAbout={() => setView("about")} onPrivacy={() => setView("privacy")} />
+        <Footer onAbout={() => setView("about")} onPrivacy={() => setView("privacy")} hideMethod={view === "manabase"} />
       </div>
       {toast && <div className="toast" role="status">{toast}</div>}
       {canHover && hoverCard?.image_url && (() => {
