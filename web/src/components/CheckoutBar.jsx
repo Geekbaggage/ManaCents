@@ -9,6 +9,7 @@ import {
   SLEEVES_URL,
   isEuLocale,
 } from "../affiliates.js";
+import { trackAffiliateClick } from "../analytics.js";
 
 async function copyText(text) {
   try {
@@ -170,6 +171,7 @@ export default function CheckoutBar({ commander, budget, cards, total, remaining
                     target="_blank"
                     rel="noopener sponsored"
                     aria-disabled={!cards.length}
+                    onClick={() => trackAffiliateClick("manapool_deck", { view: "results" })}
                   >
                     Buy All on Mana Pool
                   </a>

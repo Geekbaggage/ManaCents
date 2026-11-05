@@ -8,11 +8,11 @@
       "episode": 1,
       "id": "ondu-secret-arcade",
       "loop_steps": [
-        "Make a token — Ondu doubles it",
+        "Make a token \u2014 Ondu doubles it",
         "Secret Arcade triggers off the tokens",
         "Keep the engine fed; tokens are 3/3s with no haste"
       ],
-      "outcome": "Infinite 3/3 tokens (no haste — not an automatic win)",
+      "outcome": "Infinite 3/3 tokens (no haste \u2014 not an automatic win)",
       "pieces": [
         {
           "finish": "nonfoil",
@@ -20,7 +20,8 @@
           "price": 9.73,
           "printing": "DSC #101",
           "role": "Doubles your tokens",
-          "art": "https://cards.scryfall.io/art_crop/front/e/e/ee1c6432-54d7-4b57-a554-f7194d74e03c.jpg?1783909632"
+          "art": "https://cards.scryfall.io/art_crop/front/e/e/ee1c6432-54d7-4b57-a554-f7194d74e03c.jpg?1783909632",
+          "oracle_text": "Whenever an enchantment you control enters, you may create a token that's a copy of it. Do this only once each turn."
         },
         {
           "finish": "nonfoil",
@@ -28,7 +29,8 @@
           "price": 3.11,
           "printing": "DSC #10",
           "role": "Makes the tokens",
-          "art": "https://cards.scryfall.io/art_crop/front/f/e/fe050c16-9be5-42ef-988f-0531a8bb2352.jpg?1783909661"
+          "art": "https://cards.scryfall.io/art_crop/front/f/e/fe050c16-9be5-42ef-988f-0531a8bb2352.jpg?1783909661",
+          "oracle_text": "Nonland permanents you control and permanent spells you control are enchantments in addition to their other types.\n(You may cast either half. That door unlocks on the battlefield. As a sorcery, you may pay the mana cost of a locked door to unlock it.)"
         }
       ],
       "precon": {
@@ -64,7 +66,7 @@
       "loop_steps": [
         "Helm makes a hasty Celebrant token at combat",
         "Exert the token: untap everything, take another combat",
-        "Each new combat makes another token — repeat forever"
+        "Each new combat makes another token \u2014 repeat forever"
       ],
       "outcome": "Infinite combat steps",
       "pieces": [
@@ -74,7 +76,8 @@
           "price": 1.53,
           "printing": "J25 #531",
           "role": "Extra combats",
-          "art": "https://cards.scryfall.io/art_crop/front/e/e/ee9d77bb-ed05-49d9-8ced-d956101d3c65.jpg?1793197493"
+          "art": "https://cards.scryfall.io/art_crop/front/e/e/ee9d77bb-ed05-49d9-8ced-d956101d3c65.jpg?1793197493",
+          "oracle_text": "If this creature hasn't been exerted this turn, you may exert it as it attacks. When you do, untap all other creatures you control and after this phase, there is an additional combat phase. (An exerted creature won't untap during your next untap step.)"
         },
         {
           "finish": "nonfoil",
@@ -82,7 +85,8 @@
           "price": 5.69,
           "printing": "MSC #200",
           "role": "Copies the Celebrant",
-          "art": "https://cards.scryfall.io/art_crop/front/7/0/70ffc71f-328d-421d-926b-6f2e45ffb812.jpg?1783903218"
+          "art": "https://cards.scryfall.io/art_crop/front/7/0/70ffc71f-328d-421d-926b-6f2e45ffb812.jpg?1783903218",
+          "oracle_text": "At the beginning of combat on your turn, create a token that's a copy of equipped creature, except the token isn't legendary. That token gains haste.\nEquip {5}"
         }
       ],
       "precon": {
@@ -112,7 +116,7 @@
       "caveats": [
         "Needs 6 energy banked before the first attack",
         "Both creatures must survive their attacks",
-        "Combat-based finish — not instant-speed"
+        "Combat-based finish \u2014 not instant-speed"
       ],
       "episode": 3,
       "id": "satya-runner",
@@ -120,7 +124,7 @@
       "loop_steps": [
         "Attack with both: Satya banks 2 energy and makes a Runner token; the original Runner banks 2 more (10 total)",
         "Pay 8 energy: untap everything, take another combat",
-        "Later combats: the accumulating Runner tokens attack too, each banking 2 more — every combat funds the next"
+        "Later combats: the accumulating Runner tokens attack too, each banking 2 more \u2014 every combat funds the next"
       ],
       "outcome": "Infinite combat steps (energy-fueled)",
       "pieces": [
@@ -130,7 +134,8 @@
           "price": 0.27,
           "printing": "M3C #3",
           "role": "Copies the Runner, banks energy",
-          "art": "https://cards.scryfall.io/art_crop/front/3/b/3b964bbe-54cc-425c-9cc6-c877f82af7ba.jpg?1783911437"
+          "art": "https://cards.scryfall.io/art_crop/front/3/b/3b964bbe-54cc-425c-9cc6-c877f82af7ba.jpg?1783911437",
+          "oracle_text": "Menace, haste\nWhenever Satya attacks, create a tapped and attacking token that's a copy of up to one other target nontoken creature you control. You get {E}{E} (two energy counters). At the beginning of the next end step, sacrifice that token unless you pay an amount of {E} equal to its mana value."
         },
         {
           "finish": "nonfoil",
@@ -138,7 +143,8 @@
           "price": 0.16,
           "printing": "M3C #215",
           "role": "Banks energy on attack",
-          "art": "https://cards.scryfall.io/art_crop/front/e/5/e5d9c7eb-dca4-4471-a91f-a5aad3a69c2f.jpg?1783936753"
+          "art": "https://cards.scryfall.io/art_crop/front/e/5/e5d9c7eb-dca4-4471-a91f-a5aad3a69c2f.jpg?1783936753",
+          "oracle_text": "Double strike, haste\nWhenever this creature attacks, you get {E}{E} (two energy counters), then you may pay eight {E}. If you pay, untap all creatures you control, and after this phase, there is an additional combat phase."
         }
       ],
       "precon": {
@@ -154,7 +160,7 @@
         "6 energy banked to start",
         "Both creatures able to attack and survive"
       ],
-      "reel_url": null,
+      "reel_url": "https://www.instagram.com/reel/DfFqPjoDMPT/",
       "slug": "satya-aetherflux-genius-lightning-runner",
       "title": "Satya, Aetherflux Genius + Lightning Runner",
       "total_from_scratch": 0.43,
@@ -169,7 +175,7 @@
     {
       "caveats": [
         "Bounded by the basics left in your library",
-        "First landfall each turn manifests dread instead of flipping — plan around it"
+        "First landfall each turn manifests dread instead of flipping \u2014 plan around it"
       ],
       "episode": 4,
       "id": "zimone-loop",
@@ -178,7 +184,7 @@
         "Sacrifice the Elder: tutor a basic land to the battlefield",
         "Yedora returns the Elder face-down, as a Forest land",
         "Zimone's landfall flips it face-up again",
-        "Repeat — every loop is another basic and another landfall trigger"
+        "Repeat \u2014 every loop is another basic and another landfall trigger"
       ],
       "outcome": "Infinite basic lands + infinite landfall triggers",
       "pieces": [
@@ -188,7 +194,8 @@
           "price": 0.37,
           "printing": "DSC #8",
           "role": "Flips the Elder face-up",
-          "art": "https://cards.scryfall.io/art_crop/front/3/0/30f23588-5064-48d9-a271-039df757f8d2.jpg?1783909663"
+          "art": "https://cards.scryfall.io/art_crop/front/3/0/30f23588-5064-48d9-a271-039df757f8d2.jpg?1783909663",
+          "oracle_text": "Landfall \u2014 Whenever a land you control enters, manifest dread if this is the first time this ability has resolved this turn. Otherwise, you may turn a permanent you control face up. (To manifest dread, look at the top two cards of your library. Put one onto the battlefield face down as a 2/2 creature and the other into your graveyard. Turn it face up any time for its mana cost if it's a creature card.)"
         },
         {
           "finish": "nonfoil",
@@ -196,7 +203,8 @@
           "price": 0.18,
           "printing": "CMM #333",
           "role": "Returns the Elder as a Forest",
-          "art": "https://cards.scryfall.io/art_crop/front/7/b/7b852b55-bee1-46fc-87e4-5c01b90bbd43.jpg?1783909598"
+          "art": "https://cards.scryfall.io/art_crop/front/7/b/7b852b55-bee1-46fc-87e4-5c01b90bbd43.jpg?1783909598",
+          "oracle_text": "Whenever another nontoken creature you control dies, you may return it to the battlefield face down under its owner's control. It's a Forest land. (It has no other types or abilities.)"
         },
         {
           "finish": "nonfoil",
@@ -204,7 +212,8 @@
           "price": 0.31,
           "printing": "SCD #208",
           "role": "Sacs to tutor a basic",
-          "art": "https://cards.scryfall.io/art_crop/front/7/a/7a8b1c49-8594-426d-b585-41140235bb0e.jpg?1783903761"
+          "art": "https://cards.scryfall.io/art_crop/front/7/a/7a8b1c49-8594-426d-b585-41140235bb0e.jpg?1783903761",
+          "oracle_text": "Sacrifice this creature: Search your library for a basic land card, put that card onto the battlefield tapped, then shuffle."
         }
       ],
       "precon": {
@@ -221,7 +230,7 @@
         "All three on the battlefield",
         "Sakura-Tribe Elder ready to sacrifice"
       ],
-      "reel_url": null,
+      "reel_url": "https://www.instagram.com/reel/DfIQDLSDLnj/",
       "slug": "zimone-yedora-sakura-tribe-elder",
       "title": "Zimone + Yedora + Sakura-Tribe Elder",
       "total_from_scratch": 0.86,
@@ -234,16 +243,16 @@
     },
     {
       "caveats": [
-        "Needs all four pieces — kill any one in response and the loop stops cold",
+        "Needs all four pieces \u2014 kill any one in response and the loop stops cold",
         "Graveyard hate ends the recast"
       ],
       "episode": 5,
       "id": "gravecrawler-loop",
       "instagram_media_id": "17995885649840851",
       "loop_steps": [
-        "Control Rooftop Storm, Diregraf Captain, and Viscera Seer. Cast Gravecrawler for free — from hand or graveyard",
+        "Control Rooftop Storm, Diregraf Captain, and Viscera Seer. Cast Gravecrawler for free \u2014 from hand or graveyard",
         "Sacrifice Gravecrawler to the Seer: scry 1. It dies, so the Captain drains an opponent for 1",
-        "Cast Gravecrawler from your graveyard for free again — you still control a Zombie (the Captain)",
+        "Cast Gravecrawler from your graveyard for free again \u2014 you still control a Zombie (the Captain)",
         "Repeat forever: infinite scry, infinite drain"
       ],
       "outcome": "Infinite scry + infinite drain (1 life per loop)",
@@ -254,7 +263,8 @@
           "price": 0.56,
           "printing": "FDC #104",
           "role": "The zombie that won't stay dead",
-          "art": "https://cards.scryfall.io/art_crop/front/6/9/6987d609-ba0f-42bf-9b61-bdfb943c03b5.jpg?1783907138"
+          "art": "https://cards.scryfall.io/art_crop/front/6/9/6987d609-ba0f-42bf-9b61-bdfb943c03b5.jpg?1783907138",
+          "oracle_text": "This creature can't block.\nYou may cast this card from your graveyard as long as you control a Zombie."
         },
         {
           "finish": "nonfoil",
@@ -262,7 +272,8 @@
           "price": 2.11,
           "printing": "INR #83",
           "role": "Zombie spells cost nothing",
-          "art": "https://cards.scryfall.io/art_crop/front/3/1/31146f03-cb5e-4f33-aad7-ce970b914d90.jpg?1783908155"
+          "art": "https://cards.scryfall.io/art_crop/front/3/1/31146f03-cb5e-4f33-aad7-ce970b914d90.jpg?1783908155",
+          "oracle_text": "You may pay {0} rather than pay the mana cost for Zombie creature spells you cast."
         },
         {
           "finish": "nonfoil",
@@ -270,7 +281,8 @@
           "price": 0.33,
           "printing": "DDQ #68",
           "role": "Drains 1 when a Zombie dies",
-          "art": "https://cards.scryfall.io/art_crop/front/1/5/158407ad-35a9-40e1-9762-1c0572b56ecb.jpg?1783925325"
+          "art": "https://cards.scryfall.io/art_crop/front/1/5/158407ad-35a9-40e1-9762-1c0572b56ecb.jpg?1783925325",
+          "oracle_text": "Deathtouch\nOther Zombie creatures you control get +1/+1.\nWhenever another Zombie you control dies, target opponent loses 1 life."
         },
         {
           "finish": "nonfoil",
@@ -278,16 +290,17 @@
           "price": 0.57,
           "printing": "TDC #199",
           "role": "Free sac outlet, scry 1",
-          "art": "https://cards.scryfall.io/art_crop/front/f/5/f511830b-1c1f-4d30-aa5d-4314726d142e.jpg?1783903780"
+          "art": "https://cards.scryfall.io/art_crop/front/f/5/f511830b-1c1f-4d30-aa5d-4314726d142e.jpg?1783903780",
+          "oracle_text": "Sacrifice a creature: Scry 1. (Look at the top card of your library. You may put that card on the bottom.)"
         }
       ],
       "precon": null,
-      "precon_note": "Only Gravecrawler ships in Undead Unleashed — priced from scratch only.",
+      "precon_note": "Only Gravecrawler ships in Undead Unleashed \u2014 priced from scratch only.",
       "prerequisites": [
         "All four pieces on the battlefield",
         "Gravecrawler in hand or graveyard to start"
       ],
-      "reel_url": null,
+      "reel_url": "https://www.instagram.com/reel/DfKxvIljn-N/",
       "slug": "gravecrawler-rooftop-storm-diregraf-captain-viscera-seer",
       "title": "Gravecrawler Zombie Loop",
       "total_from_scratch": 3.57,
@@ -300,7 +313,7 @@
     },
     {
       "caveats": [
-        "Stella has to survive — removal on her in response kills the loop",
+        "Stella has to survive \u2014 removal on her in response kills the loop",
         "You must cast 3 spells first, and the copy has to stay on the stack while you work"
       ],
       "episode": 6,
@@ -308,7 +321,7 @@
       "instagram_media_id": "18102520574432551",
       "loop_steps": [
         "Cast two spells, then Twisted Fealty targeting Stella",
-        "Tap Stella: copy it while the original is still on the stack — the copy untaps her",
+        "Tap Stella: copy it while the original is still on the stack \u2014 the copy untaps her",
         "Tap her again. And again. Infinite copies",
         "Every copy makes a Wicked Role; the old one falls off to the graveyard and drains each opponent for 1"
       ],
@@ -320,7 +333,8 @@
           "price": 4.61,
           "printing": "OTC #3",
           "role": "Copies the spell, untaps itself",
-          "art": "https://cards.scryfall.io/art_crop/front/5/4/54820d80-f32e-4e2f-a0e2-4db781444217.jpg?1793187478"
+          "art": "https://cards.scryfall.io/art_crop/front/5/4/54820d80-f32e-4e2f-a0e2-4db781444217.jpg?1793187478",
+          "oracle_text": "Whenever you cast your second spell each turn, exile the top card of your library. Until the end of your next turn, you may play that card.\n{T}: Copy target instant or sorcery spell you control. You may choose new targets for the copy. Activate only if you've cast three or more spells this turn."
         },
         {
           "finish": "nonfoil",
@@ -328,13 +342,14 @@
           "price": 0.29,
           "printing": "WOE #154",
           "role": "Untaps Stella, makes the Wicked Role",
-          "art": "https://cards.scryfall.io/art_crop/front/3/8/382d6085-79b9-48f7-8949-9f44dde2c753.jpg?1783915087"
+          "art": "https://cards.scryfall.io/art_crop/front/3/8/382d6085-79b9-48f7-8949-9f44dde2c753.jpg?1783915087",
+          "oracle_text": "Gain control of target creature until end of turn. Untap that creature. It gains haste until end of turn.\nCreate a Wicked Role token attached to up to one target creature. (If you control another Role on it, put that one into the graveyard. Enchanted creature gets +1/+1. When this token is put into a graveyard, each opponent loses 1 life.)"
         }
       ],
       "precon": {
         "detail": "2024 Outlaws of Thunder Junction Izzet precon led by Stella Lee, Wild Card",
         "incremental_cost": 0.29,
-        "incremental_note": "Twisted Fealty is the #1 most-added card to Quick Draw (38.7% of decks per EDHREC) — not in the box.",
+        "incremental_note": "Twisted Fealty is the #1 most-added card to Quick Draw (38.7% of decks per EDHREC) \u2014 not in the box.",
         "name": "Quick Draw",
         "pieces_included": [
           "Stella Lee, Wild Card"
@@ -348,7 +363,7 @@
         "3 spells cast this turn (unlocks her tap ability)",
         "Twisted Fealty in hand"
       ],
-      "reel_url": null,
+      "reel_url": "https://www.instagram.com/reel/DfNMxjkDAvw/",
       "slug": "stella-lee-twisted-fealty",
       "title": "Stella Lee + Twisted Fealty",
       "total_from_scratch": 4.9,
@@ -361,7 +376,7 @@
     },
     {
       "caveats": [
-        "Infinite tokens is not an immediate win — you need a haste enabler or another outlet",
+        "Infinite tokens is not an immediate win \u2014 you need a haste enabler or another outlet",
         "Needs a green creature entering to get started"
       ],
       "episode": 7,
@@ -370,7 +385,7 @@
       "loop_steps": [
         "Both on board. A green creature enters",
         "The Denizen puts a +1/+1 counter on the Oak",
-        "The Oak makes a 1/1 Squirrel — which entering triggers the Denizen again",
+        "The Oak makes a 1/1 Squirrel \u2014 which entering triggers the Denizen again",
         "Repeat. Squirrels forever"
       ],
       "outcome": "Infinite 1/1 Squirrel tokens (not an immediate win)",
@@ -381,7 +396,8 @@
           "price": 2.39,
           "printing": "PLST MH2-172",
           "role": "Makes a Squirrel per counter",
-          "art": "https://cards.scryfall.io/art_crop/front/0/f/0fb48c2e-ee0f-4fae-9c22-247870c10d5b.jpg?1783926825"
+          "art": "https://cards.scryfall.io/art_crop/front/0/f/0fb48c2e-ee0f-4fae-9c22-247870c10d5b.jpg?1783926825",
+          "oracle_text": "Evolve (Whenever a creature you control enters, if that creature has greater power or toughness than this creature, put a +1/+1 counter on this creature.)\nWhenever one or more +1/+1 counters are put on this creature, you may create a 1/1 green Squirrel creature token."
         },
         {
           "finish": "nonfoil",
@@ -389,16 +405,17 @@
           "price": 0.19,
           "printing": "CLU #166",
           "role": "Puts the counter on the Oak",
-          "art": "https://cards.scryfall.io/art_crop/front/b/6/b6936a91-db5d-4977-a851-2dc6a4141ceb.jpg?1783912530"
+          "art": "https://cards.scryfall.io/art_crop/front/b/6/b6936a91-db5d-4977-a851-2dc6a4141ceb.jpg?1783912530",
+          "oracle_text": "Whenever another green creature you control enters, put a +1/+1 counter on target creature."
         }
       ],
       "precon": null,
-      "precon_note": "Priced from scratch only — no precon-residency claim.",
+      "precon_note": "Priced from scratch only \u2014 no precon-residency claim.",
       "prerequisites": [
         "Both pieces on the battlefield",
         "A green creature entering to kick it off"
       ],
-      "reel_url": null,
+      "reel_url": "https://www.instagram.com/reel/DfN6UtVDygq/",
       "slug": "scurry-oak-ivy-lane-denizen",
       "title": "Scurry Oak + Ivy Lane Denizen",
       "total_from_scratch": 2.58,
@@ -417,8 +434,8 @@
       "id": "broodscale-glee",
       "loop_steps": [
         "Kick it off: Adapt the Broodscale, or let any creature die first",
-        "Sac a Spawn — Glee puts a +1/+1 counter on the Broodscale",
-        "Broodscale hatches a fresh Spawn — repeat forever"
+        "Sac a Spawn \u2014 Glee puts a +1/+1 counter on the Broodscale",
+        "Broodscale hatches a fresh Spawn \u2014 repeat forever"
       ],
       "outcome": "Infinite mana, +1/+1 counters, Spawn tokens & death triggers",
       "pieces": [
@@ -427,16 +444,18 @@
           "name": "Basking Broodscale",
           "price": 0.2,
           "printing": "MH3 #145",
-          "role": "The engine — counters hatch Eldrazi Spawns",
-          "art": "https://cards.scryfall.io/art_crop/front/5/f/5feba5d6-99a6-4e9b-8a7d-90d955868fc3.jpg?1783911263"
+          "role": "The engine \u2014 counters hatch Eldrazi Spawns",
+          "art": "https://cards.scryfall.io/art_crop/front/5/f/5feba5d6-99a6-4e9b-8a7d-90d955868fc3.jpg?1783911263",
+          "oracle_text": "Devoid (This card has no color.)\n{1}{G}: Adapt 1. (If this creature has no +1/+1 counters on it, put a +1/+1 counter on it.)\nWhenever one or more +1/+1 counters are put on this creature, you may create a 0/1 colorless Eldrazi Spawn creature token with \"Sacrifice this token: Add {C}.\""
         },
         {
           "finish": "nonfoil",
           "name": "Sadistic Glee",
           "price": 1.34,
           "printing": "TMP #153",
-          "role": "The spark — every dead Spawn feeds the lizard a counter",
-          "art": "https://cards.scryfall.io/art_crop/front/d/9/d9e1959c-b87b-4e17-a0d2-0489ea79220b.jpg?1783946636"
+          "role": "The spark \u2014 every dead Spawn feeds the lizard a counter",
+          "art": "https://cards.scryfall.io/art_crop/front/d/9/d9e1959c-b87b-4e17-a0d2-0489ea79220b.jpg?1783946636",
+          "oracle_text": "Enchant creature\nWhenever a creature dies, put a +1/+1 counter on enchanted creature."
         }
       ],
       "prerequisites": [
@@ -474,22 +493,24 @@
           "price": 3.35,
           "printing": "CMR #412",
           "finish": "nonfoil",
-          "role": "The copier — flash it in, its ETB copies any instant or sorcery on the stack",
-          "art": "https://cards.scryfall.io/art_crop/front/d/e/defcc4a3-40e0-4f5d-b23c-6cd6a614abc1.jpg?1783927545"
+          "role": "The copier \u2014 flash it in, its ETB copies any instant or sorcery on the stack",
+          "art": "https://cards.scryfall.io/art_crop/front/d/e/defcc4a3-40e0-4f5d-b23c-6cd6a614abc1.jpg?1783927545",
+          "oracle_text": "Flash\nWhen this creature enters, copy target instant or sorcery spell. You may choose new targets for the copy."
         },
         {
           "name": "Twinflame",
           "price": 0.94,
           "printing": "SOC #258",
           "finish": "nonfoil",
-          "role": "The spark — copy a creature you control, the token comes in with haste",
-          "art": "https://cards.scryfall.io/art_crop/front/8/5/85c863ef-b266-410d-87b3-ced791f99966.jpg?1783903769"
+          "role": "The spark \u2014 copy a creature you control, the token comes in with haste",
+          "art": "https://cards.scryfall.io/art_crop/front/8/5/85c863ef-b266-410d-87b3-ced791f99966.jpg?1783903769",
+          "oracle_text": "Strive \u2014 This spell costs {2}{R} more to cast for each target beyond the first.\nChoose any number of target creatures you control. For each of them, create a token that's a copy of that creature, except it has haste. Exile those tokens at the beginning of the next end step."
         }
       ],
       "loop_steps": [
-        "Cast Twinflame targeting a creature you control — hold priority",
-        "Flash in Dualcaster Mage — its ETB copies Twinflame, retargeting the Dualcaster",
-        "Each token enters and copies Twinflame again — repeat forever, then attack"
+        "Cast Twinflame targeting a creature you control \u2014 hold priority",
+        "Flash in Dualcaster Mage \u2014 its ETB copies Twinflame, retargeting the Dualcaster",
+        "Each token enters and copies Twinflame again \u2014 repeat forever, then attack"
       ],
       "prerequisites": [
         "A creature on the battlefield to target with the first Twinflame",
@@ -500,7 +521,151 @@
         "Dies to removal in response",
         "Needs an attack step to win"
       ],
-      "reel_url": ""
+      "reel_url": "https://www.instagram.com/reel/DfP2dMHD9Wo/"
+    },
+    {
+      "episode": 10,
+      "id": "drake-navigator",
+      "slug": "peregrine-drake-deadeye-navigator",
+      "title": "Peregrine Drake + Deadeye Navigator",
+      "combo_type": "infinite",
+      "color_identity": [
+        "U"
+      ],
+      "payoff_class": "mana",
+      "outcome": "Infinite mana",
+      "total_from_scratch": 1.54,
+      "verified_date": "2026-11-03",
+      "reel_url": "https://www.instagram.com/reel/DfSOj9Yk5oC/",
+      "prerequisites": [
+        "11 mana to cast both (4U Drake + 4UU Navigator)",
+        "Lands that tap for more than 1U combined",
+        "A mana win outlet (the mana alone doesn't win)"
+      ],
+      "loop_steps": [
+        "Soulbond Deadeye Navigator to Peregrine Drake \u2014 they stay paired while you control both",
+        "Pay 1U: exile the Drake, then return it \u2014 its ETB untaps up to five lands",
+        "Lands produce more than 1U \u2014 pocket the difference and repeat forever"
+      ],
+      "caveats": [
+        "Needs 11 mana upfront to cast both creatures",
+        "Dies to removal in response to the blink activation",
+        "Infinite mana needs a separate win condition"
+      ],
+      "pieces": [
+        {
+          "name": "Peregrine Drake",
+          "price": 0.25,
+          "set": "DMR",
+          "collector_number": "65",
+          "finish": "nonfoil",
+          "art": "https://cards.scryfall.io/art_crop/front/6/1/611c8fa2-b53f-483b-9efa-759ac59dc30f.jpg?1783918487",
+          "printing": "DMR #65",
+          "role": "Untaps on ETB, blink engine",
+          "oracle_text": "Flying\nWhen this creature enters, untap up to five lands."
+        },
+        {
+          "name": "Deadeye Navigator",
+          "price": 1.29,
+          "set": "INR",
+          "collector_number": "492",
+          "finish": "foil",
+          "art": "https://cards.scryfall.io/art_crop/front/4/f/4f0791b5-fdb4-4378-8fd3-7e7367ffc05c.jpg?1783908166",
+          "printing": "INR #59",
+          "role": "Soulbond blink outlet",
+          "oracle_text": "Soulbond (You may pair this creature with another unpaired creature when either enters. They remain paired for as long as you control both of them.)\nAs long as Deadeye Navigator is paired with another creature, each of those creatures has \"{1}{U}: Exile this creature, then return it to the battlefield under your control.\""
+        }
+      ]
+    },
+    {
+      "id": "guard-gond",
+      "slug": "midnight-guard-presence-of-gond",
+      "episode": 11,
+      "title": "Midnight Guard + Presence of Gond",
+      "pieces": [
+        {
+          "name": "Midnight Guard",
+          "price": 0.08,
+          "printing": "M15 #20",
+          "finish": "nonfoil",
+          "role": "Untaps when a creature enters",
+          "art": "https://cards.scryfall.io/art_crop/front/8/7/87c1d85d-b2b8-4c9d-84fa-2566b14cb5ea.jpg?1783934842",
+          "oracle_text": "Whenever another creature enters, untap this creature."
+        },
+        {
+          "name": "Presence of Gond",
+          "price": 0.2,
+          "printing": "SCD #203",
+          "finish": "nonfoil",
+          "role": "Grants tap: make a 1/1 Elf",
+          "art": "https://cards.scryfall.io/art_crop/front/b/b/bba661af-c4a8-4230-830e-a9ee22b25d6b.jpg?1783930356",
+          "oracle_text": "Enchant creature\nEnchanted creature has \"{T}: Create a 1/1 green Elf Warrior creature token.\""
+        }
+      ],
+      "verified_date": "2026-11-03",
+      "color_identity": [
+        "W",
+        "G"
+      ],
+      "combo_type": "infinite",
+      "payoff_class": "tokens",
+      "outcome": "Infinite 1/1 Elf Warrior tokens",
+      "loop_steps": [
+        "Enchant the Guard with Presence of Gond",
+        "Tap the Guard \u2014 an Elf enters, untapping the Guard",
+        "Repeat forever"
+      ],
+      "caveats": [
+        "Guard must be able to tap (no summoning sickness)",
+        "Elves need haste to attack"
+      ],
+      "reel_url": "https://www.instagram.com/reel/DfTOX68j-4n/",
+      "total_from_scratch": 0.28
+    },
+    {
+      "id": "monolith-monument",
+      "slug": "basalt-monolith-forsaken-monument",
+      "episode": 12,
+      "title": "Basalt Monolith + Forsaken Monument",
+      "pieces": [
+        {
+          "name": "Basalt Monolith",
+          "price": 2.99,
+          "printing": "MB2 #217",
+          "finish": "nonfoil",
+          "role": "Taps for 3, untaps for 3",
+          "art": "https://cards.scryfall.io/art_crop/front/f/7/f79de5e7-1545-420c-bfe1-ee2444fca85b.jpg?1783930120",
+          "oracle_text": "This artifact doesn't untap during your untap step.\n{T}: Add {C}{C}{C}.\n{3}: Untap this artifact."
+        },
+        {
+          "name": "Forsaken Monument",
+          "price": 3.42,
+          "printing": "FDC #258",
+          "finish": "nonfoil",
+          "role": "Adds 1 to every colorless tap",
+          "art": "https://cards.scryfall.io/art_crop/front/8/a/8ac75fbd-ca71-470a-98c2-4b21cc920b7b.jpg?1793021157",
+          "oracle_text": "Colorless creatures you control get +2/+2.\nWhenever you tap a permanent for {C}, add an additional {C}.\nWhenever you cast a colorless spell, you gain 2 life."
+        }
+      ],
+      "verified_date": "2026-11-04",
+      "color_identity": [
+        "C"
+      ],
+      "combo_type": "infinite",
+      "payoff_class": "mana",
+      "outcome": "Infinite colorless mana",
+      "loop_steps": [
+        "Tap Monolith for 4 colorless (Monument adds 1)",
+        "Pay 3 to untap it",
+        "Net 1 mana. Repeat forever."
+      ],
+      "caveats": [
+        "Needs both on board",
+        "Dies to artifact removal",
+        "Needs a mana win outlet"
+      ],
+      "reel_url": "https://www.instagram.com/reel/DfUw5kkju2r/",
+      "total_from_scratch": 6.41
     }
   ]
 }

@@ -2,16 +2,19 @@ import React, { useMemo, useState } from "react";
 import combosData from "../data/combos.json";
 import { money } from "../api.js";
 import { manaPoolCardUrl, tcgplayerListText, tcgplayerMassEntryUrl } from "../affiliates.js";
+import { trackAffiliateClick } from "../analytics.js";
 
 const combos = combosData.combos;
 
 const COLOR_PIPS = [
-  { id: "W", label: "White", bg: "#f8f6d8", fg: "#1e293b" },
-  { id: "U", label: "Blue", bg: "#0e68ab", fg: "#f8fafc" },
-  { id: "B", label: "Black", bg: "#3b2f2f", fg: "#f8fafc" },
-  { id: "R", label: "Red", bg: "#d3202a", fg: "#f8fafc" },
-  { id: "G", label: "Green", bg: "#00733e", fg: "#f8fafc" },
+  { id: "W", label: "White", img: "/mana/white-v2.png" },
+  { id: "U", label: "Blue", img: "/mana/blue-v2.png" },
+  { id: "B", label: "Black", img: "/mana/black-v2.png" },
+  { id: "R", label: "Red", img: "/mana/red-v2.png" },
+  { id: "G", label: "Green", img: "/mana/green-v2.png" },
 ];
+
+const PIP_IMG = { W: "/mana/white-v2.png", U: "/mana/blue-v2.png", B: "/mana/black-v2.png", R: "/mana/red-v2.png", G: "/mana/green-v2.png", C: "/mana/colorless-v2.png" };
 
 export function getCombo(slug) {
   return combos.find((c) => c.slug === slug) ?? null;
@@ -27,21 +30,20 @@ function ciGradient(identity) {
 }
 
 export function ColorPips({ identity, size = 26 }) {
-  if (!identity || identity.length === 0) return <span className="combo-pips" title="Colorless">◯</span>;
+  if (!identity || identity.length === 0) return <img src="/mana/colorless-v2.png" alt="Colorless" width={size} height={size} className="combo-pips" title="Colorless" />;
   return (
     <span className="combo-pips" aria-label={`Color identity ${identity.join("")}`}>
-      {identity.map((pip) => {
-        const def = COLOR_PIPS.find((p) => p.id === pip);
-        return (
-          <span
-            key={pip}
-            className="combo-pip"
-            style={{ background: def.bg, color: def.fg, width: size, height: size, fontSize: size * 0.55 }}
-          >
-            {pip}
-          </span>
-        );
-      })}
+      {identity.map((pip) => (
+        <img
+          key={pip}
+          src={PIP_IMG[pip] ?? PIP_IMG.C}
+          alt={pip}
+          width={size}
+          height={size}
+          className="combo-pip"
+          draggable="false"
+        />
+      ))}
     </span>
   );
 }
@@ -156,13 +158,12 @@ export function CombosIndex({ onOpen }) {
               key={pip.id}
               type="button"
               className={colors.has(pip.id) ? "pip on" : "pip"}
-              style={{ "--pip-bg": pip.bg, "--pip-fg": pip.fg }}
               onClick={() => toggleColor(pip.id)}
               aria-pressed={colors.has(pip.id)}
               aria-label={`${pip.label} ${colors.has(pip.id) ? "on" : "off"}`}
               title={pip.label}
             >
-              {pip.id}
+              <img src={pip.img} alt={pip.label} width="28" height="28" draggable="false" />
             </button>
           ))}
         </div>
@@ -248,7 +249,7 @@ function BuyBox({ combo }) {
       <h3>Get the pieces</h3>
       <div className="combo-buy-actions">
         {combo.pieces.map((p) => (
-          <a key={p.name} className="btn-buy" href={manaPoolCardUrl(p.name)} target="_blank" rel="noopener noreferrer">
+          <a key={p.name} className="btn-buy" href={manaPoolCardUrl(p.name)} target="_blank" rel="noopener noreferrer" onClick={() => trackAffiliateClick("manapool", { view: "combo", comboSlug: combo.slug })}>
             {p.name} — {money(p.price)}
           </a>
         ))}
@@ -257,7 +258,7 @@ function BuyBox({ combo }) {
         <button type="button" className="btn-copy" onClick={copyList}>
           {copied ? "Copied!" : "Copy list for TCGplayer"}
         </button>
-        <a className="btn-buy" href={tcgplayerMassEntryUrl()} target="_blank" rel="noopener noreferrer">
+        <a className="btn-buy" href={tcgplayerMassEntryUrl()} target="_blank" rel="noopener noreferrer" onClick={() => trackAffiliateClick("tcgplayer", { view: "combo", comboSlug: combo.slug })}>
           Open TCGplayer mass entry
         </a>
       </div>
@@ -269,8 +270,25 @@ function BuyBox({ combo }) {
   );
 }
 
-export function ComboDetail({ slug, onBack }) {
-  const combo = getCombo(slug);
+function OracleToggle({ text, cardName }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="combo-eq-oracle-wrap">
+      <button
+        type="button"
+        className="combo-eq-oracle-toggle"
+        onClick={() => setOpen(!open)}
+        aria-expanded={open}
+        aria-label={`${open ? "Hide" : "Show"} card text for ${cardName}`}
+      >
+        {open ? "▾ Hide card text" : "▸ Show card text"}
+      </button>
+      {open && <div className="combo-eq-oracle">{text}</div>}
+    </div>
+  );
+}
+
+export function ComboDetail({ slug, onBack }) {  const combo = getCombo(slug);
   if (!combo) {
     return (
       <div className="combos-page">
@@ -307,7 +325,10 @@ export function ComboDetail({ slug, onBack }) {
                 {p.printing} · {p.finish}
               </div>
               <div className="combo-eq-price">{money(p.price)}</div>
-              <a className="btn-copy combo-eq-buy" href={manaPoolCardUrl(p.name)} target="_blank" rel="noopener noreferrer">
+              {p.oracle_text && (
+                <OracleToggle text={p.oracle_text} cardName={p.name} />
+              )}
+              <a className="btn-copy combo-eq-buy" href={manaPoolCardUrl(p.name)} target="_blank" rel="noopener noreferrer" onClick={() => trackAffiliateClick("manapool", { view: "combo", comboSlug: combo.slug })}>
                 Buy this card
               </a>
             </div>
