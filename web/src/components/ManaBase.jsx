@@ -318,6 +318,30 @@ export function ManaBase() {
             Prices are a {result.meta?.priceSnapshot || "2026-11-04"} snapshot
             of cheapest printings — verify at checkout. Life costs are modeled
             scoring values, not measured per-game loss.
+            {(() => {
+              const snap = result.meta?.priceSnapshot;
+              if (!snap) return null;
+              const ageDays = Math.floor(
+                (Date.now() - new Date(snap + "T00:00:00Z").getTime()) / 86400000
+              );
+              if (ageDays > 30) {
+                return (
+                  <span className="mb-stale mb-stale-expired">
+                    {" "}Pricing is over 30 days old — treat prices as
+                    expired and verify every card before buying.
+                  </span>
+                );
+              }
+              if (ageDays > 7) {
+                return (
+                  <span className="mb-stale">
+                    {" "}Prices are {ageDays} days old and may be stale —
+                    verify before you buy.
+                  </span>
+                );
+              }
+              return null;
+            })()}
           </p>
         </div>
       )}

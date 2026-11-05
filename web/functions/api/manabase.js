@@ -44,7 +44,7 @@ function parseIntParam(v, name, min, max) {
   return n;
 }
 
-export async function onRequestGet({ request }) {
+export async function onRequestGet({ request, env }) {
   const url = new URL(request.url);
   const q = url.searchParams;
 
@@ -179,7 +179,7 @@ export async function onRequestGet({ request }) {
 
   const [pkg, score, stats] = [result.pkg, result.score, result.stats];
   const perColor = score[4]?.per_color ?? {};
-  return Response.json({
+  const response = {
     lands: pkg.map((l) => {
       const full = landData.lands.find((x) => x.oracleId === l.oracleId);
       return {
@@ -223,5 +223,24 @@ export async function onRequestGet({ request }) {
       servedLandCount: lands.length,
       provisionalNote: "Node budgets provisional pending production calibration.",
     },
-  });
+  };
+
+  // Calibration logging: one row per solver query (never fails the response).
+  // Date.now() is frozen during CPU execution in Workers, so server-side
+  // elapsed is 0 — nodesVisited/status is the calibration signal.
+  try {
+    await env.MANACENTS_DB.prepare(
+      `INSERT INTO manabase_queries
+       (colors, priorities, budget, slots, opponents, bracket,
+        nodes_visited, status, interrupt_reason, result_count)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).bind(
+      colors, JSON.stringify(effectivePriorities), budget, slots,
+      opponents, bracket, stats.nodesVisited, stats.status,
+      stats.interruptReason ?? null, pkg.length
+    ).run();
+  } catch (e) {
+    console.error("manabase query log failed:", e.message);
+  }
+  return Response.json(response);
 }

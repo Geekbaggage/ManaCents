@@ -1,0 +1,4808 @@
+{
+  "catalog_name": "ManaBase Seed Catalog v0.4.2",
+  "date": "2026-11-04",
+  "taxonomy_version": "charlie-2026-11-04",
+  "spec_version": "v4",
+  "snapshot_hash": "477ccc370a9950d7",
+  "total_rows": 45,
+  "approved_rows": 43,
+  "held_rows": 2,
+  "eligible_rows": 43,
+  "corrections_from_v02": [
+    "colors: WUBRG only; C via producesColorless flag",
+    "Receipt identity: fixed stale loop variable (7 mismatches)",
+    "Basic types: derived for 5 basics + 8 typed lands (was 10 missing)",
+    "Pain/Confluence/Brass/Canopy/Grove: scoring_status=pending",
+    "Command Tower: resolve_command_tower_colors() function",
+    "Eligibility gate: unknown GC excluded (not translated to false)",
+    "Context placeholders marked CONTEXT PENDING (not integration-ready)"
+  ],
+  "pending_scope": [
+    "Scoring: shock paid-entry 2.0 recorded, not applied (entry-choice deferred); utility scoring for sacrifice-draw abilities; context-dependent cost resolution",
+    "Context evaluation: opponent count, land count, basic count, bounce",
+    "Game Changer: checked source/version for served subset"
+  ],
+  "coverage_note": "Seed only. Held: fetches (2). Gaps: Marvel, MDFC, reversible, banned.",
+  "held_summary": [
+    {
+      "name": "Flooded Strand",
+      "reason": "True typed fetch: target availability unknown."
+    },
+    {
+      "name": "Polluted Delta",
+      "reason": "True typed fetch: target availability unknown."
+    }
+  ],
+  "rows": [
+    {
+      "name": "Plains",
+      "oracle_id": "bc71ebf6-2056-41f7-be35-b2e5c34afa99",
+      "type_line": "Basic Land \u2014 Plains",
+      "color_identity": [
+        "W"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": false,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "W"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          true,
+          false,
+          "Basic land"
+        ],
+        "U": [
+          false,
+          false,
+          ""
+        ],
+        "B": [
+          false,
+          false,
+          ""
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "W"
+        ],
+        "producesColorless": false,
+        "untapped": true,
+        "conditional": false,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [
+          "Plains"
+        ],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "bc71ebf6-2056-41f7-be35-b2e5c34afa99",
+        "oracle_text": "({T}: Add {W}.)",
+        "scryfall_uri": "https://scryfall.com/card/mdd/292/plains?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Plains",
+        "oracle_id": "bc71ebf6-2056-41f7-be35-b2e5c34afa99",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": "Basic land"
+      },
+      "hold_reason": null,
+      "notes": null,
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 0.09,
+      "price_printing": "MSH #288 (usd_foil)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Island",
+      "oracle_id": "b2c6aa39-2d2a-459c-a555-fb48ba993373",
+      "type_line": "Basic Land \u2014 Island",
+      "color_identity": [
+        "U"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": false,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "U"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          ""
+        ],
+        "U": [
+          true,
+          false,
+          "Basic land"
+        ],
+        "B": [
+          false,
+          false,
+          ""
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "U"
+        ],
+        "producesColorless": false,
+        "untapped": true,
+        "conditional": false,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [
+          "Island"
+        ],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "b2c6aa39-2d2a-459c-a555-fb48ba993373",
+        "oracle_text": "({T}: Add {U}.)",
+        "scryfall_uri": "https://scryfall.com/card/mdd/294/island?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Island",
+        "oracle_id": "b2c6aa39-2d2a-459c-a555-fb48ba993373",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": "Basic land"
+      },
+      "hold_reason": null,
+      "notes": null,
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 0.09,
+      "price_printing": "FRA #284 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Swamp",
+      "oracle_id": "56719f6a-1a6c-4c0a-8d21-18f7d7350b68",
+      "type_line": "Basic Land \u2014 Swamp",
+      "color_identity": [
+        "B"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": false,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "B"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          ""
+        ],
+        "U": [
+          false,
+          false,
+          ""
+        ],
+        "B": [
+          true,
+          false,
+          "Basic land"
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "B"
+        ],
+        "producesColorless": false,
+        "untapped": true,
+        "conditional": false,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [
+          "Swamp"
+        ],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "56719f6a-1a6c-4c0a-8d21-18f7d7350b68",
+        "oracle_text": "({T}: Add {B}.)",
+        "scryfall_uri": "https://scryfall.com/card/mdd/296/swamp?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Swamp",
+        "oracle_id": "56719f6a-1a6c-4c0a-8d21-18f7d7350b68",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": "Basic land"
+      },
+      "hold_reason": null,
+      "notes": null,
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 0.11,
+      "price_printing": "M21 #268 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Mountain",
+      "oracle_id": "a3fb7228-e76b-4e96-a40e-20b5fed75685",
+      "type_line": "Basic Land \u2014 Mountain",
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": false,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "R"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          ""
+        ],
+        "U": [
+          false,
+          false,
+          ""
+        ],
+        "B": [
+          false,
+          false,
+          ""
+        ],
+        "R": [
+          true,
+          false,
+          "Basic land"
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "R"
+        ],
+        "producesColorless": false,
+        "untapped": true,
+        "conditional": false,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [
+          "Mountain"
+        ],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "a3fb7228-e76b-4e96-a40e-20b5fed75685",
+        "oracle_text": "({T}: Add {R}.)",
+        "scryfall_uri": "https://scryfall.com/card/mdd/298/mountain?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Mountain",
+        "oracle_id": "a3fb7228-e76b-4e96-a40e-20b5fed75685",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": "Basic land"
+      },
+      "hold_reason": null,
+      "notes": null,
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 0.09,
+      "price_printing": "BRO #274 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Forest",
+      "oracle_id": "b34bb2dc-c1af-4d77-b0b3-a0fb342a5fc6",
+      "type_line": "Basic Land \u2014 Forest",
+      "color_identity": [
+        "G"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": false,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "G"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          ""
+        ],
+        "U": [
+          false,
+          false,
+          ""
+        ],
+        "B": [
+          false,
+          false,
+          ""
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          true,
+          false,
+          "Basic land"
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "G"
+        ],
+        "producesColorless": false,
+        "untapped": true,
+        "conditional": false,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [
+          "Forest"
+        ],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "b34bb2dc-c1af-4d77-b0b3-a0fb342a5fc6",
+        "oracle_text": "({T}: Add {G}.)",
+        "scryfall_uri": "https://scryfall.com/card/mdd/301/forest?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Forest",
+        "oracle_id": "b34bb2dc-c1af-4d77-b0b3-a0fb342a5fc6",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": "Basic land"
+      },
+      "hold_reason": null,
+      "notes": null,
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 0.1,
+      "price_printing": "M20 #279 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Wastes",
+      "oracle_id": "05d24b0c-904a-46b6-b42a-96a4d91a0dd4",
+      "type_line": "Basic Land",
+      "color_identity": [],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": false,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "C"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          ""
+        ],
+        "U": [
+          false,
+          false,
+          ""
+        ],
+        "B": [
+          false,
+          false,
+          ""
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          true,
+          false,
+          "Unconditional colorless"
+        ]
+      },
+      "solver_projection": {
+        "colors": [],
+        "producesColorless": true,
+        "untapped": true,
+        "conditional": false,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "05d24b0c-904a-46b6-b42a-96a4d91a0dd4",
+        "oracle_text": "{T}: Add {C}.",
+        "scryfall_uri": "https://scryfall.com/card/eoc/191/wastes?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Wastes",
+        "oracle_id": "05d24b0c-904a-46b6-b42a-96a4d91a0dd4",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": "Basic supertype, no basic land type (CR 305.6)"
+      },
+      "hold_reason": null,
+      "notes": "Wastes: Basic supertype, zero basic land types.",
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 0.63,
+      "price_printing": "OGW #183 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Adarkar Wastes",
+      "oracle_id": "d5ad26cc-2bdb-46b7-b8bf-dd099d5fa09b",
+      "type_line": "Land",
+      "color_identity": [
+        "U",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": false,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "C"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        },
+        {
+          "output": [
+            "W",
+            "U"
+          ],
+          "unconditional": true,
+          "consequence": "deals 1 damage to controller"
+        }
+      ],
+      "source_credit": {
+        "W": [
+          true,
+          false,
+          "Unconditional, 1 damage"
+        ],
+        "U": [
+          true,
+          false,
+          "Unconditional, 1 damage"
+        ],
+        "B": [
+          false,
+          false,
+          ""
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          true,
+          false,
+          "Unconditional colorless"
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "U",
+          "W"
+        ],
+        "producesColorless": true,
+        "untapped": true,
+        "conditional": false,
+        "production_conditional": false,
+        "life_cost": 1.5,
+        "basic_types": [],
+        "scoring_status": "applied:scoring-policy-v1",
+        "notes": "SCORING v1 applied: life_cost=1.5 (policy SCORING_POLICY_v1.md). Oracle mechanics preserved."
+      },
+      "other_consequences": [
+        "Deals 1 damage on colored activation"
+      ],
+      "evidence": {
+        "oracle_id": "d5ad26cc-2bdb-46b7-b8bf-dd099d5fa09b",
+        "oracle_text": "{T}: Add {C}.\n{T}: Add {W} or {U}. This land deals 1 damage to you.",
+        "scryfall_uri": "https://scryfall.com/card/eoc/147/adarkar-wastes?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Adarkar Wastes",
+        "oracle_id": "d5ad26cc-2bdb-46b7-b8bf-dd099d5fa09b",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": "Scoring pending: raw damage preserved"
+      },
+      "hold_reason": null,
+      "notes": "SCORING v1 applied: life_cost 0.0 \u2192 1.5. Oracle mechanics preserved in mana_modes.",
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 0.23,
+      "price_printing": "PLST #DMU-243 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Underground River",
+      "oracle_id": "857febd9-cdd7-4f8e-a852-d88084b0cfbc",
+      "type_line": "Land",
+      "color_identity": [
+        "B",
+        "U"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": false,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "C"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        },
+        {
+          "output": [
+            "U",
+            "B"
+          ],
+          "unconditional": true,
+          "consequence": "deals 1 damage to controller"
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          ""
+        ],
+        "U": [
+          true,
+          false,
+          "Unconditional, 1 damage"
+        ],
+        "B": [
+          true,
+          false,
+          "Unconditional, 1 damage"
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          true,
+          false,
+          "Unconditional colorless"
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "B",
+          "U"
+        ],
+        "producesColorless": true,
+        "untapped": true,
+        "conditional": false,
+        "production_conditional": false,
+        "life_cost": 1.5,
+        "basic_types": [],
+        "scoring_status": "applied:scoring-policy-v1",
+        "notes": "SCORING v1 applied: life_cost=1.5 (policy SCORING_POLICY_v1.md). Oracle mechanics preserved."
+      },
+      "other_consequences": [
+        "Deals 1 damage on colored activation"
+      ],
+      "evidence": {
+        "oracle_id": "857febd9-cdd7-4f8e-a852-d88084b0cfbc",
+        "oracle_text": "{T}: Add {C}.\n{T}: Add {U} or {B}. This land deals 1 damage to you.",
+        "scryfall_uri": "https://scryfall.com/card/trc/575/underground-river?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Underground River",
+        "oracle_id": "857febd9-cdd7-4f8e-a852-d88084b0cfbc",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": "Scoring pending: raw damage preserved"
+      },
+      "hold_reason": null,
+      "notes": "SCORING v1 applied: life_cost 0.0 \u2192 1.5. Oracle mechanics preserved in mana_modes.",
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 0.48,
+      "price_printing": "PLST #BRO-267 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Sulfurous Springs",
+      "oracle_id": "f5c38c01-4a40-469f-91a0-7479daf4e8e7",
+      "type_line": "Land",
+      "color_identity": [
+        "B",
+        "R"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": false,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "C"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        },
+        {
+          "output": [
+            "B",
+            "R"
+          ],
+          "unconditional": true,
+          "consequence": "deals 1 damage to controller"
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          ""
+        ],
+        "U": [
+          false,
+          false,
+          ""
+        ],
+        "B": [
+          true,
+          false,
+          "Unconditional, 1 damage"
+        ],
+        "R": [
+          true,
+          false,
+          "Unconditional, 1 damage"
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          true,
+          false,
+          "Unconditional colorless"
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "B",
+          "R"
+        ],
+        "producesColorless": true,
+        "untapped": true,
+        "conditional": false,
+        "production_conditional": false,
+        "life_cost": 1.5,
+        "basic_types": [],
+        "scoring_status": "applied:scoring-policy-v1",
+        "notes": "SCORING v1 applied: life_cost=1.5 (policy SCORING_POLICY_v1.md). Oracle mechanics preserved."
+      },
+      "other_consequences": [
+        "Deals 1 damage on colored activation"
+      ],
+      "evidence": {
+        "oracle_id": "f5c38c01-4a40-469f-91a0-7479daf4e8e7",
+        "oracle_text": "{T}: Add {C}.\n{T}: Add {B} or {R}. This land deals 1 damage to you.",
+        "scryfall_uri": "https://scryfall.com/card/frc/85/sulfurous-springs?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Sulfurous Springs",
+        "oracle_id": "f5c38c01-4a40-469f-91a0-7479daf4e8e7",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": "Scoring pending: raw damage preserved"
+      },
+      "hold_reason": null,
+      "notes": "SCORING v1 applied: life_cost 0.0 \u2192 1.5. Oracle mechanics preserved in mana_modes.",
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 0.49,
+      "price_printing": "FRC #85 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Karplusan Forest",
+      "oracle_id": "bd912666-f37f-4767-af6f-9e6d0fcccacf",
+      "type_line": "Land",
+      "color_identity": [
+        "G",
+        "R"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": false,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "C"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        },
+        {
+          "output": [
+            "R",
+            "G"
+          ],
+          "unconditional": true,
+          "consequence": "deals 1 damage to controller"
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          ""
+        ],
+        "U": [
+          false,
+          false,
+          ""
+        ],
+        "B": [
+          false,
+          false,
+          ""
+        ],
+        "R": [
+          true,
+          false,
+          "Unconditional, 1 damage"
+        ],
+        "G": [
+          true,
+          false,
+          "Unconditional, 1 damage"
+        ],
+        "C": [
+          true,
+          false,
+          "Unconditional colorless"
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "G",
+          "R"
+        ],
+        "producesColorless": true,
+        "untapped": true,
+        "conditional": false,
+        "production_conditional": false,
+        "life_cost": 1.5,
+        "basic_types": [],
+        "scoring_status": "applied:scoring-policy-v1",
+        "notes": "SCORING v1 applied: life_cost=1.5 (policy SCORING_POLICY_v1.md). Oracle mechanics preserved."
+      },
+      "other_consequences": [
+        "Deals 1 damage on colored activation"
+      ],
+      "evidence": {
+        "oracle_id": "bd912666-f37f-4767-af6f-9e6d0fcccacf",
+        "oracle_text": "{T}: Add {C}.\n{T}: Add {R} or {G}. This land deals 1 damage to you.",
+        "scryfall_uri": "https://scryfall.com/card/eoc/164/karplusan-forest?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Karplusan Forest",
+        "oracle_id": "bd912666-f37f-4767-af6f-9e6d0fcccacf",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": "Scoring pending: raw damage preserved"
+      },
+      "hold_reason": null,
+      "notes": "SCORING v1 applied: life_cost 0.0 \u2192 1.5. Oracle mechanics preserved in mana_modes.",
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 0.48,
+      "price_printing": "EOC #164 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Brushland",
+      "oracle_id": "5eb8b497-ec9a-4a89-ad29-1ec3ca82da7c",
+      "type_line": "Land",
+      "color_identity": [
+        "G",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": false,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "C"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        },
+        {
+          "output": [
+            "G",
+            "W"
+          ],
+          "unconditional": true,
+          "consequence": "deals 1 damage to controller"
+        }
+      ],
+      "source_credit": {
+        "W": [
+          true,
+          false,
+          "Unconditional, 1 damage"
+        ],
+        "U": [
+          false,
+          false,
+          ""
+        ],
+        "B": [
+          false,
+          false,
+          ""
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          true,
+          false,
+          "Unconditional, 1 damage"
+        ],
+        "C": [
+          true,
+          false,
+          "Unconditional colorless"
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "G",
+          "W"
+        ],
+        "producesColorless": true,
+        "untapped": true,
+        "conditional": false,
+        "production_conditional": false,
+        "life_cost": 1.5,
+        "basic_types": [],
+        "scoring_status": "applied:scoring-policy-v1",
+        "notes": "SCORING v1 applied: life_cost=1.5 (policy SCORING_POLICY_v1.md). Oracle mechanics preserved."
+      },
+      "other_consequences": [
+        "Deals 1 damage on colored activation"
+      ],
+      "evidence": {
+        "oracle_id": "5eb8b497-ec9a-4a89-ad29-1ec3ca82da7c",
+        "oracle_text": "{T}: Add {C}.\n{T}: Add {G} or {W}. This land deals 1 damage to you.",
+        "scryfall_uri": "https://scryfall.com/card/bro/259/brushland?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Brushland",
+        "oracle_id": "5eb8b497-ec9a-4a89-ad29-1ec3ca82da7c",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": "Scoring pending: raw damage preserved"
+      },
+      "hold_reason": null,
+      "notes": "SCORING v1 applied: life_cost 0.0 \u2192 1.5. Oracle mechanics preserved in mana_modes.",
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 0.59,
+      "price_printing": "PLST #M3C-324 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Battlefield Forge",
+      "oracle_id": "6b75b94e-83b7-457e-ac41-7ca90b5a59aa",
+      "type_line": "Land",
+      "color_identity": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": false,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "C"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        },
+        {
+          "output": [
+            "R",
+            "W"
+          ],
+          "unconditional": true,
+          "consequence": "deals 1 damage to controller"
+        }
+      ],
+      "source_credit": {
+        "W": [
+          true,
+          false,
+          "Unconditional, 1 damage"
+        ],
+        "U": [
+          false,
+          false,
+          ""
+        ],
+        "B": [
+          false,
+          false,
+          ""
+        ],
+        "R": [
+          true,
+          false,
+          "Unconditional, 1 damage"
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          true,
+          false,
+          "Unconditional colorless"
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "R",
+          "W"
+        ],
+        "producesColorless": true,
+        "untapped": true,
+        "conditional": false,
+        "production_conditional": false,
+        "life_cost": 1.5,
+        "basic_types": [],
+        "scoring_status": "applied:scoring-policy-v1",
+        "notes": "SCORING v1 applied: life_cost=1.5 (policy SCORING_POLICY_v1.md). Oracle mechanics preserved."
+      },
+      "other_consequences": [
+        "Deals 1 damage on colored activation"
+      ],
+      "evidence": {
+        "oracle_id": "6b75b94e-83b7-457e-ac41-7ca90b5a59aa",
+        "oracle_text": "{T}: Add {C}.\n{T}: Add {R} or {W}. This land deals 1 damage to you.",
+        "scryfall_uri": "https://scryfall.com/card/trc/514/battlefield-forge?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Battlefield Forge",
+        "oracle_id": "6b75b94e-83b7-457e-ac41-7ca90b5a59aa",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": "Scoring pending: raw damage preserved"
+      },
+      "hold_reason": null,
+      "notes": "SCORING v1 applied: life_cost 0.0 \u2192 1.5. Oracle mechanics preserved in mana_modes.",
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 0.21,
+      "price_printing": "FIC #375 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Glacial Fortress",
+      "oracle_id": "027dd013-baa7-4111-b3c9-f4d1414e9c45",
+      "type_line": "Land",
+      "color_identity": [
+        "U",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "check_basic_type",
+        "enters_tapped": true,
+        "predicate": {
+          "types": [
+            "Plains",
+            "Island"
+          ],
+          "threshold": 1
+        }
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "W",
+            "U"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "U": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "B": [
+          false,
+          false,
+          ""
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "U",
+          "W"
+        ],
+        "producesColorless": false,
+        "untapped": false,
+        "conditional": true,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "027dd013-baa7-4111-b3c9-f4d1414e9c45",
+        "oracle_text": "This land enters tapped unless you control a Plains or an Island.\n{T}: Add {W} or {U}.",
+        "scryfall_uri": "https://scryfall.com/card/trc/535/glacial-fortress?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Glacial Fortress",
+        "oracle_id": "027dd013-baa7-4111-b3c9-f4d1414e9c45",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": null
+      },
+      "hold_reason": null,
+      "notes": null,
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 0.22,
+      "price_printing": "PLST #BLC-307 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Drowned Catacomb",
+      "oracle_id": "819fc966-434e-470f-91e9-a38df974ad17",
+      "type_line": "Land",
+      "color_identity": [
+        "B",
+        "U"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "check_basic_type",
+        "enters_tapped": true,
+        "predicate": {
+          "types": [
+            "Island",
+            "Swamp"
+          ],
+          "threshold": 1
+        }
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "U",
+            "B"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          ""
+        ],
+        "U": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "B": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "B",
+          "U"
+        ],
+        "producesColorless": false,
+        "untapped": false,
+        "conditional": true,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "819fc966-434e-470f-91e9-a38df974ad17",
+        "oracle_text": "This land enters tapped unless you control an Island or a Swamp.\n{T}: Add {U} or {B}.",
+        "scryfall_uri": "https://scryfall.com/card/trc/525/drowned-catacomb?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Drowned Catacomb",
+        "oracle_id": "819fc966-434e-470f-91e9-a38df974ad17",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": null
+      },
+      "hold_reason": null,
+      "notes": null,
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 0.36,
+      "price_printing": "FRC #69 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Dragonskull Summit",
+      "oracle_id": "63398c02-6fb1-481d-9d9f-81063532fbc0",
+      "type_line": "Land",
+      "color_identity": [
+        "B",
+        "R"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "check_basic_type",
+        "enters_tapped": true,
+        "predicate": {
+          "types": [
+            "Swamp",
+            "Mountain"
+          ],
+          "threshold": 1
+        }
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "B",
+            "R"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          ""
+        ],
+        "U": [
+          false,
+          false,
+          ""
+        ],
+        "B": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "R": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "B",
+          "R"
+        ],
+        "producesColorless": false,
+        "untapped": false,
+        "conditional": true,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "63398c02-6fb1-481d-9d9f-81063532fbc0",
+        "oracle_text": "This land enters tapped unless you control a Swamp or a Mountain.\n{T}: Add {B} or {R}.",
+        "scryfall_uri": "https://scryfall.com/card/trc/524/dragonskull-summit?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Dragonskull Summit",
+        "oracle_id": "63398c02-6fb1-481d-9d9f-81063532fbc0",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": null
+      },
+      "hold_reason": null,
+      "notes": null,
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 0.46,
+      "price_printing": "MSC #238 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Hallowed Fountain",
+      "oracle_id": "f1750962-a87c-49f6-b731-02ae971ac6ea",
+      "type_line": "Land \u2014 Plains Island",
+      "color_identity": [
+        "U",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "life_payment",
+        "enters_tapped": true,
+        "predicate": {
+          "payment": 2,
+          "types": [
+            "Plains",
+            "Island"
+          ]
+        }
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "W",
+            "U"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "U": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "B": [
+          false,
+          false,
+          ""
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "U",
+          "W"
+        ],
+        "producesColorless": false,
+        "untapped": false,
+        "conditional": true,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [
+          "Island",
+          "Plains"
+        ],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [
+        "May pay 2 life to enter untapped"
+      ],
+      "evidence": {
+        "oracle_id": "f1750962-a87c-49f6-b731-02ae971ac6ea",
+        "oracle_text": "({T}: Add {W} or {U}.)\nAs this land enters, you may pay 2 life. If you don't, it enters tapped.",
+        "scryfall_uri": "https://scryfall.com/card/trk/286/hallowed-fountain?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Hallowed Fountain",
+        "oracle_id": "f1750962-a87c-49f6-b731-02ae971ac6ea",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": null
+      },
+      "hold_reason": null,
+      "notes": "SCORING v1: 2.0 paid-entry policy recorded per spec v4, NOT applied \u2014 entry-choice resolution deferred. Projection life_cost stays 0.0; do not treat unresolved entry as paid.",
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 7.61,
+      "price_printing": "PECL #265p (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Watery Grave",
+      "oracle_id": "fc9ec820-4245-4a96-b009-5308a818ca58",
+      "type_line": "Land \u2014 Island Swamp",
+      "color_identity": [
+        "B",
+        "U"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "life_payment",
+        "enters_tapped": true,
+        "predicate": {
+          "payment": 2,
+          "types": [
+            "Island",
+            "Swamp"
+          ]
+        }
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "U",
+            "B"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          ""
+        ],
+        "U": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "B": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "B",
+          "U"
+        ],
+        "producesColorless": false,
+        "untapped": false,
+        "conditional": true,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [
+          "Island",
+          "Swamp"
+        ],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [
+        "May pay 2 life to enter untapped"
+      ],
+      "evidence": {
+        "oracle_id": "fc9ec820-4245-4a96-b009-5308a818ca58",
+        "oracle_text": "({T}: Add {U} or {B}.)\nAs this land enters, you may pay 2 life. If you don't, it enters tapped.",
+        "scryfall_uri": "https://scryfall.com/card/trk/306/watery-grave?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Watery Grave",
+        "oracle_id": "fc9ec820-4245-4a96-b009-5308a818ca58",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": null
+      },
+      "hold_reason": null,
+      "notes": "SCORING v1: 2.0 paid-entry policy recorded per spec v4, NOT applied \u2014 entry-choice resolution deferred. Projection life_cost stays 0.0; do not treat unresolved entry as paid.",
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 8.62,
+      "price_printing": "TRK #306 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Blood Crypt",
+      "oracle_id": "43985bbc-a0f6-4812-984e-392bc8562633",
+      "type_line": "Land \u2014 Swamp Mountain",
+      "color_identity": [
+        "B",
+        "R"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "life_payment",
+        "enters_tapped": true,
+        "predicate": {
+          "payment": 2,
+          "types": [
+            "Swamp",
+            "Mountain"
+          ]
+        }
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "B",
+            "R"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          ""
+        ],
+        "U": [
+          false,
+          false,
+          ""
+        ],
+        "B": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "R": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "B",
+          "R"
+        ],
+        "producesColorless": false,
+        "untapped": false,
+        "conditional": true,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [
+          "Mountain",
+          "Swamp"
+        ],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [
+        "May pay 2 life to enter untapped"
+      ],
+      "evidence": {
+        "oracle_id": "43985bbc-a0f6-4812-984e-392bc8562633",
+        "oracle_text": "({T}: Add {B} or {R}.)\nAs this land enters, you may pay 2 life. If you don't, it enters tapped.",
+        "scryfall_uri": "https://scryfall.com/card/trk/278/blood-crypt?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Blood Crypt",
+        "oracle_id": "43985bbc-a0f6-4812-984e-392bc8562633",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": null
+      },
+      "hold_reason": null,
+      "notes": "SCORING v1: 2.0 paid-entry policy recorded per spec v4, NOT applied \u2014 entry-choice resolution deferred. Projection life_cost stays 0.0; do not treat unresolved entry as paid.",
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 9.0,
+      "price_printing": "ECL #262 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Sea of Clouds",
+      "oracle_id": "672e190d-8ea0-4a2e-b74f-5d35304631e4",
+      "type_line": "Land",
+      "color_identity": [
+        "U",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "opponent_count",
+        "enters_tapped": true,
+        "predicate": {
+          "threshold": 2,
+          "comparison": ">="
+        }
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "W",
+            "U"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "U": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "B": [
+          false,
+          false,
+          ""
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "U",
+          "W"
+        ],
+        "producesColorless": false,
+        "untapped": false,
+        "conditional": true,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "672e190d-8ea0-4a2e-b74f-5d35304631e4",
+        "oracle_text": "This land enters tapped unless you have two or more opponents.\n{T}: Add {W} or {U}.",
+        "scryfall_uri": "https://scryfall.com/card/trc/555/sea-of-clouds?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Sea of Clouds",
+        "oracle_id": "672e190d-8ea0-4a2e-b74f-5d35304631e4",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": null
+      },
+      "hold_reason": null,
+      "notes": "CONTEXT PENDING: known opponent count not yet evaluated.",
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 11.3,
+      "price_printing": "TRC #555 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Morphic Pool",
+      "oracle_id": "bd004c9d-771e-4e63-a97d-a2259c096af8",
+      "type_line": "Land",
+      "color_identity": [
+        "B",
+        "U"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "opponent_count",
+        "enters_tapped": true,
+        "predicate": {
+          "threshold": 2,
+          "comparison": ">="
+        }
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "U",
+            "B"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          ""
+        ],
+        "U": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "B": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "B",
+          "U"
+        ],
+        "producesColorless": false,
+        "untapped": false,
+        "conditional": true,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "bd004c9d-771e-4e63-a97d-a2259c096af8",
+        "oracle_text": "This land enters tapped unless you have two or more opponents.\n{T}: Add {U} or {B}.",
+        "scryfall_uri": "https://scryfall.com/card/trc/540/morphic-pool?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Morphic Pool",
+        "oracle_id": "bd004c9d-771e-4e63-a97d-a2259c096af8",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": null
+      },
+      "hold_reason": null,
+      "notes": "CONTEXT PENDING: known opponent count not yet evaluated.",
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 11.59,
+      "price_printing": "TRC #540 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Luxury Suite",
+      "oracle_id": "819e1765-8325-4e6f-89c1-63ea86de369f",
+      "type_line": "Land",
+      "color_identity": [
+        "B",
+        "R"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "opponent_count",
+        "enters_tapped": true,
+        "predicate": {
+          "threshold": 2,
+          "comparison": ">="
+        }
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "B",
+            "R"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          ""
+        ],
+        "U": [
+          false,
+          false,
+          ""
+        ],
+        "B": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "R": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "B",
+          "R"
+        ],
+        "producesColorless": false,
+        "untapped": false,
+        "conditional": true,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "819e1765-8325-4e6f-89c1-63ea86de369f",
+        "oracle_text": "This land enters tapped unless you have two or more opponents.\n{T}: Add {B} or {R}.",
+        "scryfall_uri": "https://scryfall.com/card/msc/252/luxury-suite?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Luxury Suite",
+        "oracle_id": "819e1765-8325-4e6f-89c1-63ea86de369f",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": null
+      },
+      "hold_reason": null,
+      "notes": "CONTEXT PENDING: known opponent count not yet evaluated.",
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 8.61,
+      "price_printing": "MSC #252 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Command Tower",
+      "oracle_id": "0895c9b7-ae7d-4bb3-af17-3b75deb50a25",
+      "type_line": "Land",
+      "color_identity": [],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": false,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": "context-dependent",
+          "unconditional": true,
+          "note": "Any color in commander's color identity"
+        }
+      ],
+      "source_credit": {
+        "W": [
+          true,
+          false,
+          "If W in context"
+        ],
+        "U": [
+          true,
+          false,
+          "If U in context"
+        ],
+        "B": [
+          true,
+          false,
+          "If B in context"
+        ],
+        "R": [
+          true,
+          false,
+          "If R in context"
+        ],
+        "G": [
+          true,
+          false,
+          "If G in context"
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [],
+        "producesColorless": false,
+        "untapped": true,
+        "conditional": false,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [],
+        "scoring_status": "complete",
+        "notes": "resolve_command_tower_colors() at solve time"
+      },
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "0895c9b7-ae7d-4bb3-af17-3b75deb50a25",
+        "oracle_text": "{T}: Add one mana of any color in your commander's color identity.",
+        "scryfall_uri": "https://scryfall.com/card/trc/521/command-tower?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Command Tower",
+        "oracle_id": "0895c9b7-ae7d-4bb3-af17-3b75deb50a25",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": "Context resolution via resolve_command_tower_colors()"
+      },
+      "hold_reason": null,
+      "notes": "Use resolve_command_tower_colors(requested) before solving.",
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 0.15,
+      "price_printing": "TDC #107 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Exotic Orchard",
+      "oracle_id": "27b047e3-0d41-45e2-98e9-9391d7923a1e",
+      "type_line": "Land",
+      "color_identity": [],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": false,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": "opponent-dependent",
+          "unconditional": false,
+          "dependency": "CR 106.7"
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          ""
+        ],
+        "U": [
+          false,
+          false,
+          ""
+        ],
+        "B": [
+          false,
+          false,
+          ""
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [],
+        "producesColorless": false,
+        "untapped": true,
+        "conditional": false,
+        "production_conditional": true,
+        "life_cost": 0.0,
+        "basic_types": [],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "27b047e3-0d41-45e2-98e9-9391d7923a1e",
+        "oracle_text": "{T}: Add one mana of any color that a land an opponent controls could produce.",
+        "scryfall_uri": "https://scryfall.com/card/trc/528/exotic-orchard?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Exotic Orchard",
+        "oracle_id": "27b047e3-0d41-45e2-98e9-9391d7923a1e",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": "CR 106.7"
+      },
+      "hold_reason": null,
+      "notes": null,
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 0.21,
+      "price_printing": "FRC #70 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Mana Confluence",
+      "oracle_id": "d0ee5bdc-2b69-4b73-9a20-ffcc18783b29",
+      "type_line": "Land",
+      "color_identity": [],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": false,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "W",
+            "U",
+            "B",
+            "R",
+            "G"
+          ],
+          "unconditional": true,
+          "input_cost": "Pay 1 life"
+        }
+      ],
+      "source_credit": {
+        "W": [
+          true,
+          false,
+          "Life payment"
+        ],
+        "U": [
+          true,
+          false,
+          "Life payment"
+        ],
+        "B": [
+          true,
+          false,
+          "Life payment"
+        ],
+        "R": [
+          true,
+          false,
+          "Life payment"
+        ],
+        "G": [
+          true,
+          false,
+          "Life payment"
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "B",
+          "G",
+          "R",
+          "U",
+          "W"
+        ],
+        "producesColorless": false,
+        "untapped": true,
+        "conditional": false,
+        "production_conditional": false,
+        "life_cost": 3.0,
+        "basic_types": [],
+        "scoring_status": "applied:scoring-policy-v1",
+        "notes": "SCORING v1 applied: life_cost=3.0 (policy SCORING_POLICY_v1.md). Oracle mechanics preserved."
+      },
+      "other_consequences": [
+        "Pay 1 life as activation cost"
+      ],
+      "evidence": {
+        "oracle_id": "d0ee5bdc-2b69-4b73-9a20-ffcc18783b29",
+        "oracle_text": "{T}, Pay 1 life: Add one mana of any color.",
+        "scryfall_uri": "https://scryfall.com/card/jou/163/mana-confluence?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Mana Confluence",
+        "oracle_id": "d0ee5bdc-2b69-4b73-9a20-ffcc18783b29",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": "Life payment, not damage"
+      },
+      "hold_reason": null,
+      "notes": "SCORING v1 applied: life_cost 1.0 \u2192 3.0. Oracle mechanics preserved in mana_modes.",
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 33.79,
+      "price_printing": "JOU #163 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "City of Brass",
+      "oracle_id": "f25351e3-539b-4bbc-b92d-6480acf4d722",
+      "type_line": "Land",
+      "color_identity": [],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": false,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "W",
+            "U",
+            "B",
+            "R",
+            "G"
+          ],
+          "unconditional": true,
+          "consequence": "triggered damage"
+        }
+      ],
+      "source_credit": {
+        "W": [
+          true,
+          false,
+          "Triggered damage"
+        ],
+        "U": [
+          true,
+          false,
+          "Triggered damage"
+        ],
+        "B": [
+          true,
+          false,
+          "Triggered damage"
+        ],
+        "R": [
+          true,
+          false,
+          "Triggered damage"
+        ],
+        "G": [
+          true,
+          false,
+          "Triggered damage"
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "B",
+          "G",
+          "R",
+          "U",
+          "W"
+        ],
+        "producesColorless": false,
+        "untapped": true,
+        "conditional": false,
+        "production_conditional": false,
+        "life_cost": 3.0,
+        "basic_types": [],
+        "scoring_status": "applied:scoring-policy-v1",
+        "notes": "SCORING v1 applied: life_cost=3.0 (policy SCORING_POLICY_v1.md). Oracle mechanics preserved."
+      },
+      "other_consequences": [
+        "Triggered: 1 damage when tapped"
+      ],
+      "evidence": {
+        "oracle_id": "f25351e3-539b-4bbc-b92d-6480acf4d722",
+        "oracle_text": "Whenever this land becomes tapped, it deals 1 damage to you.\n{T}: Add one mana of any color.",
+        "scryfall_uri": "https://scryfall.com/card/tmc/62/city-of-brass?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "City of Brass",
+        "oracle_id": "f25351e3-539b-4bbc-b92d-6480acf4d722",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": "Triggered damage, not payment"
+      },
+      "hold_reason": null,
+      "notes": "SCORING v1 applied: life_cost 1.0 \u2192 3.0. Oracle mechanics preserved in mana_modes.",
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 11.36,
+      "price_printing": "TMC #62 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Floodfarm Verge",
+      "oracle_id": "f1e9abfb-c3c8-483e-b446-5c2afc9f6394",
+      "type_line": "Land",
+      "color_identity": [
+        "U",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": false,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "W"
+          ],
+          "unconditional": true
+        },
+        {
+          "output": [
+            "U"
+          ],
+          "unconditional": false,
+          "dependency": "Control Plains or Island"
+        }
+      ],
+      "source_credit": {
+        "W": [
+          true,
+          false,
+          "Primary"
+        ],
+        "U": [
+          false,
+          false,
+          "Secondary: zero credit"
+        ],
+        "B": [
+          false,
+          false,
+          ""
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "W"
+        ],
+        "producesColorless": false,
+        "untapped": true,
+        "conditional": false,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "f1e9abfb-c3c8-483e-b446-5c2afc9f6394",
+        "oracle_text": "{T}: Add {W}.\n{T}: Add {U}. Activate only if you control a Plains or an Island.",
+        "scryfall_uri": "https://scryfall.com/card/dsk/259/floodfarm-verge?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Floodfarm Verge",
+        "oracle_id": "f1e9abfb-c3c8-483e-b446-5c2afc9f6394",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": "Secondary zero credit"
+      },
+      "hold_reason": null,
+      "notes": null,
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 8.55,
+      "price_printing": "DSK #259 (usd_foil)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Gloomlake Verge",
+      "oracle_id": "d71bda4c-3dee-4398-8fd0-f77d8743b887",
+      "type_line": "Land",
+      "color_identity": [
+        "B",
+        "U"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": false,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "U"
+          ],
+          "unconditional": true
+        },
+        {
+          "output": [
+            "B"
+          ],
+          "unconditional": false,
+          "dependency": "Control Island or Swamp"
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          ""
+        ],
+        "U": [
+          true,
+          false,
+          "Primary"
+        ],
+        "B": [
+          false,
+          false,
+          "Secondary: zero credit"
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "U"
+        ],
+        "producesColorless": false,
+        "untapped": true,
+        "conditional": false,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "d71bda4c-3dee-4398-8fd0-f77d8743b887",
+        "oracle_text": "{T}: Add {U}.\n{T}: Add {B}. Activate only if you control an Island or a Swamp.",
+        "scryfall_uri": "https://scryfall.com/card/dsk/260/gloomlake-verge?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Gloomlake Verge",
+        "oracle_id": "d71bda4c-3dee-4398-8fd0-f77d8743b887",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": "Secondary zero credit"
+      },
+      "hold_reason": null,
+      "notes": null,
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 10.64,
+      "price_printing": "PDSK #260p (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Mystic Gate",
+      "oracle_id": "e9f5feb2-2c1a-46ce-885a-4f378d7d10af",
+      "type_line": "Land",
+      "color_identity": [
+        "U",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": false,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "C"
+          ],
+          "unconditional": true
+        },
+        {
+          "output": [
+            "W",
+            "U"
+          ],
+          "unconditional": false,
+          "input_cost": "input mana",
+          "dependency": "Requires input"
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          "Input-dependent: zero"
+        ],
+        "U": [
+          false,
+          false,
+          "Input-dependent: zero"
+        ],
+        "B": [
+          false,
+          false,
+          ""
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          true,
+          false,
+          "Independent"
+        ]
+      },
+      "solver_projection": {
+        "colors": [],
+        "producesColorless": true,
+        "untapped": true,
+        "conditional": false,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "e9f5feb2-2c1a-46ce-885a-4f378d7d10af",
+        "oracle_text": "{T}: Add {C}.\n{W/U}, {T}: Add {W}{W}, {W}{U}, or {U}{U}.",
+        "scryfall_uri": "https://scryfall.com/card/frc/76/mystic-gate?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Mystic Gate",
+        "oracle_id": "e9f5feb2-2c1a-46ce-885a-4f378d7d10af",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": "C preserved via flag"
+      },
+      "hold_reason": null,
+      "notes": null,
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 0.5,
+      "price_printing": "PLST #M3C-359 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Sunken Ruins",
+      "oracle_id": "e6415ffb-8b7a-41c3-bedf-0d4112b7b795",
+      "type_line": "Land",
+      "color_identity": [
+        "B",
+        "U"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": false,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "C"
+          ],
+          "unconditional": true
+        },
+        {
+          "output": [
+            "U",
+            "B"
+          ],
+          "unconditional": false,
+          "input_cost": "input mana",
+          "dependency": "Requires input"
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          ""
+        ],
+        "U": [
+          false,
+          false,
+          "Input-dependent: zero"
+        ],
+        "B": [
+          false,
+          false,
+          "Input-dependent: zero"
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          true,
+          false,
+          "Independent"
+        ]
+      },
+      "solver_projection": {
+        "colors": [],
+        "producesColorless": true,
+        "untapped": true,
+        "conditional": false,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "e6415ffb-8b7a-41c3-bedf-0d4112b7b795",
+        "oracle_text": "{T}: Add {C}.\n{U/B}, {T}: Add {U}{U}, {U}{B}, or {B}{B}.",
+        "scryfall_uri": "https://scryfall.com/card/frc/86/sunken-ruins?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Sunken Ruins",
+        "oracle_id": "e6415ffb-8b7a-41c3-bedf-0d4112b7b795",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": "C preserved via flag"
+      },
+      "hold_reason": null,
+      "notes": null,
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 0.45,
+      "price_printing": "FRC #86 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Flooded Strand",
+      "oracle_id": "f3c7af78-a77d-4134-82a2-a5ce84285a84",
+      "type_line": "Land",
+      "color_identity": [],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": false,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": [],
+          "unconditional": false,
+          "dependency": "Target availability"
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          ""
+        ],
+        "U": [
+          false,
+          false,
+          ""
+        ],
+        "B": [
+          false,
+          false,
+          ""
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": null,
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "f3c7af78-a77d-4134-82a2-a5ce84285a84",
+        "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Plains or Island card, put it onto the battlefield, then shuffle.",
+        "scryfall_uri": "https://scryfall.com/card/mh3/220/flooded-strand?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Flooded Strand",
+        "oracle_id": "f3c7af78-a77d-4134-82a2-a5ce84285a84",
+        "reviewer": "Robin (builder)",
+        "decision": "held",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": "Usefulness not inferrable"
+      },
+      "hold_reason": "True typed fetch: target availability unknown.",
+      "notes": null,
+      "eligibility": {
+        "eligible": false,
+        "reason": "held or no projection"
+      },
+      "price_usd": 15.67,
+      "price_printing": "KTK #233 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Polluted Delta",
+      "oracle_id": "ef86989d-ce80-4e55-aece-7d11710eeffa",
+      "type_line": "Land",
+      "color_identity": [],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": false,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": [],
+          "unconditional": false,
+          "dependency": "Target availability"
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          ""
+        ],
+        "U": [
+          false,
+          false,
+          ""
+        ],
+        "B": [
+          false,
+          false,
+          ""
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": null,
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "ef86989d-ce80-4e55-aece-7d11710eeffa",
+        "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Swamp card, put it onto the battlefield, then shuffle.",
+        "scryfall_uri": "https://scryfall.com/card/mh3/224/polluted-delta?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Polluted Delta",
+        "oracle_id": "ef86989d-ce80-4e55-aece-7d11710eeffa",
+        "reviewer": "Robin (builder)",
+        "decision": "held",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": "Usefulness not inferrable"
+      },
+      "hold_reason": "True typed fetch: target availability unknown.",
+      "notes": null,
+      "eligibility": {
+        "eligible": false,
+        "reason": "held or no projection"
+      },
+      "price_usd": 20.25,
+      "price_printing": "KTK #239 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Azorius Chancery",
+      "oracle_id": "189fc8f4-17ac-4f1d-82c8-8401445bdaf4",
+      "type_line": "Land",
+      "color_identity": [
+        "U",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "special_model",
+        "enters_tapped": true,
+        "predicate": {
+          "evaluator": "bounce_v1"
+        }
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "W",
+            "U"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          true,
+          false,
+          "Both colors"
+        ],
+        "U": [
+          true,
+          false,
+          "Both colors"
+        ],
+        "B": [
+          false,
+          false,
+          ""
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "U",
+          "W"
+        ],
+        "producesColorless": false,
+        "untapped": false,
+        "conditional": true,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [
+        "Return a land to hand"
+      ],
+      "evidence": {
+        "oracle_id": "189fc8f4-17ac-4f1d-82c8-8401445bdaf4",
+        "oracle_text": "This land enters tapped.\nWhen this land enters, return a land you control to its owner's hand.\n{T}: Add {W}{U}.",
+        "scryfall_uri": "https://scryfall.com/card/dsc/261/azorius-chancery?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Azorius Chancery",
+        "oracle_id": "189fc8f4-17ac-4f1d-82c8-8401445bdaf4",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": null
+      },
+      "hold_reason": null,
+      "notes": "CONTEXT PENDING: bounce evaluator not yet implemented.",
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 0.16,
+      "price_printing": "DDI #33 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Dimir Aqueduct",
+      "oracle_id": "378a1d57-e2f1-4b84-9692-1564602e9e99",
+      "type_line": "Land",
+      "color_identity": [
+        "B",
+        "U"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "special_model",
+        "enters_tapped": true,
+        "predicate": {
+          "evaluator": "bounce_v1"
+        }
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "U",
+            "B"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          ""
+        ],
+        "U": [
+          true,
+          false,
+          "Both colors"
+        ],
+        "B": [
+          true,
+          false,
+          "Both colors"
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "B",
+          "U"
+        ],
+        "producesColorless": false,
+        "untapped": false,
+        "conditional": true,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [
+        "Return a land to hand"
+      ],
+      "evidence": {
+        "oracle_id": "378a1d57-e2f1-4b84-9692-1564602e9e99",
+        "oracle_text": "This land enters tapped.\nWhen this land enters, return a land you control to its owner's hand.\n{T}: Add {U}{B}.",
+        "scryfall_uri": "https://scryfall.com/card/dsc/270/dimir-aqueduct?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Dimir Aqueduct",
+        "oracle_id": "378a1d57-e2f1-4b84-9692-1564602e9e99",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": null
+      },
+      "hold_reason": null,
+      "notes": "CONTEXT PENDING: bounce evaluator not yet implemented.",
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 0.22,
+      "price_printing": "MM2 #239 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Seachrome Coast",
+      "oracle_id": "9e7a240d-dc33-47ac-9f17-77fab4c1c340",
+      "type_line": "Land",
+      "color_identity": [
+        "U",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "land_count_lte",
+        "enters_tapped": true,
+        "predicate": {
+          "threshold": 2,
+          "comparison": "<="
+        }
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "W",
+            "U"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "U": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "B": [
+          false,
+          false,
+          ""
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "U",
+          "W"
+        ],
+        "producesColorless": false,
+        "untapped": false,
+        "conditional": true,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "9e7a240d-dc33-47ac-9f17-77fab4c1c340",
+        "oracle_text": "This land enters tapped unless you control two or fewer other lands.\n{T}: Add {W} or {U}.",
+        "scryfall_uri": "https://scryfall.com/card/one/258/seachrome-coast?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Seachrome Coast",
+        "oracle_id": "9e7a240d-dc33-47ac-9f17-77fab4c1c340",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": null
+      },
+      "hold_reason": null,
+      "notes": "CONTEXT PENDING: land count not yet evaluated.",
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 0.37,
+      "price_printing": "BLC #328 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Darkslick Shores",
+      "oracle_id": "a2b48695-f7d7-42ce-a8a0-2a723428542a",
+      "type_line": "Land",
+      "color_identity": [
+        "B",
+        "U"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "land_count_lte",
+        "enters_tapped": true,
+        "predicate": {
+          "threshold": 2,
+          "comparison": "<="
+        }
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "U",
+            "B"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          ""
+        ],
+        "U": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "B": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "B",
+          "U"
+        ],
+        "producesColorless": false,
+        "untapped": false,
+        "conditional": true,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "a2b48695-f7d7-42ce-a8a0-2a723428542a",
+        "oracle_text": "This land enters tapped unless you control two or fewer other lands.\n{T}: Add {U} or {B}.",
+        "scryfall_uri": "https://scryfall.com/card/otc/281/darkslick-shores?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Darkslick Shores",
+        "oracle_id": "a2b48695-f7d7-42ce-a8a0-2a723428542a",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": null
+      },
+      "hold_reason": null,
+      "notes": "CONTEXT PENDING: land count not yet evaluated.",
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 1.77,
+      "price_printing": "ONE #372 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Deserted Beach",
+      "oracle_id": "f0ec8681-da50-466b-8cdd-1dc710deccd9",
+      "type_line": "Land",
+      "color_identity": [
+        "U",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "land_count_gte",
+        "enters_tapped": true,
+        "predicate": {
+          "threshold": 2,
+          "comparison": ">="
+        }
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "W",
+            "U"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "U": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "B": [
+          false,
+          false,
+          ""
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "U",
+          "W"
+        ],
+        "producesColorless": false,
+        "untapped": false,
+        "conditional": true,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "f0ec8681-da50-466b-8cdd-1dc710deccd9",
+        "oracle_text": "This land enters tapped unless you control two or more other lands.\n{T}: Add {W} or {U}.",
+        "scryfall_uri": "https://scryfall.com/card/fra/176/deserted-beach?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Deserted Beach",
+        "oracle_id": "f0ec8681-da50-466b-8cdd-1dc710deccd9",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": null
+      },
+      "hold_reason": null,
+      "notes": "CONTEXT PENDING: land count not yet evaluated.",
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 1.28,
+      "price_printing": "FRA #176 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Shipwreck Marsh",
+      "oracle_id": "5f42b67f-87fd-4f98-a0e8-0c8313f4bbc8",
+      "type_line": "Land",
+      "color_identity": [
+        "B",
+        "U"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "land_count_gte",
+        "enters_tapped": true,
+        "predicate": {
+          "threshold": 2,
+          "comparison": ">="
+        }
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "U",
+            "B"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          ""
+        ],
+        "U": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "B": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "B",
+          "U"
+        ],
+        "producesColorless": false,
+        "untapped": false,
+        "conditional": true,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "5f42b67f-87fd-4f98-a0e8-0c8313f4bbc8",
+        "oracle_text": "This land enters tapped unless you control two or more other lands.\n{T}: Add {U} or {B}.",
+        "scryfall_uri": "https://scryfall.com/card/fra/189/shipwreck-marsh?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Shipwreck Marsh",
+        "oracle_id": "5f42b67f-87fd-4f98-a0e8-0c8313f4bbc8",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": null
+      },
+      "hold_reason": null,
+      "notes": "CONTEXT PENDING: land count not yet evaluated.",
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 1.42,
+      "price_printing": "FRA #189 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Undercity Sewers",
+      "oracle_id": "08d80efc-9542-4ba2-824c-c8615d8d07f2",
+      "type_line": "Land \u2014 Island Swamp",
+      "color_identity": [
+        "B",
+        "U"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": true,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "U",
+            "B"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          ""
+        ],
+        "U": [
+          true,
+          false,
+          "Typed"
+        ],
+        "B": [
+          true,
+          false,
+          "Typed"
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "B",
+          "U"
+        ],
+        "producesColorless": false,
+        "untapped": false,
+        "conditional": false,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [
+          "Island",
+          "Swamp"
+        ],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [
+        "Surveil 1"
+      ],
+      "evidence": {
+        "oracle_id": "08d80efc-9542-4ba2-824c-c8615d8d07f2",
+        "oracle_text": "({T}: Add {U} or {B}.)\nThis land enters tapped.\nWhen this land enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)",
+        "scryfall_uri": "https://scryfall.com/card/mkm/270/undercity-sewers?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Undercity Sewers",
+        "oracle_id": "08d80efc-9542-4ba2-824c-c8615d8d07f2",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": null
+      },
+      "hold_reason": null,
+      "notes": null,
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 9.63,
+      "price_printing": "PZA #20 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Shadowy Backstreet",
+      "oracle_id": "216a2a92-9ca3-4ca3-8af7-686c13b04290",
+      "type_line": "Land \u2014 Plains Swamp",
+      "color_identity": [
+        "B",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": true,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "W",
+            "B"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          true,
+          false,
+          "Typed"
+        ],
+        "U": [
+          false,
+          false,
+          ""
+        ],
+        "B": [
+          true,
+          false,
+          "Typed"
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "B",
+          "W"
+        ],
+        "producesColorless": false,
+        "untapped": false,
+        "conditional": false,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [
+          "Plains",
+          "Swamp"
+        ],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [
+        "Surveil 1"
+      ],
+      "evidence": {
+        "oracle_id": "216a2a92-9ca3-4ca3-8af7-686c13b04290",
+        "oracle_text": "({T}: Add {W} or {B}.)\nThis land enters tapped.\nWhen this land enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)",
+        "scryfall_uri": "https://scryfall.com/card/mkm/268/shadowy-backstreet?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Shadowy Backstreet",
+        "oracle_id": "216a2a92-9ca3-4ca3-8af7-686c13b04290",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": null
+      },
+      "hold_reason": null,
+      "notes": null,
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 10.58,
+      "price_printing": "MKM #268 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Raugrin Triome",
+      "oracle_id": "c7fa1dda-9312-4ec8-82cd-a1ba7bc33497",
+      "type_line": "Land \u2014 Island Mountain Plains",
+      "color_identity": [
+        "R",
+        "U",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": true,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "W",
+            "U",
+            "R"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          true,
+          false,
+          "Typed"
+        ],
+        "U": [
+          true,
+          false,
+          "Typed"
+        ],
+        "B": [
+          false,
+          false,
+          ""
+        ],
+        "R": [
+          true,
+          false,
+          "Typed"
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "R",
+          "U",
+          "W"
+        ],
+        "producesColorless": false,
+        "untapped": false,
+        "conditional": false,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [
+          "Island",
+          "Mountain",
+          "Plains"
+        ],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "c7fa1dda-9312-4ec8-82cd-a1ba7bc33497",
+        "oracle_text": "({T}: Add {U}, {R}, or {W}.)\nThis land enters tapped.\nCycling {3} ({3}, Discard this card: Draw a card.)",
+        "scryfall_uri": "https://scryfall.com/card/iko/251/raugrin-triome?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Raugrin Triome",
+        "oracle_id": "c7fa1dda-9312-4ec8-82cd-a1ba7bc33497",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": null
+      },
+      "hold_reason": null,
+      "notes": null,
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 16.19,
+      "price_printing": "IKO #251 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Zagoth Triome",
+      "oracle_id": "fdd46004-eaba-4024-8687-39b23dc6a58c",
+      "type_line": "Land \u2014 Swamp Forest Island",
+      "color_identity": [
+        "B",
+        "G",
+        "U"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": true,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "B",
+            "G",
+            "U"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          ""
+        ],
+        "U": [
+          true,
+          false,
+          "Typed"
+        ],
+        "B": [
+          true,
+          false,
+          "Typed"
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          true,
+          false,
+          "Typed"
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "B",
+          "G",
+          "U"
+        ],
+        "producesColorless": false,
+        "untapped": false,
+        "conditional": false,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [
+          "Forest",
+          "Island",
+          "Swamp"
+        ],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "fdd46004-eaba-4024-8687-39b23dc6a58c",
+        "oracle_text": "({T}: Add {B}, {G}, or {U}.)\nThis land enters tapped.\nCycling {3} ({3}, Discard this card: Draw a card.)",
+        "scryfall_uri": "https://scryfall.com/card/iko/259/zagoth-triome?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Zagoth Triome",
+        "oracle_id": "fdd46004-eaba-4024-8687-39b23dc6a58c",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": null
+      },
+      "hold_reason": null,
+      "notes": null,
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 20.23,
+      "price_printing": "IKO #259 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Horizon Canopy",
+      "oracle_id": "262a5d83-506c-4781-9bc9-1a2b5d83955c",
+      "type_line": "Land",
+      "color_identity": [
+        "G",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": false,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "G",
+            "W"
+          ],
+          "unconditional": true,
+          "input_cost": "Pay 1 life"
+        }
+      ],
+      "source_credit": {
+        "W": [
+          true,
+          false,
+          "Life payment"
+        ],
+        "U": [
+          false,
+          false,
+          ""
+        ],
+        "B": [
+          false,
+          false,
+          ""
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          true,
+          false,
+          "Life payment"
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "G",
+          "W"
+        ],
+        "producesColorless": false,
+        "untapped": true,
+        "conditional": false,
+        "production_conditional": false,
+        "life_cost": 3.0,
+        "basic_types": [],
+        "scoring_status": "applied:scoring-policy-v1",
+        "notes": "SCORING v1 applied: life_cost=3.0 (policy SCORING_POLICY_v1.md). Oracle mechanics preserved."
+      },
+      "other_consequences": [
+        "Pay 1 life per activation",
+        "Sacrifice: draw"
+      ],
+      "evidence": {
+        "oracle_id": "262a5d83-506c-4781-9bc9-1a2b5d83955c",
+        "oracle_text": "{T}, Pay 1 life: Add {G} or {W}.\n{1}, {T}, Sacrifice this land: Draw a card.",
+        "scryfall_uri": "https://scryfall.com/card/ima/240/horizon-canopy?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Horizon Canopy",
+        "oracle_id": "262a5d83-506c-4781-9bc9-1a2b5d83955c",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": "No C mode"
+      },
+      "hold_reason": null,
+      "notes": "SCORING v1 applied: life_cost 1.0 \u2192 3.0. Oracle mechanics preserved in mana_modes.",
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 2.82,
+      "price_printing": "WHO #1094 (usd_foil)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Waterlogged Grove",
+      "oracle_id": "70fa2eba-565e-4fed-adc9-7f5d9fcbf1fa",
+      "type_line": "Land",
+      "color_identity": [
+        "G",
+        "U"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "none",
+        "enters_tapped": false,
+        "predicate": null
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "G",
+            "U"
+          ],
+          "unconditional": true,
+          "input_cost": "Pay 1 life"
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          ""
+        ],
+        "U": [
+          true,
+          false,
+          "Life payment"
+        ],
+        "B": [
+          false,
+          false,
+          ""
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          true,
+          false,
+          "Life payment"
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "G",
+          "U"
+        ],
+        "producesColorless": false,
+        "untapped": true,
+        "conditional": false,
+        "production_conditional": false,
+        "life_cost": 3.0,
+        "basic_types": [],
+        "scoring_status": "applied:scoring-policy-v1",
+        "notes": "SCORING v1 applied: life_cost=3.0 (policy SCORING_POLICY_v1.md). Oracle mechanics preserved."
+      },
+      "other_consequences": [
+        "Pay 1 life per activation",
+        "Sacrifice: draw"
+      ],
+      "evidence": {
+        "oracle_id": "70fa2eba-565e-4fed-adc9-7f5d9fcbf1fa",
+        "oracle_text": "{T}, Pay 1 life: Add {G} or {U}.\n{1}, {T}, Sacrifice this land: Draw a card.",
+        "scryfall_uri": "https://scryfall.com/card/mh1/249/waterlogged-grove?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Waterlogged Grove",
+        "oracle_id": "70fa2eba-565e-4fed-adc9-7f5d9fcbf1fa",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": "No C mode"
+      },
+      "hold_reason": null,
+      "notes": "SCORING v1 applied: life_cost 1.0 \u2192 3.0. Oracle mechanics preserved in mana_modes.",
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 1.09,
+      "price_printing": "WHO #331 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Prairie Stream",
+      "oracle_id": "5330e24a-8568-446e-840a-594cd08bd1bc",
+      "type_line": "Land \u2014 Plains Island",
+      "color_identity": [
+        "U",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "basic_controlled",
+        "enters_tapped": true,
+        "predicate": {
+          "supertype": "Basic",
+          "threshold": 2
+        }
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "W",
+            "U"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "U": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "B": [
+          false,
+          false,
+          ""
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "U",
+          "W"
+        ],
+        "producesColorless": false,
+        "untapped": false,
+        "conditional": true,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [
+          "Island",
+          "Plains"
+        ],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "5330e24a-8568-446e-840a-594cd08bd1bc",
+        "oracle_text": "({T}: Add {W} or {U}.)\nThis land enters tapped unless you control two or more basic lands.",
+        "scryfall_uri": "https://scryfall.com/card/trc/548/prairie-stream?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Prairie Stream",
+        "oracle_id": "5330e24a-8568-446e-840a-594cd08bd1bc",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": null
+      },
+      "hold_reason": null,
+      "notes": "CONTEXT PENDING: basic count not yet evaluated.",
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 0.17,
+      "price_printing": "SCD #314 (usd)",
+      "price_date": "2026-11-04"
+    },
+    {
+      "name": "Sunken Hollow",
+      "oracle_id": "cd2c90ac-2b04-461c-92f3-939871b6b6a3",
+      "type_line": "Land \u2014 Island Swamp",
+      "color_identity": [
+        "B",
+        "U"
+      ],
+      "commander_legality": "legal",
+      "game_changer": {
+        "status": "no",
+        "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+        "freshness": "2026-11-04"
+      },
+      "entry": {
+        "condition": "basic_controlled",
+        "enters_tapped": true,
+        "predicate": {
+          "supertype": "Basic",
+          "threshold": 2
+        }
+      },
+      "mana_modes": [
+        {
+          "output": [
+            "U",
+            "B"
+          ],
+          "unconditional": true,
+          "input_cost": null,
+          "restriction": null
+        }
+      ],
+      "source_credit": {
+        "W": [
+          false,
+          false,
+          ""
+        ],
+        "U": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "B": [
+          true,
+          false,
+          "Unconditional"
+        ],
+        "R": [
+          false,
+          false,
+          ""
+        ],
+        "G": [
+          false,
+          false,
+          ""
+        ],
+        "C": [
+          false,
+          false,
+          ""
+        ]
+      },
+      "solver_projection": {
+        "colors": [
+          "B",
+          "U"
+        ],
+        "producesColorless": false,
+        "untapped": false,
+        "conditional": true,
+        "production_conditional": false,
+        "life_cost": 0.0,
+        "basic_types": [
+          "Island",
+          "Swamp"
+        ],
+        "scoring_status": "complete",
+        "notes": null
+      },
+      "other_consequences": [],
+      "evidence": {
+        "oracle_id": "cd2c90ac-2b04-461c-92f3-939871b6b6a3",
+        "oracle_text": "({T}: Add {U} or {B}.)\nThis land enters tapped unless you control two or more basic lands.",
+        "scryfall_uri": "https://scryfall.com/card/trc/564/sunken-hollow?utm_source=api",
+        "checked_date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7"
+      },
+      "review": {
+        "row_name": "Sunken Hollow",
+        "oracle_id": "cd2c90ac-2b04-461c-92f3-939871b6b6a3",
+        "reviewer": "Robin (builder)",
+        "decision": "approved",
+        "date": "2026-11-04",
+        "snapshot_hash": "477ccc370a9950d7",
+        "notes": null
+      },
+      "hold_reason": null,
+      "notes": "CONTEXT PENDING: basic count not yet evaluated.",
+      "eligibility": {
+        "eligible": true,
+        "reason": "eligible: checked, fresh, non-GC"
+      },
+      "price_usd": 0.29,
+      "price_printing": "BFZ #249 (usd)",
+      "price_date": "2026-11-04"
+    }
+  ],
+  "seed_version": "0.4.2",
+  "scoring_policy": "v1",
+  "derived_from": "catalog_seed_v041.json (frozen)",
+  "eligibility_data": {
+    "checked_date": "2026-11-04",
+    "source": "Scryfall is:gamechanger (official WotC list, 53 cards), checked 2026-11-04",
+    "game_changers_in_seed": 0
+  },
+  "price_snapshot": {
+    "date": "2026-11-04",
+    "policy": "cheapest printing, any finish (foils count)",
+    "note": "Dated snapshot for prototype. Production uses nightly price sync."
+  }
+}
