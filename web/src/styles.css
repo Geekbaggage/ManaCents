@@ -20,7 +20,7 @@ body {
   margin: 0;
   background: var(--obsidian);
   color: var(--wisp);
-  font-family: Aptos, "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -102,13 +102,14 @@ input:focus, select:focus, button:focus-visible {
   color: inherit; font: inherit; text-align: left; cursor: pointer;
 }
 .brand-home:focus-visible { outline: 2px solid #10B981; outline-offset: 4px; border-radius: 10px; }
+.brand-home img { width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(212, 175, 55, 0.35); }
 .site-header .brand { font-size: 1.35rem; font-weight: 800; letter-spacing: 0.02em; }
 .brand-cents { color: #10B981; }
 .site-header .tagline { color: var(--gray); font-size: 0.85rem; }
 
 /* Landing */
 .landing { padding: 3.5rem 0 4rem; text-align: center; }
-.landing h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); margin: 0.4rem 0 1.6rem; }
+.landing h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); margin: 0.4rem 0 1.6rem; letter-spacing: -0.025em; line-height: 1.12; font-weight: 800; }
 /* Animated brand mark: one play on load, then rests on the final frame. */
 /* Animated brand mark: continuous slow rotation. Circular clip hides the
    square video's corners during rotation; reduced-motion gets the still. */
@@ -152,10 +153,10 @@ input:focus, select:focus, button:focus-visible {
 .color-chips .pip {
   width: 30px; height: 30px; min-height: 30px; padding: 0;
   border-radius: 50%;
-  border: 2px solid transparent;
+  border: 1px solid #334155;
   background: var(--pip-bg); color: var(--pip-fg);
   font-size: 0.8rem; font-weight: 700;
-  opacity: 0.35;
+  opacity: 0.55;
   display: inline-flex; align-items: center; justify-content: center;
 }
 .color-chips .pip.on { opacity: 1; border-color: var(--wisp); }
@@ -292,7 +293,7 @@ input:focus, select:focus, button:focus-visible {
   font-size: 0.75rem; font-weight: 800; white-space: nowrap;
   background: rgba(15, 23, 42, 0.9); border: 1px solid var(--gray); color: var(--wisp);
 }
-.value-badge.gold { border-color: var(--gold); color: var(--gold); }
+.value-badge.gold { border-color: var(--emerald); color: var(--mint); }
 .value-badge.emerald { border-color: var(--emerald); color: var(--mint); }
 .card-tile .meta { padding: 0.6rem 0.7rem 0.7rem; display: flex; flex-direction: column; gap: 0.3rem; }
 .card-tile .meta-head { display: flex; align-items: center; gap: 0.45rem; }
@@ -305,7 +306,7 @@ input:focus, select:focus, button:focus-visible {
 .card-tile.selected .select-dot { background: var(--emerald); border-color: var(--emerald); color: #06281c; }
 .card-tile .name { font-weight: 700; font-size: 0.92rem; }
 .card-tile .price-row { display: flex; align-items: center; gap: 0.5rem; }
-.card-tile .price { color: var(--mint); font-weight: 700; }
+.card-tile .price { color: var(--gold); font-weight: 700; font-variant-numeric: tabular-nums; }
 .card-tile .role {
   display: inline-block; align-self: flex-start;
   font-size: 0.75rem; color: var(--gray);
@@ -327,7 +328,7 @@ input:focus, select:focus, button:focus-visible {
 .checkout-bar .totals { font-weight: 700; margin-right: auto; }
 .checkout-bar .totals small { display: block; color: var(--gray); font-weight: 400; font-size: 0.8rem; }
 .checkout-bar .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-.ftc { color: #64748b; font-size: 0.75rem; text-align: center; margin: 0.45rem 0 0.2rem; }
+.ftc { color: #94a3b8; font-size: 0.75rem; text-align: center; margin: 0.45rem 0 0.2rem; }
 .tcg-note { color: var(--gray); font-size: 0.8rem; text-align: center; margin: 0.35rem 0 0; }
 .upsell {
   text-align: center; font-size: 0.85rem; color: var(--gray); margin: 0 0 0.3rem;
@@ -362,7 +363,7 @@ input:focus, select:focus, button:focus-visible {
 /* Method + footer */
 .method { padding: 2.5rem 0; border-top: 1px solid var(--teal); margin-top: 2rem; }
 .method h2 { margin-top: 0; }
-.method .kicker { color: var(--gold); text-transform: uppercase; font-size: 0.78rem; letter-spacing: 0.12em; }
+.method .kicker { color: var(--emerald); text-transform: uppercase; font-size: 0.78rem; letter-spacing: 0.12em; }
 .method p { color: var(--gray); line-height: 1.6; max-width: 60ch; }
 .site-footer {
   border-top: 1px solid var(--teal); padding: 1.4rem 0 2rem;
@@ -371,7 +372,7 @@ input:focus, select:focus, button:focus-visible {
   margin-bottom: 9rem;
 }
 .site-footer .credit { opacity: 0.75; }
-.site-footer .legal { color: #64748B; }
+.site-footer .legal { color: #94A3B8; }
 
 /* Receipt */
 .receipt-preview { max-width: 100%; border-radius: var(--radius); border: 1px solid var(--teal); }
@@ -395,7 +396,7 @@ input:focus, select:focus, button:focus-visible {
   border: 2px solid var(--teal); box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
 }
 .hero-body { position: relative; z-index: 1; flex: 1 1 16rem; min-width: 0; }
-.hero-body .kicker { color: var(--gold); text-transform: uppercase; font-size: 0.78rem; letter-spacing: 0.12em; }
+.hero-body .kicker { color: var(--emerald); text-transform: uppercase; font-size: 0.78rem; letter-spacing: 0.12em; }
 .hero-body h2 { margin: 0.15rem 0 0.6rem; }
 .hero-controls { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin-bottom: 0.7rem; }
 .mode-toggle.small button { padding: 0.45rem 0.9rem; font-size: 0.88rem; }
@@ -501,7 +502,7 @@ input:focus, select:focus, button:focus-visible {
 }
 .nav-link:hover { color: #10b981; background: rgba(16, 185, 129, 0.08); }
 .combos-page { max-width: 880px; margin: 0 auto; padding: 1.5rem 1rem 3rem; color: #e2e8f0; }
-.combos-page h1 { font-size: 1.9rem; margin: 0.5rem 0; color: #fff; }
+.combos-page h1 { font-size: 1.9rem; margin: 0.5rem 0; color: #fff; letter-spacing: -0.025em; line-height: 1.12; font-weight: 800; }
 .combos-page h2 { font-size: 1.25rem; margin: 1.75rem 0 0.75rem; color: #fff; }
 .combos-sub { color: #94a3b8; margin: 0 0 1.5rem; }
 .combo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; }
@@ -511,7 +512,7 @@ input:focus, select:focus, button:focus-visible {
   display: flex; flex-direction: column; gap: 0.45rem;
 }
 .combo-card:hover { border-color: #10b981; }
-.combo-card-ep { color: #f0743e; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+.combo-card-ep { color: #f43f85; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
 .combo-card-title { font-size: 1.1rem; font-weight: 700; color: #fff; }
 .combo-card-total { color: #d4af37; font-weight: 700; font-size: 1.05rem; }
 .combo-card-total span { color: #94a3b8; font-weight: 400; font-size: 0.85rem; }
@@ -543,7 +544,7 @@ input:focus, select:focus, button:focus-visible {
 .btn-buy:hover { background: #0da271; }
 .btn-copy { background: transparent; color: #e2e8f0; border: 1px solid #334155; }
 .btn-copy:hover { border-color: #10b981; color: #10b981; }
-.combo-disclosure { color: #64748b; font-size: 0.8rem; margin: 0.5rem 0 0; }
+.combo-disclosure { color: #94a3b8; font-size: 0.8rem; margin: 0.5rem 0 0; }
 @media (max-width: 640px) {
   .combo-piece-print, .combo-piece-role { display: none; }
 }
@@ -555,6 +556,43 @@ input:focus, select:focus, button:focus-visible {
 }
 .nav-link:hover { border-color: #10b981; color: #fff; }
 .nav-link.active { background: rgba(16, 185, 129, 0.18); border-color: #10b981; color: #fff; box-shadow: 0 2px 0 #10b981; }
+/* ---- Nav: Mana Base hybrid (WUBRG icons + Fix My Lands [$]) + cyan Combos ---- */
+.nav-link-combos-cyan {
+  background: rgba(34, 211, 238, 0.08); border: 1px solid rgba(34, 211, 238, 0.45);
+  color: #e2e8f0; border-radius: 999px; padding: 0.4rem 0.85rem;
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-size: 1rem; font-weight: 600; cursor: pointer;
+}
+.nav-link-combos-cyan:hover { border-color: #22d3ee; color: #fff; }
+.nav-link-combos-cyan.active { background: rgba(34, 211, 238, 0.18); border-color: #22d3ee; color: #fff; box-shadow: 0 2px 0 #22d3ee; }
+.nav-link-combos-cyan .bolt { color: #22d3ee; }
+.nav-btn-mana {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.45);
+  color: #e2e8f0; border-radius: 999px; padding: 0.35rem 0.85rem;
+  font-size: 1rem; font-weight: 600; cursor: default; opacity: 0.92;
+}
+.nav-btn-mana .pip-cluster { display: inline-flex; align-items: center; }
+.nav-btn-mana .pip-cluster img { width: 20px; height: 20px; margin-left: -6px; border-radius: 50%; }
+.nav-btn-mana .pip-cluster img:first-child { margin-left: 0; }
+.nav-btn-mana .price-chip {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: #d4af37; color: #161e31; font-size: 0.8rem; font-weight: 700;
+}
+.nav-btn-mana .soon {
+  font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  color: #94a3b8; border: 1px solid #334155; border-radius: 999px; padding: 0.1rem 0.45rem;
+}
+.site-nav { gap: 0.5rem; }
+@media (max-width: 640px) {
+  .site-header { flex-wrap: nowrap; align-items: center; }
+  .site-nav { flex-direction: row; align-items: center; gap: 0.5rem; }
+  .nav-btn-mana, .nav-link-combos-cyan { font-size: 0.85rem; white-space: nowrap; }
+  .nav-btn-mana .price-chip { display: none; }
+  .nav-btn-mana .soon { font-size: 0.6rem; padding: 0.08rem 0.35rem; }
+  .nav-btn-mana .mana-label { max-width: 5.5rem; overflow: hidden; text-overflow: ellipsis; }
+}
 .combos-teaser {
   margin: 1.75rem auto 0; max-width: 640px; padding: 1.1rem 1.25rem;
   background: #0f172a; border: 1px solid #115e59; border-radius: 0.9rem;
@@ -576,7 +614,7 @@ input:focus, select:focus, button:focus-visible {
   background: transparent; border: 1px solid #334155; color: #94a3b8;
   border-radius: 999px; padding: 0.4rem 0.9rem; cursor: pointer; font-weight: 600;
 }
-.combo-type-tabs button.on { border-color: #10b981; color: #fff; background: rgba(16, 185, 129, 0.12); }
+.combo-type-tabs button.on { border-color: #22d3ee; color: #fff; background: rgba(34, 211, 238, 0.12); }
 .combo-color-filter { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
 .combo-color-label { color: #94a3b8; font-size: 0.9rem; margin-right: 0.25rem; }
 .combo-color-filter .pip {
@@ -584,7 +622,8 @@ input:focus, select:focus, button:focus-visible {
   background: var(--pip-bg); color: var(--pip-fg); font-weight: 700; cursor: pointer;
   display: inline-flex; align-items: center; justify-content: center;
 }
-.combo-color-filter .pip.on { border-color: #10b981; box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35); }
+.combo-color-filter .pip { opacity: 0.55; }
+.combo-color-filter .pip.on { opacity: 1; border-color: #22d3ee; box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.35); }
 .combo-result-count { color: #94a3b8; font-size: 0.9rem; }
 .combo-reset { background: none; border: none; color: #10b981; cursor: pointer; font-size: 0.9rem; margin-left: 0.5rem; text-decoration: underline; }
 .combo-empty { color: #94a3b8; padding: 2rem 0; text-align: center; }
@@ -630,6 +669,19 @@ input:focus, select:focus, button:focus-visible {
 .combo-eq-name { font-weight: 700; color: #fff; margin-top: 0.5rem; font-size: 0.95rem; }
 .combo-eq-print { color: #94a3b8; font-size: 0.78rem; }
 .combo-eq-price { color: #d4af37; font-weight: 700; margin: 0.25rem 0 0.5rem; }
+.combo-eq-oracle-toggle {
+  background: none; border: none; padding: 0.3rem 0; margin: 0.25rem 0 0;
+  color: #22d3ee; font-size: 0.82rem; cursor: pointer; text-align: center;
+  width: 100%;
+}
+.combo-eq-oracle-toggle:hover { text-decoration: underline; }
+.combo-eq-oracle-wrap { width: 100%; }
+.combo-eq-oracle {
+  font-size: 0.82rem; line-height: 1.5; color: #94a3b8;
+  background: rgba(15, 23, 42, 0.6); border: 1px solid #334155;
+  border-radius: 8px; padding: 0.6rem 0.75rem; margin: 0.5rem 0;
+  white-space: pre-line; text-align: left; max-width: 100%;
+}
 .combo-eq-buy { font-size: 0.85rem; padding: 0.45rem 0.8rem; }
 .combo-eq-plus {
   align-self: center; width: 36px; height: 36px; flex: none;
@@ -663,3 +715,60 @@ input:focus, select:focus, button:focus-visible {
   display: block; height: 8px; border-radius: 999px;
   margin: -0.35rem -0.35rem 0.65rem;
 }
+
+/* ---- Fix My Mana Base (Phase 2) ---- */
+.manabase-page .combo-card-ep {
+  background: #22d3ee; color: #0f172a;
+}
+.mb-colors {
+  display: flex; gap: 1rem; flex-wrap: wrap; margin: 1rem 0 1.5rem;
+}
+.mb-color { text-align: center; }
+.mb-color-btn {
+  background: #0f172a; border: 2px solid #334155; border-radius: 50%;
+  width: 64px; height: 64px; padding: 6px; cursor: pointer;
+  opacity: 0.45; transition: opacity 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+.mb-color-btn img { width: 100%; height: 100%; }
+.mb-color.on .mb-color-btn {
+  opacity: 1; border-color: #22d3ee;
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.35);
+}
+.mb-priority { display: flex; gap: 4px; margin-top: 6px; justify-content: center; }
+.mb-prio {
+  background: none; border: 1px solid #334155; border-radius: 6px;
+  color: #94a3b8; font-size: 0.7rem; padding: 3px 8px; cursor: pointer;
+}
+.mb-prio.on { border-color: #22d3ee; color: #22d3ee; }
+.mb-controls {
+  display: flex; gap: 2rem; flex-wrap: wrap; margin: 1rem 0;
+}
+.mb-controls label { display: flex; flex-direction: column; gap: 6px; color: #cbd5e1; }
+.mb-controls input[type="range"] { width: 200px; accent-color: #22d3ee; }
+.mb-run {
+  background: #22d3ee; color: #0f172a; border: none; border-radius: 10px;
+  font-size: 1.05rem; font-weight: 800; padding: 0.8rem 2rem; cursor: pointer;
+  margin: 0.5rem 0 1.5rem;
+}
+.mb-run:disabled { opacity: 0.6; cursor: wait; }
+.mb-error { color: #f43f85; }
+.mb-status {
+  font-size: 0.75rem; font-weight: 600; color: #10b981;
+  border: 1px solid #10b981; border-radius: 6px; padding: 2px 8px;
+  margin-left: 10px; vertical-align: middle;
+}
+.mb-lands {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px; margin: 1rem 0;
+}
+.mb-land {
+  background: rgba(15, 23, 42, 0.6); border: 1px solid #334155;
+  border-radius: 10px; padding: 0.8rem;
+}
+.mb-land-name { font-weight: 700; color: #f1f5f9; margin-bottom: 4px; }
+.mb-land-meta { display: flex; gap: 8px; align-items: center; margin-bottom: 4px; }
+.mb-land-price { color: var(--gold); font-weight: 700; font-variant-numeric: tabular-nums; }
+.mb-land-life { color: #f43f85; font-size: 0.82rem; }
+.mb-land-cond { color: #94a3b8; font-size: 0.75rem; font-style: italic; }
+.mb-land-print { color: #64748b; font-size: 0.75rem; margin-bottom: 8px; }
+.mb-disclaimer { color: #64748b; font-size: 0.8rem; margin-top: 1rem; }

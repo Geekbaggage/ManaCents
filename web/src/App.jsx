@@ -1,10 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { trackPageview } from "./analytics.js";
 import Fuse from "fuse.js";
 import { searchCommanders, fetchAllCommanders, fetchUpgrades, money, previewCommanderRequest, confirmCommanderRequest, voteCommander, checkRequestStatus } from "./api.js";
 import CheckoutBar from "./components/CheckoutBar.jsx";
 import About from "./components/About.jsx";
+import Privacy from "./components/Privacy.jsx";
 import Footer from "./components/Footer.jsx";
 import { CombosIndex, ComboDetail, CombosTeaser, getCombo } from "./components/Combos.jsx";
+import { ManaBase } from "./components/ManaBase.jsx";
 
 // Color-identity filter chips. Exact-match semantics: a commander shows only
 // when its color identity is exactly the selected pips (so W+U+R finds Jeskai
@@ -12,12 +15,12 @@ import { CombosIndex, ComboDetail, CombosTeaser, getCombo } from "./components/C
 // colorless (empty identity) only, and only when selected alone. With no chips
 // selected there is no filtering.
 const COLOR_PIPS = [
-  { id: "W", label: "White", bg: "#f8f6d8", fg: "#1e293b" },
-  { id: "U", label: "Blue", bg: "#0e68ab", fg: "#f8fafc" },
-  { id: "B", label: "Black", bg: "#3b2f2f", fg: "#f8fafc" },
-  { id: "R", label: "Red", bg: "#d3202a", fg: "#f8fafc" },
-  { id: "G", label: "Green", bg: "#00733e", fg: "#f8fafc" },
-  { id: "C", label: "Colorless", bg: "#94a3b8", fg: "#1e293b" },
+  { id: "W", label: "White", img: "/mana/white-v2.png" },
+  { id: "U", label: "Blue", img: "/mana/blue-v2.png" },
+  { id: "B", label: "Black", img: "/mana/black-v2.png" },
+  { id: "R", label: "Red", img: "/mana/red-v2.png" },
+  { id: "G", label: "Green", img: "/mana/green-v2.png" },
+  { id: "C", label: "Colorless", img: "/mana/colorless-v2.png" },
 ];
 function matchesColorFilter(commander, selected) {
   if (selected.size === 0) return true;
@@ -262,6 +265,17 @@ export default function App() {
 
   // Scroll to top and set the page title when switching views.
   // Unknown combo slugs get a robots noindex so they stay out of search indexes.
+  // Analytics: track pageviews (bots don't run JS, so they're excluded).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    try { document.body.setAttribute("data-view", view); } catch {}
+    trackPageview({
+      view,
+      comboSlug: params.get("combo") || comboSlug,
+      commanderSlug: params.get("commander"),
+    });
+  }, [view, comboSlug]);
+
   useEffect(() => {
     window.scrollTo(0, 0);
     const setNoindex = (on) => {
@@ -279,6 +293,7 @@ export default function App() {
     };
     if (view === "about") { document.title = "About — ManaCents"; setNoindex(false); }
     else if (view === "combos") { document.title = "Commander Combos — ManaCents"; setNoindex(false); }
+    else if (view === "manabase") { document.title = "Fix My Mana Base — ManaCents"; setNoindex(false); }
     else if (view === "combo") {
       const c = comboSlug ? getCombo(comboSlug) : null;
       document.title = c ? `${c.title} — ManaCents Combos` : "Combo not found — ManaCents";
@@ -308,6 +323,7 @@ export default function App() {
     try {
       const p = new URLSearchParams(window.location.search);
       if (p.has("combos")) return { combos: true };
+      if (p.has("manabase")) return { manabase: true };
       const cslug = p.get("combo");
       if (cslug) return { combo: cslug };
       const slug = p.get("commander");
@@ -393,6 +409,13 @@ export default function App() {
     setView("combos");
     try {
       window.history.replaceState(null, "", "/?combos");
+    } catch { /* URL update is best-effort */ }
+  };
+  // ManaBase navigation. ?manabase opens the tool.
+  const goManaBase = () => {
+    setView("manabase");
+    try {
+      window.history.replaceState(null, "", "/?manabase");
     } catch { /* URL update is best-effort */ }
   };
   const openCombo = (slug) => {
@@ -604,6 +627,11 @@ export default function App() {
       setView("combos");
       return;
     }
+    if (deepLink.manabase) {
+      deepLinkDone.current = true;
+      setView("manabase");
+      return;
+    }
     if (deepLink.combo) {
       deepLinkDone.current = true;
       setComboSlug(deepLink.combo);
@@ -725,11 +753,28 @@ export default function App() {
           <nav className="site-nav" aria-label="Site">
             <button
               type="button"
-              className={`nav-link${view === "combos" || view === "combo" ? " active" : ""}`}
+              className="nav-btn-mana"
+              title="Fix My Mana Base"
+              onClick={goManaBase}
+              aria-label="Fix My Mana Base"
+              aria-current={view === "manabase" ? "page" : undefined}
+            >
+              <span className="pip-cluster" aria-hidden="true">
+                <img src="/mana/white-v2.png" alt="" draggable="false" />
+                <img src="/mana/blue-v2.png" alt="" draggable="false" />
+                <img src="/mana/black-v2.png" alt="" draggable="false" />
+                <img src="/mana/red-v2.png" alt="" draggable="false" />
+                <img src="/mana/green-v2.png" alt="" draggable="false" />
+              </span>
+              <span className="mana-label">Fix My Lands</span>
+            </button>
+            <button
+              type="button"
+              className={`nav-link-combos-cyan${view === "combos" || view === "combo" ? " active" : ""}`}
               onClick={goCombos}
               aria-current={view === "combos" || view === "combo" ? "page" : undefined}
             >
-              ⚡ Combos
+              <span className="bolt">⚡</span> Combos
             </button>
           </nav>
         </header>
@@ -738,12 +783,20 @@ export default function App() {
           <About onBack={() => setView("landing")} />
         )}
 
+        {view === "privacy" && (
+          <Privacy onBack={() => setView("landing")} />
+        )}
+
         {view === "combos" && (
           <CombosIndex onOpen={openCombo} />
         )}
 
         {view === "combo" && (
           <ComboDetail slug={comboSlug} onBack={goCombos} />
+        )}
+
+        {view === "manabase" && (
+          <ManaBase />
         )}
 
         {view === "landing" && (
@@ -786,13 +839,12 @@ export default function App() {
                       key={pip.id}
                       type="button"
                       className={colorFilter.has(pip.id) ? "pip on" : "pip"}
-                      style={{ "--pip-bg": pip.bg, "--pip-fg": pip.fg }}
                       onClick={() => toggleColorPip(pip.id)}
                       aria-pressed={colorFilter.has(pip.id)}
                       aria-label={`${pip.label} ${colorFilter.has(pip.id) ? "filter on" : "filter off"}`}
                       title={pip.label}
                     >
-                      {pip.id}
+                      <img src={pip.img} alt={pip.label} width="28" height="28" draggable="false" />
                     </button>
                   ))}
                   {colorFilter.size > 0 && (
@@ -1095,7 +1147,7 @@ export default function App() {
           </main>
         )}
 
-        <Footer onAbout={() => setView("about")} />
+        <Footer onAbout={() => setView("about")} onPrivacy={() => setView("privacy")} />
       </div>
       {toast && <div className="toast" role="status">{toast}</div>}
       {canHover && hoverCard?.image_url && (() => {
