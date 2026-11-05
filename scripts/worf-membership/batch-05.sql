@@ -1,0 +1,8 @@
+INSERT OR IGNORE INTO precon_membership (commander_slug, card_name, source) VALUES ('worf-defiant-commander', 'Valorous Stance', 'Wizards official Magic: The Gathering | Star Trek Commander Decklists - Klingon Fury');
+INSERT OR IGNORE INTO precon_membership (commander_slug, card_name, source) VALUES ('worf-defiant-commander', 'Vanquish the Horde', 'Wizards official Magic: The Gathering | Star Trek Commander Decklists - Klingon Fury');
+INSERT OR IGNORE INTO precon_membership (commander_slug, card_name, source) VALUES ('worf-defiant-commander', 'Vault of Champions', 'Wizards official Magic: The Gathering | Star Trek Commander Decklists - Klingon Fury');
+INSERT OR IGNORE INTO precon_membership (commander_slug, card_name, source) VALUES ('worf-defiant-commander', 'Vindicate', 'Wizards official Magic: The Gathering | Star Trek Commander Decklists - Klingon Fury');
+INSERT OR IGNORE INTO precon_membership (commander_slug, card_name, source) VALUES ('worf-defiant-commander', 'Voq, Torchbearer', 'Wizards official Magic: The Gathering | Star Trek Commander Decklists - Klingon Fury');
+INSERT OR IGNORE INTO precon_membership (commander_slug, card_name, source) VALUES ('worf-defiant-commander', 'Warleader''s Call', 'Wizards official Magic: The Gathering | Star Trek Commander Decklists - Klingon Fury');
+INSERT OR IGNORE INTO precon_membership (commander_slug, card_name, source) VALUES ('worf-defiant-commander', 'Worf, Defiant Commander', 'Wizards official Magic: The Gathering | Star Trek Commander Decklists - Klingon Fury');
+INSERT OR IGNORE INTO precon_membership (commander_slug, card_name, source) VALUES ('worf-defiant-commander', 'World at War', 'Wizards official Magic: The Gathering | Star Trek Commander Decklists - Klingon Fury');

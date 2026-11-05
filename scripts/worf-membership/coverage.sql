@@ -1,0 +1,1 @@
+INSERT OR IGNORE INTO precon_coverage (commander_slug, precon_name, source_url, distinct_names, verified_at) VALUES ('worf-defiant-commander', 'Klingon Fury', 'https://magic.wizards.com/en/news/announcements/star-trek-commander-decklists', 88, '2026-11-05');
