@@ -12,6 +12,7 @@ const PIP_IMG = {
   B: "/mana/black-v2.png",
   R: "/mana/red-v2.png",
   G: "/mana/green-v2.png",
+  C: "/mana/colorless-v2.png",
 };
 const PRIORITIES = ["early", "main", "splash"];
 
@@ -280,7 +281,7 @@ export function ManaBase() {
             <div className="mb-shortfalls">
               {Object.entries(result.perColor).map(([c, v]) => (
                 <span key={c} className={`mb-short${v.shortfall > 0 ? " unmet" : " met"}`}>
-                  {c}: {v.qualifying}/{v.target}
+                  <img src={PIP_IMG[c] ?? PIP_IMG.C} alt={COLOR_NAMES[c] ?? c} width={16} height={16} draggable="false" /> {v.qualifying}/{v.target}
                   {v.shortfall > 0 ? ` (short ${v.shortfall})` : " ✓"}
                 </span>
               ))}

@@ -12,6 +12,7 @@ const COLOR_PIPS = [
   { id: "B", label: "Black", img: "/mana/black-v2.png" },
   { id: "R", label: "Red", img: "/mana/red-v2.png" },
   { id: "G", label: "Green", img: "/mana/green-v2.png" },
+  { id: "C", label: "Colorless", img: "/mana/colorless-v2.png" },
 ];
 
 const PIP_IMG = { W: "/mana/white-v2.png", U: "/mana/blue-v2.png", B: "/mana/black-v2.png", R: "/mana/red-v2.png", G: "/mana/green-v2.png", C: "/mana/colorless-v2.png" };
