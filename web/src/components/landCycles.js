@@ -11,7 +11,7 @@ export const LAND_CYCLES = [
               "Karplusan Forest", "Brushland", "Battlefield Forge"],
   },
   {
-    id: "check", name: "Check Lands", trait: "Untapped if you control a matching basic.",
+    id: "check", name: "Check Lands", trait: "Untapped if you control a land with a matching basic land type — typed nonbasics count.",
     members: ["Glacial Fortress", "Drowned Catacomb", "Dragonskull Summit"],
   },
   {
@@ -23,11 +23,11 @@ export const LAND_CYCLES = [
     members: ["Sea of Clouds", "Morphic Pool", "Luxury Suite"],
   },
   {
-    id: "fast", name: "Fast Lands", trait: "Untapped early (2 or fewer lands).",
+    id: "fast", name: "Fast Lands", trait: "Untapped if you control two or fewer other lands.",
     members: ["Seachrome Coast", "Darkslick Shores"],
   },
   {
-    id: "slow", name: "Slow Lands", trait: "Untapped from turn 3+ (2+ other lands).",
+    id: "slow", name: "Slow Lands", trait: "Untapped if you control two or more other lands.",
     members: ["Deserted Beach", "Shipwreck Marsh"],
   },
   {
@@ -43,7 +43,7 @@ export const LAND_CYCLES = [
     members: ["Azorius Chancery", "Dimir Aqueduct"],
   },
   {
-    id: "verge", name: "Verge Lands", trait: "Untapped if you control a matching basic type.",
+    id: "verge", name: "Verge Lands", trait: "Enters untapped. Second color needs a matching basic land type.",
     members: ["Floodfarm Verge", "Gloomlake Verge"],
   },
   {

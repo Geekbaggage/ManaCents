@@ -1,4 +1,4 @@
-// GET /api/manabase?colors=WU&priorities={"W":"early","U":"main"}&budget=50&slots=10&opponents=3&bracket=3
+// GET /api/manabase?colors=WU&priorities={"W":"early","U":"main"}&budget=25&slots=10&opponents=3&bracket=3
 //
 // ManaBase solver API. Runs accepted solver v1.4.1-js against catalog seed
 // v0.4.2 (43 eligible lands, scoring policy v1, price snapshot 2026-11-04).
@@ -7,8 +7,8 @@
 // Params (all validated; invalid input → 400, never silently rewritten):
 //   colors: string of WUBRG chars; EMPTY string = explicit colorless query
 //   priorities: JSON object like {"W":"early","U":"main"} (default: all "main")
-//   budget: dollars > 0 (default 50)
-//   slots: integer 1-20 (default 10)
+//   budget: whole cents $5–$200 (default 25)
+//   slots: integer 1-10 (default 10, accepted solver contract)
 //   opponents: 1 or 3 (default 3; bond lands resolved pre-solver per context policy)
 //   bracket: 1-5 (default 3; Game Changer gate)
 //   maxNodes: node budget, clamped to [1, 1500000] (default 200000, provisional)
@@ -64,7 +64,7 @@ export async function onRequestGet({ request }) {
     });
   }
 
-  // ---- Explicit validation (no silent rewrites) ----
+  // ---- Strict validation (no silent rewrites; bad input → 400) ----
   const rawColors = q.get("colors") ?? "";
   if (/[^WUBRG]/.test(rawColors)) {
     return jsonError(
@@ -86,19 +86,34 @@ export async function onRequestGet({ request }) {
     return jsonError("priorities must be a JSON object");
   }
   for (const [c, p] of Object.entries(priorities)) {
-    if (!"WUBRG".includes(c) || !["early", "main", "splash"].includes(p)) {
-      return jsonError(`invalid priority: ${c}=${p} (color must be WUBRG, priority early/main/splash)`);
+    // String.includes accepts multi-char substrings ("WU" in "WUBRG") —
+    // require exactly one selected color character.
+    if (c.length !== 1 || !"WUBRG".includes(c) || !["early", "main", "splash"].includes(p)) {
+      return jsonError(`invalid priority: ${c}=${p} (key must be one selected color W/U/B/R/G, value early/main/splash)`);
     }
     if (!colors.includes(c)) {
       return jsonError(`priority for ${c} but ${c} not in colors`);
     }
   }
+  // Effective priorities: fill every selected color (solver defaults to main).
+  const effectivePriorities = {};
+  for (const c of colors) effectivePriorities[c] = priorities[c] || "main";
 
-  let budget, slots, opponents, bracket, maxNodes;
+  // Strict whole-cent budget: reject "5usd" and "5.001" at the boundary.
+  // Contract (v4): $5–$200, default $25.
+  const rawBudget = q.get("budget") ?? "25";
+  if (!/^\d+(\.\d{1,2})?$/.test(rawBudget)) {
+    return jsonError(`invalid budget: "${rawBudget}" — use whole cents, e.g. 25 or 25.50`);
+  }
+  const budget = parseFloat(rawBudget);
+  if (!(budget >= 5 && budget <= 200)) {
+    return jsonError("budget must be between $5 and $200");
+  }
+
+  let slots, opponents, bracket, maxNodes;
   try {
-    budget = parseFloat(q.get("budget") ?? "50");
-    if (!(budget > 0) || !Number.isFinite(budget)) throw new Error("budget must be a positive number");
-    slots = parseIntParam(q.get("slots") ?? "10", "slots", 1, 20);
+    // Accepted solver contract: 1–10 slots (not 1–20).
+    slots = parseIntParam(q.get("slots") ?? "10", "slots", 1, 10);
     opponents = parseIntParam(q.get("opponents") ?? "3", "opponents", 1, 3);
     if (![1, 3].includes(opponents)) throw new Error("opponents must be 1 or 3");
     bracket = parseIntParam(q.get("bracket") ?? "3", "bracket", 1, 5);
@@ -110,10 +125,12 @@ export async function onRequestGet({ request }) {
     return jsonError(e.message);
   }
 
-  // ---- Resolve opponent context BEFORE the unchanged solver ----
+  // ---- Resolve query context BEFORE the unchanged solver ----
   // Bond lands: known entry state from the supplied opponent count.
+  // Command Tower: usable colors = the selected colors (commander identity).
+  //   Colorless queries supply no colors → Tower stays colors=[] (empty output).
   // Bounce lands: held from recommendations (no reviewed evaluator).
-  const contextApplied = { opponents, bondResolved: [], bounceHeld: [] };
+  const contextApplied = { opponents, bondResolved: [], bounceHeld: [], towerColors: [] };
   const lands = [];
   for (const l of landData.lands) {
     if (BOUNCE_LANDS.has(l.name)) {
@@ -129,6 +146,10 @@ export async function onRequestGet({ request }) {
       banned: l.banned, gameChanger: l.gameChanger,
       producesColorless: l.producesColorless, oracleId: l.oracleId,
     };
+    if (l.name === "Command Tower" && colors.length > 0) {
+      land.colors = [...colors];
+      contextApplied.towerColors = [...colors];
+    }
     if (BOND_LANDS.has(l.name)) {
       if (opponents === 3) {
         land.untapped = true;
@@ -149,7 +170,7 @@ export async function onRequestGet({ request }) {
     // Effective node budget goes in the CONSTRUCTOR (not optimize options).
     const solver = new OptimizedSolver(lands, { maxNodes });
     const [pkg, score, stats] = solver.optimize(
-      colors, priorities, budget, slots, { bracket }
+      colors, effectivePriorities, budget, slots, { bracket }
     );
     result = { pkg, score, stats };
   } catch (e) {
@@ -180,7 +201,7 @@ export async function onRequestGet({ request }) {
     perColor,
     inputs: {
       colors: colors || "(colorless)",
-      priorities,
+      priorities: effectivePriorities,
       budget,
       slots,
       opponents,

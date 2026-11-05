@@ -130,7 +130,7 @@ export function ManaBase() {
   const [tab, setTab] = useState("solver");
   const [colors, setColors] = useState([]);
   const [priorities, setPriorities] = useState({});
-  const [budget, setBudget] = useState(50);
+  const [budget, setBudget] = useState(25);
   const [slots, setSlots] = useState(10);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -178,6 +178,7 @@ export function ManaBase() {
       if (!res.ok) throw new Error(data.error || "Solver failed");
       setResult(data);
     } catch (e) {
+      setResult(null); // never leave a stale package after a failed request
       setError(e.message);
     } finally {
       setLoading(false);
@@ -189,8 +190,9 @@ export function ManaBase() {
       <div className="combo-card-ep">Beta</div>
       <h1>Fix My Mana Base</h1>
       <p className="combos-sub">
-        Pick your colors, set priorities, name a budget — get the optimal
-        land package. Or browse every land by cycle.
+        Suggested land purchases optimized for your selected colors,
+        priorities and budget under the stated assumptions. Or browse every
+        land by cycle.
       </p>
 
       <div className="mb-tabs" role="tablist">
@@ -232,15 +234,15 @@ export function ManaBase() {
         <label>
           Budget: <strong>{money(budget)}</strong>
           <input
-            type="range" min="5" max="500" step="5" value={budget}
-            onChange={(e) => setBudget(Number(e.target.value))}
+            type="range" min="5" max="200" step="5" value={budget}
+            onChange={(e) => { setBudget(Number(e.target.value)); setResult(null); }}
           />
         </label>
         <label>
           Max lands: <strong>{slots}</strong>
           <input
-            type="range" min="1" max="20" step="1" value={slots}
-            onChange={(e) => setSlots(Number(e.target.value))}
+            type="range" min="1" max="10" step="1" value={slots}
+            onChange={(e) => { setSlots(Number(e.target.value)); setResult(null); }}
           />
         </label>
       </div>
@@ -265,7 +267,9 @@ export function ManaBase() {
                   ? `Best found (interrupted: ${result.stats.interruptReason || "node budget"})`
                   : result.stats.status === "interrupted_without_result"
                     ? "No result before interruption"
-                    : result.stats.status}
+                    : result.stats.status === "empty_proven"
+                      ? "No lands match these colors and budget"
+                      : result.stats.status}
             </span>
           </h2>
           <p className="combos-sub">
@@ -289,7 +293,7 @@ export function ManaBase() {
                 <div className="mb-land-meta">
                   <span className="mb-land-price">{money(l.price)}</span>
                   {l.lifeCost > 0 && (
-                    <span className="mb-land-life" title="Expected life cost per game">
+                    <span className="mb-land-life" title="Modeled life cost under the 3-use scoring scenario, not measured per-game loss">
                       −{l.lifeCost} ♥
                     </span>
                   )}
