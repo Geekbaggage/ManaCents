@@ -28,6 +28,22 @@ export async function onRequestGet({ request }) {
   const url = new URL(request.url);
   const q = url.searchParams;
 
+  // ?list=all → full land catalog with prices (for the browse gallery).
+  if (q.get("list") === "all") {
+    return Response.json({
+      lands: landData.lands.map((l) => ({
+        name: l.name, price: l.price, pricePrinting: l.pricePrinting,
+        colors: l.colors, untapped: l.untapped, conditional: l.conditional,
+        lifeCost: l.lifeCost, producesColorless: l.producesColorless,
+      })),
+      meta: {
+        seed: landData.seed_version,
+        priceSnapshot: landData.price_snapshot,
+        landCount: landData.land_count,
+      },
+    });
+  }
+
   const colors = (q.get("colors") || "").toUpperCase().replace(/[^WUBRG]/g, "");
   let priorities = {};
   try {

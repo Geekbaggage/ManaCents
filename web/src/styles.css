@@ -772,3 +772,32 @@ input:focus, select:focus, button:focus-visible {
 .mb-land-cond { color: #94a3b8; font-size: 0.75rem; font-style: italic; }
 .mb-land-print { color: #64748b; font-size: 0.75rem; margin-bottom: 8px; }
 .mb-disclaimer { color: #64748b; font-size: 0.8rem; margin-top: 1rem; }
+
+/* ---- ManaBase tabs + land gallery ---- */
+.mb-tabs { display: flex; gap: 8px; margin: 1rem 0 1.5rem; }
+.mb-tab {
+  background: none; border: 1px solid #334155; border-radius: 10px;
+  color: #94a3b8; font-size: 0.95rem; font-weight: 600;
+  padding: 0.6rem 1.4rem; cursor: pointer;
+}
+.mb-tab.on { border-color: #22d3ee; color: #22d3ee; }
+.mb-gallery { display: flex; flex-direction: column; gap: 8px; }
+.mb-cycle {
+  background: rgba(15, 23, 42, 0.6); border: 1px solid #334155;
+  border-radius: 10px; overflow: hidden;
+}
+.mb-cycle.open { border-color: #22d3ee; }
+.mb-cycle-head {
+  width: 100%; background: none; border: none; cursor: pointer;
+  display: flex; align-items: center; gap: 12px;
+  padding: 0.8rem 1rem; color: #f1f5f9; text-align: left;
+}
+.mb-cycle-name { font-weight: 700; flex: 1; }
+.mb-cycle-count {
+  background: #1e293b; border-radius: 12px; font-size: 0.75rem;
+  padding: 2px 10px; color: #94a3b8;
+}
+.mb-cycle-range { color: var(--gold); font-weight: 700; font-variant-numeric: tabular-nums; }
+.mb-cycle-arrow { color: #22d3ee; }
+.mb-cycle-body { padding: 0 1rem 1rem; }
+.mb-cycle-trait { color: #94a3b8; font-size: 0.85rem; margin: 0 0 0.8rem; }

@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { money } from "../api.js";
 import { manaPoolCardUrl } from "../affiliates.js";
 import { trackAffiliateClick } from "../analytics.js";
+import { LAND_CYCLES } from "./landCycles.js";
 
 const COLORS = ["W", "U", "B", "R", "G"];
 const COLOR_NAMES = { W: "White", U: "Blue", B: "Black", R: "Red", G: "Green" };
@@ -44,7 +45,80 @@ function ColorToggle({ color, selected, priority, onToggle, onPriority }) {
   );
 }
 
+function LandGallery() {
+  const [lands, setLands] = useState(null);
+  const [open, setOpen] = useState(null);
+
+  useEffect(() => {
+    fetch("/api/manabase?list=all")
+      .then((r) => r.json())
+      .then((d) => setLands(d.lands))
+      .catch(() => setLands([]));
+  }, []);
+
+  if (lands === null) return <p className="combos-sub">Loading lands…</p>;
+  const byName = Object.fromEntries(lands.map((l) => [l.name, l]));
+
+  return (
+    <div className="mb-gallery">
+      {LAND_CYCLES.map((cycle) => {
+        const members = cycle.members
+          .map((n) => byName[n])
+          .filter(Boolean);
+        if (members.length === 0) return null;
+        const prices = members.map((m) => m.price).filter((p) => p != null);
+        const lo = Math.min(...prices), hi = Math.max(...prices);
+        const isOpen = open === cycle.id;
+        return (
+          <div key={cycle.id} className={`mb-cycle${isOpen ? " open" : ""}`}>
+            <button
+              type="button" className="mb-cycle-head"
+              onClick={() => setOpen(isOpen ? null : cycle.id)}
+              aria-expanded={isOpen}
+            >
+              <span className="mb-cycle-name">{cycle.name}</span>
+              <span className="mb-cycle-count">{members.length}</span>
+              <span className="mb-cycle-range">
+                {money(lo)}{lo !== hi && ` – ${money(hi)}`}
+              </span>
+              <span className="mb-cycle-arrow">{isOpen ? "▾" : "▸"}</span>
+            </button>
+            {isOpen && (
+              <div className="mb-cycle-body">
+                <p className="mb-cycle-trait">{cycle.trait}</p>
+                <div className="mb-lands">
+                  {members.map((l) => (
+                    <div key={l.name} className="mb-land">
+                      <div className="mb-land-name">{l.name}</div>
+                      <div className="mb-land-meta">
+                        <span className="mb-land-price">{money(l.price)}</span>
+                        {l.lifeCost > 0 && (
+                          <span className="mb-land-life">−{l.lifeCost} ♥</span>
+                        )}
+                        {l.conditional && <span className="mb-land-cond">conditional</span>}
+                      </div>
+                      <a
+                        className="btn-copy combo-eq-buy"
+                        href={manaPoolCardUrl(l.name)}
+                        target="_blank" rel="noopener noreferrer"
+                        onClick={() => trackAffiliateClick("manapool", { view: "manabase-browse" })}
+                      >
+                        Buy this card
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function ManaBase() {
+  const [tab, setTab] = useState("solver");
   const [colors, setColors] = useState([]);
   const [priorities, setPriorities] = useState({});
   const [budget, setBudget] = useState(50);
@@ -108,10 +182,29 @@ export function ManaBase() {
       <h1>Fix My Mana Base</h1>
       <p className="combos-sub">
         Pick your colors, set priorities, name a budget — get the optimal
-        land package. Prices are cheapest printings as of{" "}
-        {result?.meta?.priceSnapshot || "2026-11-04"}.
+        land package. Or browse every land by cycle.
       </p>
 
+      <div className="mb-tabs" role="tablist">
+        <button
+          type="button" role="tab" aria-selected={tab === "solver"}
+          className={`mb-tab${tab === "solver" ? " on" : ""}`}
+          onClick={() => setTab("solver")}
+        >
+          Find my lands
+        </button>
+        <button
+          type="button" role="tab" aria-selected={tab === "browse"}
+          className={`mb-tab${tab === "browse" ? " on" : ""}`}
+          onClick={() => setTab("browse")}
+        >
+          Browse lands
+        </button>
+      </div>
+
+      {tab === "browse" && <LandGallery />}
+      {tab === "solver" && (
+      <>
       <h2>1. Your colors</h2>
       <div className="mb-colors" role="group" aria-label="Choose colors">
         {COLORS.map((c) => (
@@ -195,6 +288,7 @@ export function ManaBase() {
           </p>
         </div>
       )}
+      </>)}
     </div>
   );
 }
