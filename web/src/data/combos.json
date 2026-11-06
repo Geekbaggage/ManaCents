@@ -328,7 +328,7 @@
   {
    "caveats": [
     "Stella has to survive \u2014 removal on her in response kills the loop",
-    "You must cast 3 spells first, and the ORIGINAL Twisted Fealty stays on the stack while you work"
+    "Twisted Fealty must be the third spell you cast this turn — the ORIGINAL stays on the stack while you work"
    ],
    "episode": 6,
    "id": "stella-fealty",
@@ -376,7 +376,7 @@
    },
    "prerequisites": [
     "Stella Lee on the battlefield",
-    "3 spells cast this turn (unlocks her tap ability)",
+    "2 spells cast this turn \u2014 Twisted Fealty will be the third",
     "Twisted Fealty in hand"
    ],
    "reel_url": "https://www.instagram.com/reel/DfNMxjkDAvw/",
@@ -430,8 +430,8 @@
    "precon": null,
    "precon_note": "Priced from scratch only \u2014 no precon-residency claim.",
    "prerequisites": [
-    "Both pieces on the battlefield",
-    "Cast Scurry Oak with the Denizen on board (or any green creature entering if both are already out)"
+    "Ivy Lane Denizen on the battlefield",
+    "Cast Scurry Oak (its own entry triggers the Denizen) \u2014 or any green creature entering if both are already out"
    ],
    "reel_url": "https://www.instagram.com/reel/DfN6UtVDygq/",
    "slug": "scurry-oak-ivy-lane-denizen",
@@ -451,7 +451,7 @@
    "episode": 8,
    "id": "broodscale-glee",
    "loop_steps": [
-    "Kick it off: Adapt the Broodscale, or let any creature die first",
+    "Kick it off: pay {1}{G} to Adapt the Broodscale, or let any creature die first",
     "Sac a Spawn \u2014 Glee puts a +1/+1 counter on the Broodscale",
     "Broodscale hatches a fresh Spawn \u2014 repeat forever"
    ],
@@ -480,7 +480,7 @@
    ],
    "prerequisites": [
     "Broodscale enchanted with Sadistic Glee",
-    "A first +1/+1 counter or creature death to start the loop"
+    "A first +1/+1 counter (pay {1}{G} to Adapt) or a creature death to start the loop"
    ],
    "slug": "basking-broodscale-sadistic-glee",
    "title": "Basking Broodscale + Sadistic Glee",
