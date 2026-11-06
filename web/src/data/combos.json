@@ -8,27 +8,29 @@
    "episode": 1,
    "id": "ondu-secret-arcade",
    "loop_steps": [
-    "Make a token \u2014 Ondu doubles it",
-    "Secret Arcade triggers off the tokens",
-    "Keep the engine fed; tokens are 3/3s with no haste"
+    "Secret Arcade on the battlefield and unlocked \u2014 cast Ondu Spiritdancer for 4W",
+    "Arcade is static: Ondu enters as an enchantment and sees itself, so it may copy itself",
+    "Each new Ondu token is a fresh copy with its own once-per-turn trigger \u2014 repeat as long as you choose (the 'may' stops it)"
    ],
    "outcome": "Infinite 3/3 tokens (no haste \u2014 not an automatic win)",
    "pieces": [
     {
      "finish": "nonfoil",
      "name": "Ondu Spiritdancer",
+     "oracle_id": "d2ae893f-52af-4645-8712-d62fb78f901e",
      "price": 9.73,
      "printing": "DSC #101",
-     "role": "Doubles your tokens",
+     "role": "Copies enchantments that enter (once per turn)",
      "art": "https://cards.scryfall.io/art_crop/front/e/e/ee1c6432-54d7-4b57-a554-f7194d74e03c.jpg?1783909632",
      "oracle_text": "Whenever an enchantment you control enters, you may create a token that's a copy of it. Do this only once each turn."
     },
     {
      "finish": "nonfoil",
      "name": "Secret Arcade // Dusty Parlor",
+     "oracle_id": "c8abde48-a07a-42a0-a43b-c357e6d9cad4",
      "price": 3.11,
      "printing": "DSC #10",
-     "role": "Makes the tokens",
+     "role": "Makes your permanents enchantments",
      "art": "https://cards.scryfall.io/art_crop/front/f/e/fe050c16-9be5-42ef-988f-0531a8bb2352.jpg?1783909661",
      "oracle_text": "Nonland permanents you control and permanent spells you control are enchantments in addition to their other types.\n(You may cast either half. That door unlocks on the battlefield. As a sorcery, you may pay the mana cost of a locked door to unlock it.)"
     }
@@ -43,8 +45,8 @@
     ]
    },
    "prerequisites": [
-    "Both pieces on the battlefield",
-    "A way to make your first token"
+    "Secret Arcade on the battlefield and unlocked",
+    "4W to cast Ondu Spiritdancer"
    ],
    "reel_url": "https://www.instagram.com/reel/DfA5Vi2jvWo/",
    "slug": "ondu-spiritdancer-secret-arcade",
@@ -65,7 +67,7 @@
    "id": "celebrant-helm",
    "loop_steps": [
     "Helm makes a hasty Celebrant token at combat",
-    "Exert the token: untap everything, take another combat",
+    "Exert the token: untap all other creatures you control, take another combat",
     "Each new combat makes another token \u2014 repeat forever"
    ],
    "outcome": "Infinite combat steps",
@@ -73,6 +75,7 @@
     {
      "finish": "nonfoil",
      "name": "Combat Celebrant",
+     "oracle_id": "5e15ff93-99a0-4000-918e-4bd2c257188d",
      "price": 1.53,
      "printing": "J25 #531",
      "role": "Extra combats",
@@ -82,6 +85,7 @@
     {
      "finish": "nonfoil",
      "name": "Helm of the Host",
+     "oracle_id": "83b43aba-bf9c-4da2-967d-9daa632e97d2",
      "price": 5.69,
      "printing": "MSC #200",
      "role": "Copies the Celebrant",
@@ -116,14 +120,15 @@
    "caveats": [
     "Needs 6 energy banked before the first attack",
     "Both creatures must survive their attacks",
-    "Combat-based finish \u2014 not instant-speed"
+    "Combat-based finish \u2014 not instant-speed",
+    "Satya's token must be paid for (6 energy) at the next end step or it's sacrificed"
    ],
    "episode": 3,
    "id": "satya-runner",
    "instagram_media_id": "18072431789784749",
    "loop_steps": [
     "Attack with both: Satya banks 2 energy and makes a Runner token; the original Runner banks 2 more (10 total)",
-    "Pay 8 energy: untap everything, take another combat",
+    "Pay 8 energy: untap all creatures you control, take another combat",
     "Later combats: the accumulating Runner tokens attack too, each banking 2 more \u2014 every combat funds the next"
    ],
    "outcome": "Infinite combat steps (energy-fueled)",
@@ -131,6 +136,7 @@
     {
      "finish": "foil",
      "name": "Satya, Aetherflux Genius",
+     "oracle_id": "ce8af7dd-49df-4419-9776-4157efc60b0f",
      "price": 0.27,
      "printing": "M3C #3",
      "role": "Copies the Runner, banks energy",
@@ -140,6 +146,7 @@
     {
      "finish": "nonfoil",
      "name": "Lightning Runner",
+     "oracle_id": "2f82b232-21ff-44cc-bc35-0999a1d1c52f",
      "price": 0.16,
      "printing": "M3C #215",
      "role": "Banks energy on attack",
@@ -184,13 +191,14 @@
     "Sacrifice the Elder: tutor a basic land to the battlefield",
     "Yedora returns the Elder face-down, as a Forest land",
     "Zimone's landfall flips it face-up again",
-    "Repeat \u2014 every loop is another basic and another landfall trigger"
+    "Repeat \u2014 tap the face-down Forest for {G} before Zimone flips it; the loop keeps going after the basics run out, as long as landfall keeps happening"
    ],
-   "outcome": "Infinite basic lands + infinite landfall triggers",
+   "outcome": "Infinite landfall triggers + infinite green mana (basics in your library are finite)",
    "pieces": [
     {
      "finish": "foil",
      "name": "Zimone, Mystery Unraveler",
+     "oracle_id": "75bf0f27-9df1-4ab4-97a8-94bb3223bdf9",
      "price": 0.37,
      "printing": "DSC #8",
      "role": "Flips the Elder face-up",
@@ -200,6 +208,7 @@
     {
      "finish": "nonfoil",
      "name": "Yedora, Grave Gardener",
+     "oracle_id": "1fa20b05-cc06-4fb7-ae76-677a29e2185a",
      "price": 0.18,
      "printing": "CMM #333",
      "role": "Returns the Elder as a Forest",
@@ -209,6 +218,7 @@
     {
      "finish": "nonfoil",
      "name": "Sakura-Tribe Elder",
+     "oracle_id": "e3afc704-220f-498f-9eaa-0821b17dc24c",
      "price": 0.31,
      "printing": "SCD #208",
      "role": "Sacs to tutor a basic",
@@ -243,7 +253,7 @@
   },
   {
    "caveats": [
-    "Needs all four pieces \u2014 kill any one in response and the loop stops cold",
+    "Needs all four pieces (three on board, Gravecrawler in hand or graveyard) \u2014 kill any one in response and the loop stops cold",
     "Graveyard hate ends the recast"
    ],
    "episode": 5,
@@ -260,6 +270,7 @@
     {
      "finish": "nonfoil",
      "name": "Gravecrawler",
+     "oracle_id": "09ff28b1-b6c9-48e6-b12e-2f0e644f709f",
      "price": 0.56,
      "printing": "FDC #104",
      "role": "The zombie that won't stay dead",
@@ -269,6 +280,7 @@
     {
      "finish": "nonfoil",
      "name": "Rooftop Storm",
+     "oracle_id": "6835bf6d-7197-481b-ac26-276ce363b4ad",
      "price": 2.11,
      "printing": "INR #83",
      "role": "Zombie spells cost nothing",
@@ -278,6 +290,7 @@
     {
      "finish": "nonfoil",
      "name": "Diregraf Captain",
+     "oracle_id": "70de24d9-c585-4bf6-ac2c-c5b4b7aa298c",
      "price": 0.33,
      "printing": "DDQ #68",
      "role": "Drains 1 when a Zombie dies",
@@ -287,6 +300,7 @@
     {
      "finish": "nonfoil",
      "name": "Viscera Seer",
+     "oracle_id": "f82a4e85-526d-4456-b700-7760043a31be",
      "price": 0.57,
      "printing": "TDC #199",
      "role": "Free sac outlet, scry 1",
@@ -297,7 +311,7 @@
    "precon": null,
    "precon_note": "Only Gravecrawler ships in Undead Unleashed \u2014 priced from scratch only.",
    "prerequisites": [
-    "All four pieces on the battlefield",
+    "Rooftop Storm, Diregraf Captain, and Viscera Seer on the battlefield",
     "Gravecrawler in hand or graveyard to start"
    ],
    "reel_url": "https://www.instagram.com/reel/DfKxvIljn-N/",
@@ -314,13 +328,13 @@
   {
    "caveats": [
     "Stella has to survive \u2014 removal on her in response kills the loop",
-    "You must cast 3 spells first, and the copy has to stay on the stack while you work"
+    "You must cast 3 spells first, and the ORIGINAL Twisted Fealty stays on the stack while you work"
    ],
    "episode": 6,
    "id": "stella-fealty",
    "instagram_media_id": "18102520574432551",
    "loop_steps": [
-    "Cast two spells, then Twisted Fealty targeting Stella",
+    "Cast two spells, then Twisted Fealty as your third spell \u2014 target Stella with BOTH target clauses",
     "Tap Stella: copy it while the original is still on the stack \u2014 the copy untaps her",
     "Tap her again. And again. Infinite copies",
     "Every copy makes a Wicked Role; the old one falls off to the graveyard and drains each opponent for 1"
@@ -330,6 +344,7 @@
     {
      "finish": "nonfoil",
      "name": "Stella Lee, Wild Card",
+     "oracle_id": "8d0da2f9-0e05-4a94-8d42-fd57d06b09ba",
      "price": 4.61,
      "printing": "OTC #3",
      "role": "Copies the spell, untaps itself",
@@ -339,6 +354,7 @@
     {
      "finish": "nonfoil",
      "name": "Twisted Fealty",
+     "oracle_id": "a5ae75de-0dff-44bf-9dc6-5895ab3ae731",
      "price": 0.29,
      "printing": "WOE #154",
      "role": "Untaps Stella, makes the Wicked Role",
@@ -383,7 +399,7 @@
    "id": "scurry-denizen",
    "instagram_media_id": "17966258805218296",
    "loop_steps": [
-    "Both on board. A green creature enters",
+    "Cast Scurry Oak \u2014 its own entry triggers the Denizen, so no third card is needed",
     "The Denizen puts a +1/+1 counter on the Oak",
     "The Oak makes a 1/1 Squirrel \u2014 which entering triggers the Denizen again",
     "Repeat. Squirrels forever"
@@ -393,6 +409,7 @@
     {
      "finish": "nonfoil",
      "name": "Scurry Oak",
+     "oracle_id": "eee6c02b-7d6a-4445-ad27-8b03176147d4",
      "price": 2.39,
      "printing": "PLST MH2-172",
      "role": "Makes a Squirrel per counter",
@@ -402,6 +419,7 @@
     {
      "finish": "nonfoil",
      "name": "Ivy Lane Denizen",
+     "oracle_id": "a5da5ad6-4ed2-4041-a983-76a8c87fa109",
      "price": 0.19,
      "printing": "CLU #166",
      "role": "Puts the counter on the Oak",
@@ -413,7 +431,7 @@
    "precon_note": "Priced from scratch only \u2014 no precon-residency claim.",
    "prerequisites": [
     "Both pieces on the battlefield",
-    "A green creature entering to kick it off"
+    "Cast Scurry Oak with the Denizen on board (or any green creature entering if both are already out)"
    ],
    "reel_url": "https://www.instagram.com/reel/DfN6UtVDygq/",
    "slug": "scurry-oak-ivy-lane-denizen",
@@ -437,11 +455,12 @@
     "Sac a Spawn \u2014 Glee puts a +1/+1 counter on the Broodscale",
     "Broodscale hatches a fresh Spawn \u2014 repeat forever"
    ],
-   "outcome": "Infinite mana, +1/+1 counters, Spawn tokens & death triggers",
+   "outcome": "Arbitrarily large colorless mana + Broodscale counters (each Spawn is sacrificed as part of the loop)",
    "pieces": [
     {
      "finish": "nonfoil",
      "name": "Basking Broodscale",
+     "oracle_id": "a7c69802-99c4-4778-934e-cc09ba58c267",
      "price": 0.2,
      "printing": "MH3 #145",
      "role": "The engine \u2014 counters hatch Eldrazi Spawns",
@@ -451,6 +470,7 @@
     {
      "finish": "nonfoil",
      "name": "Sadistic Glee",
+     "oracle_id": "2af22962-8f66-4868-a175-ad5d7f4c9d58",
      "price": 1.34,
      "printing": "TMP #153",
      "role": "The spark \u2014 every dead Spawn feeds the lizard a counter",
@@ -490,6 +510,7 @@
    "pieces": [
     {
      "name": "Dualcaster Mage",
+     "oracle_id": "8eb7c0a5-6190-40de-b473-2d1daa3bbe28",
      "price": 3.35,
      "printing": "CMR #412",
      "finish": "nonfoil",
@@ -499,6 +520,7 @@
     },
     {
      "name": "Twinflame",
+     "oracle_id": "83cf1169-5853-4332-b897-7b17d72d76ab",
      "price": 0.94,
      "printing": "SOC #258",
      "finish": "nonfoil",
@@ -514,10 +536,10 @@
    ],
    "prerequisites": [
     "A creature on the battlefield to target with the first Twinflame",
-    "2RR available at once (1R Twinflame + 1RR Dualcaster)"
+    "2RRR (5 mana) available at once (1R Twinflame + 1RR Dualcaster)"
    ],
    "caveats": [
-    "Needs a creature out + 2RR at once",
+    "Needs a creature out + 2RRR (5 mana) at once",
     "Dies to removal in response",
     "Needs an attack step to win"
    ],
@@ -538,7 +560,7 @@
    "verified_date": "2026-11-03",
    "reel_url": "https://www.instagram.com/reel/DfSOj9Yk5oC/",
    "prerequisites": [
-    "11 mana to cast both (4U Drake + 4UU Navigator)",
+    "11 mana total to cast both (5 for the Drake, 6 for the Navigator \u2014 not all at once)",
     "Lands that tap for more than 1U combined",
     "A mana win outlet (the mana alone doesn't win)"
    ],
@@ -548,13 +570,14 @@
     "Lands produce more than 1U \u2014 pocket the difference and repeat forever"
    ],
    "caveats": [
-    "Needs 11 mana upfront to cast both creatures",
+    "11 mana total across the setup to cast both creatures",
     "Dies to removal in response to the blink activation",
     "Infinite mana needs a separate win condition"
    ],
    "pieces": [
     {
      "name": "Peregrine Drake",
+     "oracle_id": "0bd67481-6bd9-48d6-92bd-8933b5ea1eae",
      "price": 0.25,
      "set": "DMR",
      "collector_number": "65",
@@ -566,6 +589,7 @@
     },
     {
      "name": "Deadeye Navigator",
+     "oracle_id": "ebef6d84-b724-4a84-bcde-8eb6dc06717d",
      "price": 1.29,
      "set": "INR",
      "collector_number": "492",
@@ -585,6 +609,7 @@
    "pieces": [
     {
      "name": "Midnight Guard",
+     "oracle_id": "f5430b0e-e77f-47b8-ae6d-30bcff4d7e35",
      "price": 0.08,
      "printing": "M15 #20",
      "finish": "nonfoil",
@@ -594,6 +619,7 @@
     },
     {
      "name": "Presence of Gond",
+     "oracle_id": "ab42398c-f0a1-4b94-ac5f-b8768e1b4e05",
      "price": 0.2,
      "printing": "SCD #203",
      "finish": "nonfoil",
@@ -615,6 +641,10 @@
     "Tap the Guard \u2014 an Elf enters, untapping the Guard",
     "Repeat forever"
    ],
+   "prerequisites": [
+    "Presence of Gond enchanting Midnight Guard",
+    "Guard able to tap (not summoning sick, or has haste)"
+   ],
    "caveats": [
     "Guard must be able to tap (no summoning sickness)",
     "Elves need haste to attack"
@@ -630,6 +660,7 @@
    "pieces": [
     {
      "name": "Basalt Monolith",
+     "oracle_id": "6b8cf2a0-b045-4d91-9d91-c602d40c6237",
      "price": 2.99,
      "printing": "MB2 #217",
      "finish": "nonfoil",
@@ -639,6 +670,7 @@
     },
     {
      "name": "Forsaken Monument",
+     "oracle_id": "7777fab1-df3f-467f-b9e2-46dd2bd2166e",
      "price": 3.42,
      "printing": "FDC #258",
      "finish": "nonfoil",
@@ -659,6 +691,10 @@
     "Pay 3 to untap it",
     "Net 1 mana. Repeat forever."
    ],
+   "prerequisites": [
+    "Both pieces on the battlefield",
+    "Basalt Monolith untapped"
+   ],
    "caveats": [
     "Needs both on board",
     "Dies to artifact removal",
@@ -669,7 +705,7 @@
   },
   {
    "caveats": [
-    "Needs 5 mana to start",
+    "Needs 2 extra generic mana available to start",
     "Dies to artifact removal",
     "Needs a mana win outlet"
    ],
@@ -680,9 +716,14 @@
    "episode": 13,
    "id": "monolith-rings",
    "loop_steps": [
-    "Tap Monolith for 3 colorless (have 5 mana ready)",
-    "Pay 3 to untap it \u2014 Rings copies it for 2",
-    "Both untaps fire \u2014 tap twice. Net +1. Repeat forever."
+    "Tap Monolith for 3 colorless \u2014 you'll need 2 extra generic mana available to start",
+    "Pay 3 to untap it, then pay 2 \u2014 Rings copies the untap ability",
+    "The copy resolves first: tap again while the original untap is still on the stack. The original resolves \u2014 ready to repeat. Net +1. Repeat forever."
+   ],
+   "prerequisites": [
+    "Both pieces on the battlefield",
+    "Basalt Monolith untapped",
+    "2 extra generic mana available to start"
    ],
    "outcome": "Infinite colorless mana",
    "payoff_class": "mana",
@@ -691,6 +732,7 @@
      "art": "https://cards.scryfall.io/art_crop/front/f/7/f79de5e7-1545-420c-bfe1-ee2444fca85b.jpg?1783930120",
      "finish": "nonfoil",
      "name": "Basalt Monolith",
+     "oracle_id": "6b8cf2a0-b045-4d91-9d91-c602d40c6237",
      "oracle_text": "This artifact doesn't untap during your untap step.\n{T}: Add {C}{C}{C}.\n{3}: Untap this artifact.",
      "price": 2.99,
      "printing": "MB2 #217",
@@ -700,6 +742,7 @@
      "art": "https://cards.scryfall.io/art_crop/front/8/3/838ffc87-517a-4d94-8ce0-bc9ed01ecc52.jpg?1783928748",
      "finish": "nonfoil",
      "name": "Rings of Brighthearth",
+     "oracle_id": "bbf9494c-c4bb-4d36-98fe-8387846b342e",
      "oracle_text": "Whenever you activate an ability, if it isn't a mana ability, you may pay {2}. If you do, copy that ability. You may choose new targets for the copy.",
      "price": 6.02,
      "printing": "CMR #335",
