@@ -812,7 +812,9 @@ input:focus, select:focus, button:focus-visible {
 .mb-short.unmet { border-color: #f43f85; color: #f43f85; }
 /* Conditional-only: scored shortfall 0, guaranteed shortfall > 0 — NOT met. */
 .mb-short.cond { border-color: #f59e0b; color: #f59e0b; }
-.mb-land-served { color: #10b981; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+.mb-land-status { display: inline-block; font-size: 0.75rem; font-weight: 700; border: 1px solid currentColor; border-radius: 4px; padding: 2px 6px; margin: 4px 0; }
+.mb-land-status.available { color: #10b981; }
+.mb-land-status.held, .mb-land-status.unknown { color: #f59e0b; }
 .mb-status-best_found, .mb-status-interrupted_without_result { color: #f59e0b; border-color: #f59e0b; }
 .mb-stale { color: #f59e0b; font-weight: 700; }
 .mb-stale-expired { color: #f43f5e; font-weight: 700; }

@@ -25,12 +25,14 @@
 // Returns: { lands, score, perColor, inputs, context, stats, meta }
 import { OptimizedSolver, SOLVER_VERSION } from "./_solver_adapter.js";
 import landData from "./_manabase_lands.json";
+import { buildCatalogStatuses } from "./_manabase_status.js";
 
 const DEFAULT_MAX_NODES = 200000; // provisional per calibration notes
 const MAX_MAX_NODES = 1500000; // provisional extended cap
 
 const BOND_LANDS = new Set(["Sea of Clouds", "Morphic Pool", "Luxury Suite"]);
-const BOUNCE_LANDS = new Set(["Azorius Chancery", "Dimir Aqueduct"]);
+const catalogStatuses = buildCatalogStatuses(landData.lands, landData.held_excluded ?? []);
+const optimizationHeld = [...catalogStatuses.values()].filter((s) => s.optimizationStatus === "held");
 
 function jsonError(msg, status = 400) {
   return Response.json({ error: msg }, { status });
@@ -52,6 +54,7 @@ export async function onRequestGet({ request, env }) {
   if (q.get("list") === "all") {
     return Response.json({
       lands: landData.lands.map((l) => ({
+        ...catalogStatuses.get(l.name),
         name: l.name, price: l.price, pricePrinting: l.pricePrinting,
         colors: l.colors, untapped: l.untapped, conditional: l.conditional,
         lifeCost: l.lifeCost, producesColorless: l.producesColorless,
@@ -65,9 +68,10 @@ export async function onRequestGet({ request, env }) {
         seed: landData.seed_version,
         priceSnapshot: landData.price_snapshot,
         landCount: landData.land_count,
-        // Defect D: per-card served/held status. Every land in this list
-        // is served; heldExcluded names the lands held from optimization.
+        // Preserve the legacy seed-exclusion field for older clients.
+        // optimizationHeld also includes catalog-present model holds.
         heldExcluded: landData.held_excluded ?? [],
+        optimizationHeld,
         pilotNote: "Pilot catalog: 43 lands — a small subset of all Commander-legal lands, not a complete catalog.",
         shockAssumption: "Shock lands are scored in pay_life mode (untapped, pay 2 life, one-time) when they cover an early-priority color, else tapped mode. The paid mode is an explicit scoring assumption; the actual entry choice is the player's. A paid shock still enters tapped if another effect forces tapped.",
       },
@@ -140,11 +144,15 @@ export async function onRequestGet({ request, env }) {
   // Command Tower: usable colors = the selected colors (commander identity).
   //   Colorless queries supply no colors → Tower stays colors=[] (empty output).
   // Bounce lands: held from recommendations (no reviewed evaluator).
-  const contextApplied = { opponents, bondResolved: [], bounceHeld: [], towerColors: [] };
+  const contextApplied = { opponents, bondResolved: [], bounceHeld: [], towerColors: [], heldFromOptimization: [] };
   const lands = [];
   for (const l of landData.lands) {
-    if (BOUNCE_LANDS.has(l.name)) {
-      contextApplied.bounceHeld.push(l.name);
+    const status = catalogStatuses.get(l.name);
+    if (status.optimizationStatus === "held") {
+      contextApplied.heldFromOptimization.push(status);
+      if (status.optimizationReasonCode === "bounce_model_unreviewed") {
+        contextApplied.bounceHeld.push(l.name); // legacy context field
+      }
       continue;
     }
     const land = {

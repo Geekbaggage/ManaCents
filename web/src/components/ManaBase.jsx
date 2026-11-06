@@ -81,6 +81,34 @@ function etbModeCopy(l) {
   return "";
 }
 
+export function LandOptimizationStatus({ land }) {
+  const held = land.optimizationStatus === "held";
+  const available = land.optimizationStatus === "available";
+  return (
+    <div className="mb-land-availability">
+      <span className={`mb-land-status ${held ? "held" : available ? "available" : "unknown"}`}>
+        {held ? "Held from optimization" : available ? "Available for optimization" : "Optimization status unavailable"}
+      </span>
+      {held && <div className="mb-land-note">{land.optimizationReason || "This land needs further review before optimization."}</div>}
+    </div>
+  );
+}
+
+export function HeldCatalogSummary({ details }) {
+  const outsideCatalog = details.filter((land) => !land.inCatalog);
+  if (!outsideCatalog.length) return null;
+  return (
+    <div className="mb-held-summary">
+      <h3>Other lands held from optimization</h3>
+      <ul>
+        {outsideCatalog.map((land) => (
+          <li key={land.name}><strong>{land.name}</strong> — {land.optimizationReason}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function LandGallery() {
   const [lands, setLands] = useState(null);
   const [held, setHeld] = useState([]);
@@ -89,7 +117,7 @@ function LandGallery() {
   useEffect(() => {
     fetch("/api/manabase?list=all")
       .then((r) => r.json())
-      .then((d) => { setLands(d.lands); setHeld(d.meta?.heldExcluded ?? []); })
+      .then((d) => { setLands(d.lands); setHeld(d.meta?.optimizationHeld ?? []); })
       .catch(() => setLands([]));
   }, []);
 
@@ -98,6 +126,7 @@ function LandGallery() {
 
   return (
     <div className="mb-gallery">
+      <p className="combos-sub">Availability means the pilot optimizer supports this land's model. Your colors, legality, bracket and budget still determine which lands can be recommended.</p>
       {LAND_CYCLES.map((cycle) => {
         const members = cycle.members
           .map((n) => byName[n])
@@ -127,8 +156,8 @@ function LandGallery() {
                   {members.map((l) => (
                     <div key={l.name} className="mb-land">
                       <div className="mb-land-name">{l.name}</div>
+                      <LandOptimizationStatus land={l} />
                       <div className="mb-land-meta">
-                        <span className="mb-land-served">served</span>
                         <span className="mb-land-price">{money(l.price)}</span>
                         {l.lifeCost > 0 && (
                           <span className="mb-land-life">−{l.lifeCost} ♥</span>
@@ -154,13 +183,7 @@ function LandGallery() {
           </div>
         );
       })}
-      {held.length > 0 && (
-        <p className="combos-sub">
-          Held from optimization (not served): {held.join(", ")} — true
-          typed fetchlands, no reviewed evaluator yet. The pilot catalog
-          covers 43 lands, not every Commander-legal land.
-        </p>
-      )}
+      <HeldCatalogSummary details={held} />
     </div>
   );
 }
