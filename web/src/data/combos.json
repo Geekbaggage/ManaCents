@@ -806,6 +806,56 @@
       ],
       "total_from_scratch": 18.2,
       "reel_url": "https://www.instagram.com/reel/DfaFuv7j1MH/"
+    },
+    {
+      "caveats": [
+        "Only nets mana if your nonland sources tap for 3+ total.",
+        "Dies to artifact removal.",
+        "Needs a mana outlet or tap ability to win."
+      ],
+      "color_identity": [
+        "U"
+      ],
+      "combo_type": "infinite",
+      "episode": 15,
+      "id": "isochron-scepter-dramatic-reversal",
+      "loop_steps": [
+        "Imprint Dramatic Reversal on the Scepter.",
+        "Pay {2}, tap the Scepter: cast it free.",
+        "Everything's untapped \u2014 Scepter too. Tap it again. Repeat forever."
+      ],
+      "outcome": "Infinite untaps of all nonland permanents you control. It only nets infinite mana if your nonland sources tap for 3 or more total.",
+      "payoff_class": "mana",
+      "pieces": [
+        {
+          "art": "isochron_scepter.jpg",
+          "finish": "nonfoil",
+          "name": "Isochron Scepter",
+          "oracle_id": "ddd649f4-dbaf-48ec-8ff7-95581257772d",
+          "oracle_text": "Imprint \u2014 When this artifact enters, you may exile an instant card with mana value 2 or less from your hand.\n{2}, {T}: You may copy the exiled card. If you do, you may cast the copy without paying its mana cost.",
+          "price": 8.91,
+          "printing": "MB2 #96",
+          "role": "engine"
+        },
+        {
+          "art": "dramatic_reversal.jpg",
+          "finish": "nonfoil",
+          "name": "Dramatic Reversal",
+          "oracle_id": "da46904c-8fb8-44c2-b2ab-775a1cc12ec3",
+          "oracle_text": "Untap all nonland permanents you control.",
+          "price": 0.44,
+          "printing": "TLE #158",
+          "role": "spark"
+        }
+      ],
+      "prerequisites": [
+        "Isochron Scepter on the battlefield with Dramatic Reversal imprinted",
+        "Dramatic Reversal is an instant costing 2 or less"
+      ],
+      "slug": "isochron-scepter-dramatic-reversal",
+      "title": "Isochron Scepter + Dramatic Reversal",
+      "total_from_scratch": 9.35,
+      "verified_date": "2026-11-06"
     }
   ]
 }
