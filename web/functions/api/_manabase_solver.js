@@ -12,8 +12,28 @@
  * - Full suffix-table bounds + weighted-gain bound
  * - Deterministic node/work budget (frozen-clock safe)
  *
- * Version: 1.4.1-js
+ * Version: 1.4.2-js
  * Reference: solver_optimized.py (review-1.4.0)
+ *
+ * 1.4.2-js (2026-11-06, ManaBase Designs A/B — additive, search unchanged):
+ * - Design A (shocks): a land with etbModes gets its mode resolved per
+ *   request in the row builder (pre-chosen mode): pay_life when the land
+ *   covers an early-priority color, else tapped. The 2-life cost is
+ *   ONE-TIME (not multiplied by any use scenario). The chosen mode is
+ *   recorded on the row and attached to returned lands as assumedEtbMode.
+ *   Per-mode branching in the search was NOT implemented (it would require
+ *   identity-aware DFS + suffix-table changes — a solver redesign); see the
+ *   2026-11-06 handoff for the open question. The paid mode is an EXPLICIT
+ *   scoring assumption, labeled in the API response — never a fact about
+ *   what the player will do. A paid shock still enters tapped if another
+ *   effect forces tapped (Lorwyn Eclipsed notes).
+ * - Design B (verges): a land with conditionalColors qualifies for a
+ *   conditional color at main/splash ONLY (never early), and carries a +1
+ *   production-conditional penalty when selected. The dependency is
+ *   unknown/conditional from deck context alone — never counted as
+ *   guaranteed target completion.
+ * - The four lexicographic objectives, their order, the search, the
+ *   bounds, and the tie-break are unchanged.
  */
 
 // ---------------------------------------------------------------------------
@@ -146,6 +166,60 @@ function validateLand(land) {
       throw new Error(`Invalid color '${c}' in colors for land '${land.name}'`);
     }
   }
+  // Design A: etbModes (shocks) — both modes, payment already resolved by
+  // the converter; the solver only reads them. Must carry exactly the
+  // pay_life and tapped modes with boolean untapped/conditional and a
+  // finite non-negative lifeCost.
+  if (land.etbModes !== undefined && land.etbModes !== null) {
+    if (!Array.isArray(land.etbModes)) {
+      throw new Error(`etbModes must be an array for land '${land.name}'`);
+    }
+    const modes = land.etbModes.map((m) => m && m.mode);
+    if (!modes.includes("pay_life") || !modes.includes("tapped")) {
+      throw new Error(
+        `etbModes for land '${land.name}' must include pay_life and tapped modes`
+      );
+    }
+    for (const m of land.etbModes) {
+      if (typeof m.untapped !== "boolean" || typeof m.conditional !== "boolean") {
+        throw new Error(
+          `etbModes mode '${m.mode}' for land '${land.name}' needs boolean untapped/conditional`
+        );
+      }
+      parseDecimal(m.lifeCost ?? 0, `etbModes lifeCost for '${land.name}'`);
+      if ((m.lifeCost ?? 0) < 0) {
+        throw new Error(`etbModes lifeCost must be nonnegative for land '${land.name}'`);
+      }
+    }
+  }
+  // Design B: conditionalColors (verges) — each entry is one color plus a
+  // basic_land_type dependency with known types.
+  if (land.conditionalColors !== undefined && land.conditionalColors !== null) {
+    if (!Array.isArray(land.conditionalColors)) {
+      throw new Error(`conditionalColors must be an array for land '${land.name}'`);
+    }
+    const typeMap = { Plains: 1, Island: 1, Swamp: 1, Mountain: 1, Forest: 1 };
+    for (const cc of land.conditionalColors) {
+      if (!VALID_COLORS.has(cc.color)) {
+        throw new Error(
+          `Invalid conditional color '${cc.color}' for land '${land.name}'`
+        );
+      }
+      if (!cc.dependency || cc.dependency.type !== "basic_land_type" ||
+          !Array.isArray(cc.dependency.types) || !cc.dependency.types.length) {
+        throw new Error(
+          `conditionalColors for land '${land.name}' needs a basic_land_type dependency`
+        );
+      }
+      for (const t of cc.dependency.types) {
+        if (!typeMap[t]) {
+          throw new Error(
+            `Unknown basic land type '${t}' in conditionalColors for land '${land.name}'`
+          );
+        }
+      }
+    }
+  }
 }
 
 function validateInputs(colors, priorities, slots) {
@@ -201,13 +275,48 @@ class OptimizedSolver {
     return [true, 'ok'];
   }
 
+  // Design A: resolve a shock's ETB mode for this request (pre-chosen
+  // mode, per land, before the search). pay_life when the land covers any
+  // axis whose priority is early; otherwise tapped. The paid mode is an
+  // explicit scoring assumption (see the header note) — the actual entry
+  // choice is the player's, and a paid shock still enters tapped if
+  // another effect forces tapped. Returns {mode, untapped, conditional,
+  // lifeCost} or null for lands without etbModes.
+  resolveEtbMode(land, priorities, axes) {
+    const modes = land.etbModes;
+    if (!modes || !modes.length) return null;
+    const pay = modes.find((m) => m.mode === "pay_life");
+    const tap = modes.find((m) => m.mode === "tapped");
+    if (!pay || !tap) return null;
+    const coversEarly = (land.colors || []).some((c) =>
+      axes.includes(c) && (priorities[c] || "main") === "early"
+    );
+    const chosen = coversEarly ? pay : tap;
+    return {
+      mode: chosen.mode,
+      untapped: chosen.untapped,
+      conditional: chosen.conditional,
+      lifeCost: chosen.lifeCost ?? 0,
+    };
+  }
+
   qualifiesFor(land, color, priority) {
     if (land.productionConditional) return false;
-    if (!(land.colors || []).includes(color)) return false;
-    if (priority === 'early') {
-      return land.untapped && !land.conditional;
+    if ((land.colors || []).includes(color)) {
+      if (priority === "early") {
+        return land.untapped && !land.conditional;
+      }
+      return true;
     }
-    return true;
+    // Design B: a conditional color qualifies for main/splash ONLY — never
+    // early. The dependency is unknown/conditional from deck context alone;
+    // it is never counted as guaranteed target completion for early.
+    if (priority !== "early") {
+      for (const cc of land.conditionalColors || []) {
+        if (cc.color === color) return true;
+      }
+    }
+    return false;
   }
 
   qualifiesColorless(land) {
@@ -243,23 +352,42 @@ class OptimizedSolver {
       const price = toCents(land.price);
       if (price > budgetCents) continue;
 
+      // Design A: resolve a shock's ETB mode for this request (pre-chosen
+      // mode). The effective land view carries the mode's untapped /
+      // conditional / lifeCost for qualification, early credit and penalty.
+      // The original land object is kept for the returned package; the
+      // assumed mode is recorded on the row and surfaced by finish().
+      const etb = this.resolveEtbMode(land, priorities, axes);
+      const eff = etb
+        ? { ...land, untapped: etb.untapped, conditional: etb.conditional,
+            lifeCost: etb.lifeCost }
+        : land;
+
       const qualifies = axes.map(c =>
         colorArr.length
-          ? (this.qualifiesFor(land, c, priorities[c] || 'main') ? 1 : 0)
-          : (this.qualifiesColorless(land) ? 1 : 0)
+          ? (this.qualifiesFor(eff, c, priorities[c] || 'main') ? 1 : 0)
+          : (this.qualifiesColorless(eff) ? 1 : 0)
       );
-      const early = (land.untapped && !land.conditional && !land.productionConditional &&
+      const early = (eff.untapped && !eff.conditional && !eff.productionConditional &&
         (colorArr.length
           ? axes.some((c, i) => (priorities[c] || 'main') === 'early' && qualifies[i])
-          : this.qualifiesColorless(land))) ? 1 : 0;
+          : this.qualifiesColorless(eff))) ? 1 : 0;
 
-      // Exact penalty: life_cost + conditional + prod_cond - utility
-      const lc = parseDecimal(land.lifeCost ?? 0, 'lifeCost');
-      const ut = parseDecimal(land.utility ?? 0, 'utility');
-      const condInt = land.conditional ? 1 : 0;
-      const prodInt = land.productionConditional ? 1 : 0;
+      // Exact penalty: life_cost + conditional + prod_cond
+      //   + conditional_color (Design B: +1 when the land carries a
+      //     conditional color) - utility.
+      // The +1 is charged whenever a verge is selected (a conservative
+      // simplification: the solver's penalty is per-land, not per-color).
+      const lc = parseDecimal(eff.lifeCost ?? 0, 'lifeCost');
+      const ut = parseDecimal(eff.utility ?? 0, 'utility');
+      const condInt = eff.conditional ? 1 : 0;
+      const prodInt = eff.productionConditional ? 1 : 0;
+      const condColorInt = (land.conditionalColors && land.conditionalColors.length) ? 1 : 0;
       penaltyParsed.push({ land, price, qualifies, early, lc, ut, condInt, prodInt,
-        gameChanger: land.gameChanger ? 1 : 0 });
+        condColorInt, gameChanger: land.gameChanger ? 1 : 0,
+        assumedMode: etb ? etb.mode : null,
+        effUntapped: eff.untapped, effConditional: eff.conditional,
+        effLifeCost: eff.lifeCost ?? 0 });
     }
 
     // Find max scale across all penalty components for exact BigInt math
@@ -269,11 +397,14 @@ class OptimizedSolver {
     }
     for (const p of penaltyParsed) {
       const penaltyBig =
-        scaleTo(p.lc, maxScale) + BigInt(p.condInt + p.prodInt) * (10n ** BigInt(maxScale))
+        scaleTo(p.lc, maxScale) + BigInt(p.condInt + p.prodInt + p.condColorInt) * (10n ** BigInt(maxScale))
         - scaleTo(p.ut, maxScale);
       rows.push({
         land: p.land, price: p.price, qualifies: p.qualifies, early: p.early,
         penalty: penaltyBig, gameChanger: p.gameChanger,
+        assumedMode: p.assumedMode,
+        effUntapped: p.effUntapped, effConditional: p.effConditional,
+        effLifeCost: p.effLifeCost,
       });
     }
     this._penaltyScale = maxScale;
@@ -290,7 +421,7 @@ class OptimizedSolver {
     const k = Math.min(slots, n);
 
     const stats = {
-      engineVersion: '1.4.1-js',
+      engineVersion: '1.4.2-js',
       rulesVersion: this.rulesVersion,
       candidates: n,
       nodesVisited: 0,
@@ -350,7 +481,17 @@ class OptimizedSolver {
     const penaltyToNumber = (big) => Number(big) / (10 ** maxScale);
 
     const finish = () => {
-      const pkg = bestIndices ? bestIndices.map(i => rows[i].land) : [];
+      // Returned lands are COPIES with the assumed ETB mode applied, so the
+      // API response is truthful about what was scored: a pay_life shock
+      // reports untapped + lifeCost 2.0 and assumedEtbMode "pay_life"; a
+      // tapped shock reports conditional + lifeCost 0 and "tapped". The
+      // input catalog objects are never mutated.
+      const pkg = bestIndices ? bestIndices.map(i => {
+        const r = rows[i];
+        if (!r.assumedMode) return r.land;
+        return { ...r.land, untapped: r.effUntapped, conditional: r.effConditional,
+          lifeCost: r.effLifeCost, assumedEtbMode: r.assumedMode };
+      }) : [];
       const status = interrupted
         ? (bestIndices ? 'best_found' : 'interrupted_without_result')
         : (bestIndices ? 'optimal' : 'empty_proven');
@@ -637,4 +778,4 @@ class OptimizedSolver {
   }
 }
 
-module.exports = { OptimizedSolver, toCents, parseDecimal, SOLVER_VERSION: '1.4.1-js' };
+module.exports = { OptimizedSolver, toCents, parseDecimal, SOLVER_VERSION: '1.4.2-js' };

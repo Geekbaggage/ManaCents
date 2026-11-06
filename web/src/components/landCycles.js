@@ -15,7 +15,7 @@ export const LAND_CYCLES = [
     members: ["Glacial Fortress", "Drowned Catacomb", "Dragonskull Summit"],
   },
   {
-    id: "shock", name: "Shock Lands", trait: "Untapped for 2 life. The gold standard.",
+    id: "shock", name: "Shock Lands", trait: "Pay 2 life to enter untapped, or enter tapped. Your choice.",
     members: ["Hallowed Fountain", "Watery Grave", "Blood Crypt"],
   },
   {
@@ -43,7 +43,7 @@ export const LAND_CYCLES = [
     members: ["Azorius Chancery", "Dimir Aqueduct"],
   },
   {
-    id: "verge", name: "Verge Lands", trait: "Enters untapped. Second color needs a matching basic land type.",
+    id: "verge", name: "Verge Lands", trait: "Enters untapped. The second color is conditional on a basic land type — see each card.",
     members: ["Floodfarm Verge", "Gloomlake Verge"],
   },
   {

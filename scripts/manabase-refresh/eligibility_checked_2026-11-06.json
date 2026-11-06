@@ -1,0 +1,323 @@
+{
+  "date": "2026-11-06",
+  "gamechanger_count": 53,
+  "gamechangers_in_seed": [],
+  "banned_in_seed": [],
+  "checks": {
+    "Plains": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Island": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Swamp": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Mountain": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Forest": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Wastes": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Adarkar Wastes": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Underground River": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Sulfurous Springs": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Karplusan Forest": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Brushland": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Battlefield Forge": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Glacial Fortress": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Drowned Catacomb": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Dragonskull Summit": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Hallowed Fountain": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Watery Grave": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Blood Crypt": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Sea of Clouds": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Morphic Pool": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Luxury Suite": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Command Tower": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Exotic Orchard": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Mana Confluence": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "City of Brass": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Floodfarm Verge": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Gloomlake Verge": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Mystic Gate": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Sunken Ruins": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Flooded Strand": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Polluted Delta": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Azorius Chancery": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Dimir Aqueduct": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Seachrome Coast": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Darkslick Shores": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Deserted Beach": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Shipwreck Marsh": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Undercity Sewers": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Shadowy Backstreet": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Raugrin Triome": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Zagoth Triome": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Horizon Canopy": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Waterlogged Grove": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Prairie Stream": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    },
+    "Sunken Hollow": {
+      "game_changer": false,
+      "banned": false,
+      "commander_legality": "legal",
+      "source": "api.scryfall.com (is:gamechanger + card legalities)",
+      "checked_date": "2026-11-06"
+    }
+  }
+}

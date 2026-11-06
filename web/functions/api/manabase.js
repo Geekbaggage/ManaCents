@@ -1,6 +1,6 @@
 // GET /api/manabase?colors=WU&priorities={"W":"early","U":"main"}&budget=25&slots=10&opponents=3&bracket=3
 //
-// ManaBase solver API. Runs accepted solver v1.4.1-js against catalog seed
+// ManaBase solver API. Runs solver v1.4.2-js against catalog seed
 // v0.4.2 (43 eligible lands, scoring policy v1, price snapshot 2026-11-04).
 // Preview only — no production approval.
 //
@@ -55,11 +55,18 @@ export async function onRequestGet({ request, env }) {
         name: l.name, price: l.price, pricePrinting: l.pricePrinting,
         colors: l.colors, untapped: l.untapped, conditional: l.conditional,
         lifeCost: l.lifeCost, producesColorless: l.producesColorless,
+        // Designs A/B: the gallery renders the shock modes and the verge
+        // conditional colors from these (never from a hardcoded copy).
+        etbModes: l.etbModes ?? null,
+        conditionalColors: l.conditionalColors ?? null,
       })),
       meta: {
+        solver: SOLVER_VERSION,
         seed: landData.seed_version,
         priceSnapshot: landData.price_snapshot,
         landCount: landData.land_count,
+        pilotNote: "Pilot catalog: 43 lands — a small subset of all Commander-legal lands, not a complete catalog.",
+        shockAssumption: "Shock lands are scored in pay_life mode (untapped, pay 2 life, one-time) when they cover an early-priority color, else tapped mode. The paid mode is an explicit scoring assumption; the actual entry choice is the player's. A paid shock still enters tapped if another effect forces tapped.",
       },
     });
   }
@@ -145,6 +152,10 @@ export async function onRequestGet({ request, env }) {
       lifeCost: l.lifeCost, utility: l.utility,
       banned: l.banned, gameChanger: l.gameChanger,
       producesColorless: l.producesColorless, oracleId: l.oracleId,
+      // Designs A/B: the solver reads these (etbModes for shock mode
+      // resolution, conditionalColors for verge qualification).
+      etbModes: l.etbModes ?? null,
+      conditionalColors: l.conditionalColors ?? null,
     };
     if (l.name === "Command Tower" && colors.length > 0) {
       land.colors = [...colors];
@@ -190,6 +201,15 @@ export async function onRequestGet({ request, env }) {
         colors: l.colors,
         untapped: l.untapped,
         conditional: l.conditional,
+        // Design A: the mode the solver assumed for this land in this
+        // request ("pay_life" = untapped, pay 2 life; "tapped" = enters
+        // tapped). An explicit scoring assumption, not a fact about what
+        // the player will do. Null for lands without etbModes.
+        assumedEtbMode: l.assumedEtbMode ?? null,
+        etbModes: full?.etbModes ?? null,
+        // Design B: conditional colors with their dependency, so the UI
+        // can say which color is conditional and on what.
+        conditionalColors: full?.conditionalColors ?? null,
       };
     }),
     score: {
@@ -222,6 +242,8 @@ export async function onRequestGet({ request, env }) {
       landCount: landData.land_count,
       servedLandCount: lands.length,
       provisionalNote: "Node budgets provisional pending production calibration.",
+      pilotNote: "Pilot catalog: 43 lands — a small subset of all Commander-legal lands, not a complete catalog.",
+      shockAssumption: "Shock lands are scored in pay_life mode (untapped, pay 2 life, one-time) when they cover an early-priority color, else tapped mode. The paid mode is an explicit scoring assumption; the actual entry choice is the player's. A paid shock still enters tapped if another effect forces tapped.",
     },
   };
 

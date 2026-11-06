@@ -44,6 +44,77 @@ const UTILITY_TAGS = {
   "Shadowy Backstreet": 0.3, // Surveil 1
 };
 
+const BASIC_LAND_TYPES = new Set(["Plains", "Island", "Swamp", "Mountain", "Forest"]);
+
+// Design B: parse a verge dependency ("Control Plains or Island") into
+// structured {type, types}. Throws on anything unparseable.
+function parseVergeDependency(dep, name) {
+  if (typeof dep !== "string" || !dep.trim().startsWith("Control ")) {
+    throw new Error(
+      `${name}: unparseable verge dependency ${JSON.stringify(dep)} ` +
+        "(expected 'Control <basic land type> or ...')"
+    );
+  }
+  const rest = dep.trim().slice("Control ".length);
+  const types = rest
+    .replace(/,/g, " or ")
+    .split(" or ")
+    .map((t) => t.trim())
+    .filter(Boolean);
+  if (!types.length) {
+    throw new Error(`${name}: empty verge dependency ${JSON.stringify(dep)}`);
+  }
+  for (const t of types) {
+    if (!BASIC_LAND_TYPES.has(t)) {
+      throw new Error(
+        `${name}: unknown basic land type ${JSON.stringify(t)} in dependency ` +
+          JSON.stringify(dep)
+      );
+    }
+  }
+  return { type: "basic_land_type", types };
+}
+
+// Design A: shock ETB modes from the seed row's entry record.
+// The payment comes from entry.predicate.payment — never hardcoded.
+// Returns [pay_life, tapped] or null for non-shock rows.
+function buildEtbModes(row) {
+  const entry = row.entry || {};
+  if (entry.condition !== "life_payment") return null;
+  const payment = entry.predicate?.payment;
+  if (typeof payment !== "number" || !Number.isFinite(payment) || payment <= 0) {
+    throw new Error(
+      `${row.name}: shock entry missing numeric payment ` +
+        `(entry.predicate.payment=${JSON.stringify(payment)}) — failing closed`
+    );
+  }
+  return [
+    { mode: "pay_life", untapped: true, conditional: false, lifeCost: payment },
+    { mode: "tapped", untapped: false, conditional: true, lifeCost: 0 },
+  ];
+}
+
+// Design B: conditional colors from mana_modes (verge-style only).
+// Other conditional modes (filter input, opponent-dependent, fetch
+// targets) stay governed by production_conditional / held status.
+function buildConditionalColors(row) {
+  const out = [];
+  for (const mode of row.mana_modes || []) {
+    if (mode.unconditional !== false) continue;
+    const dep = mode.dependency;
+    if (typeof dep !== "string" || !dep.trim().startsWith("Control ")) continue;
+    const output = mode.output || [];
+    if (output.length !== 1 || !["W", "U", "B", "R", "G"].includes(output[0])) {
+      throw new Error(
+        `${row.name}: verge-style mana_mode has unexpected output ` +
+          `${JSON.stringify(output)} — expected exactly one color`
+      );
+    }
+    out.push({ color: output[0], dependency: parseVergeDependency(dep, row.name) });
+  }
+  return out;
+}
+
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function scryfall(url, attempt = 1) {
@@ -176,7 +247,7 @@ async function main() {
       continue;
     }
     const p = row.solver_projection;
-    lands.push({
+    const land = {
       name: row.name,
       price: prices[row.name].price,
       pricePrinting: prices[row.name].printing,
@@ -189,12 +260,22 @@ async function main() {
       productionConditional: p.production_conditional,
       lifeCost: p.life_cost,
       utility: UTILITY_TAGS[row.name] ?? 0,
-      banned: false,
+      // Design C: derived from the live check (banned rows are excluded
+      // above, so served banned is always false — but it is derived, not
+      // hardcoded). gameChanger comes from the live GC list.
+      banned: check.banned,
       gameChanger: check.game_changer,
       producesColorless: p.producesColorless,
       oracleId: row.oracle_id,
       scoringStatus: p.scoring_status,
-    });
+    };
+    // Design A: both ETB modes (payment from the seed row, never hardcoded).
+    const etbModes = buildEtbModes(row);
+    if (etbModes) land.etbModes = etbModes;
+    // Design B: conditional colors (verge-style only).
+    const condColors = buildConditionalColors(row);
+    if (condColors.length) land.conditionalColors = condColors;
+    lands.push(land);
   }
 
   const out = {

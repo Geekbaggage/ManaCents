@@ -55,6 +55,32 @@ function finishLabel(printing) {
     .replace(" (usd)", " · nonfoil");
 }
 
+function conditionalCopy(l) {
+  // Design B: the exact per-verge copy, derived from the land's
+  // conditionalColors (never hardcoded). "Second color only if you control
+  // a Plains or Island." / "...an Island or Swamp."
+  const cc = l.conditionalColors;
+  if (!cc || !cc.length) return "";
+  const dep = cc[0].dependency;
+  if (!dep || !dep.types || !dep.types.length) return "";
+  const types = dep.types.join(" or ");
+  const article = /^[AEIOU]/.test(dep.types[0]) ? "an" : "a";
+  return `Second color only if you control ${article} ${types}.`;
+}
+
+function etbModeCopy(l) {
+  // Design A: the mode the solver assumed for this land in this request.
+  // The paid mode is an explicit scoring assumption, not a fact about what
+  // the player will do — the label says so.
+  if (l.assumedEtbMode === "pay_life") {
+    return "Enters untapped — pay 2 life (assumed for scoring)";
+  }
+  if (l.assumedEtbMode === "tapped") {
+    return "Enters tapped";
+  }
+  return "";
+}
+
 function LandGallery() {
   const [lands, setLands] = useState(null);
   const [open, setOpen] = useState(null);
@@ -107,6 +133,9 @@ function LandGallery() {
                         )}
                         {l.conditional && <span className="mb-land-cond">conditional</span>}
                       </div>
+                      {conditionalCopy(l) && (
+                        <div className="mb-land-note">{conditionalCopy(l)}</div>
+                      )}
                       <a
                         className="btn-copy combo-eq-buy"
                         href={manaPoolCardUrl(l.name)}
@@ -300,6 +329,12 @@ export function ManaBase() {
                   )}
                   {l.conditional && <span className="mb-land-cond">conditional</span>}
                 </div>
+                {etbModeCopy(l) && (
+                  <div className="mb-land-note">{etbModeCopy(l)}</div>
+                )}
+                {conditionalCopy(l) && (
+                  <div className="mb-land-note">{conditionalCopy(l)}</div>
+                )}
                 <div className="mb-land-print">{finishLabel(l.pricePrinting)}</div>
                 <a
                   className="btn-copy combo-eq-buy"
@@ -314,9 +349,13 @@ export function ManaBase() {
           </div>
           <p className="mb-disclaimer">
             Suggested land purchases optimized for your selected colors,
-            priorities and budget under the stated assumptions. Prototype:
-            43 lands, scoring policy v1, bond lands resolved for 3 opponents.
-            Prices are a {result.meta?.priceSnapshot || "2026-11-04"} snapshot
+            priorities and budget under the stated assumptions. Pilot catalog:
+            43 lands (a small subset of all Commander-legal lands, not a
+            complete catalog), scoring policy v1, bond lands resolved for 3
+            opponents. Shock lands are scored in pay_life mode (untapped, pay
+            2 life) when they cover an early-priority color, else tapped
+            mode — the paid mode is an explicit scoring assumption, not a
+            promise about the entry choice. Prices are a {result.meta?.priceSnapshot || "2026-11-04"} snapshot
             of cheapest printings — verify at checkout. Life costs are modeled
             scoring values, not measured per-game loss.
             {(() => {
