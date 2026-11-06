@@ -1,6 +1,6 @@
 """Generate ESM solver copy for Pages Functions.
 
-_manabase_solver.js is the accepted solver (v1.4.2-js,
+_manabase_solver.js is the accepted solver (v1.4.3-js,
 CommonJS). Cloudflare's bundler can't import its `module.exports`, so this
 script produces _manabase_solver_esm.js with ONLY the export line converted
 to ESM. Every other byte is verified identical.
@@ -12,8 +12,8 @@ import hashlib
 SRC = "functions/api/_manabase_solver.js"
 DST = "functions/api/_manabase_solver_esm.js"
 
-OLD_EXPORT = "module.exports = { OptimizedSolver, toCents, parseDecimal, SOLVER_VERSION: '1.4.2-js' };"
-NEW_EXPORT = "export { OptimizedSolver, toCents, parseDecimal };\nexport const SOLVER_VERSION = '1.4.2-js';"
+OLD_EXPORT = "module.exports = { OptimizedSolver, toCents, parseDecimal, SOLVER_VERSION: '1.4.3-js' };"
+NEW_EXPORT = "export { OptimizedSolver, toCents, parseDecimal };\nexport const SOLVER_VERSION = '1.4.3-js';"
 
 
 def main():

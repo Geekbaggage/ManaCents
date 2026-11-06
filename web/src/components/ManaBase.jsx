@@ -83,12 +83,13 @@ function etbModeCopy(l) {
 
 function LandGallery() {
   const [lands, setLands] = useState(null);
+  const [held, setHeld] = useState([]);
   const [open, setOpen] = useState(null);
 
   useEffect(() => {
     fetch("/api/manabase?list=all")
       .then((r) => r.json())
-      .then((d) => setLands(d.lands))
+      .then((d) => { setLands(d.lands); setHeld(d.meta?.heldExcluded ?? []); })
       .catch(() => setLands([]));
   }, []);
 
@@ -127,6 +128,7 @@ function LandGallery() {
                     <div key={l.name} className="mb-land">
                       <div className="mb-land-name">{l.name}</div>
                       <div className="mb-land-meta">
+                        <span className="mb-land-served">served</span>
                         <span className="mb-land-price">{money(l.price)}</span>
                         {l.lifeCost > 0 && (
                           <span className="mb-land-life">−{l.lifeCost} ♥</span>
@@ -152,6 +154,13 @@ function LandGallery() {
           </div>
         );
       })}
+      {held.length > 0 && (
+        <p className="combos-sub">
+          Held from optimization (not served): {held.join(", ")} — true
+          typed fetchlands, no reviewed evaluator yet. The pilot catalog
+          covers 43 lands, not every Commander-legal land.
+        </p>
+      )}
     </div>
   );
 }
@@ -308,13 +317,40 @@ export function ManaBase() {
           </p>
           {result.perColor && Object.keys(result.perColor).length > 0 && (
             <div className="mb-shortfalls">
-              {Object.entries(result.perColor).map(([c, v]) => (
-                <span key={c} className={`mb-short${v.shortfall > 0 ? " unmet" : " met"}`}>
-                  <img src={PIP_IMG[c] ?? PIP_IMG.C} alt={COLOR_NAMES[c] ?? c} width={16} height={16} draggable="false" /> {v.qualifying}/{v.target}
-                  {v.shortfall > 0 ? ` (short ${v.shortfall})` : " ✓"}
-                </span>
-              ))}
+              {Object.entries(result.perColor).map(([c, v]) => {
+                // A color is met ONLY when the guaranteed shortfall is 0.
+                // Conditional-only (scored shortfall 0, guaranteed
+                // shortfall > 0) is NOT met — it reads as conditional, with
+                // no checkmark. Defensive fallback: older responses without
+                // guaranteed_shortfall use the scored shortfall.
+                const gs = v.guaranteed_shortfall ?? v.shortfall;
+                const state = gs === 0 ? "met" : (v.conditional_only ? "cond" : "unmet");
+                return (
+                  <span key={c} className={`mb-short ${state}`}>
+                    <img src={PIP_IMG[c] ?? PIP_IMG.C} alt={COLOR_NAMES[c] ?? c} width={16} height={16} draggable="false" /> {v.qualifying}/{v.target}
+                    {state === "met" ? " ✓"
+                      : state === "cond" ? " · conditional only"
+                      : ` (short ${v.shortfall})`}
+                  </span>
+                );
+              })}
             </div>
+          )}
+          {result.perColor && Object.values(result.perColor).some((v) => v.conditional_only) && (
+            <p className="combos-sub">
+              Conditional only: {Object.entries(result.perColor)
+                .filter(([, v]) => v.conditional_only)
+                .map(([c, v]) => {
+                  const src = (v.conditional_sources || [])
+                    .map((s) => `${s.land} needs ${s.dependency_types.join(" or ")}` +
+                      (s.dependency_in_package ? " (in this package)" : " (not in this package)"))
+                    .join("; ");
+                  return `${COLOR_NAMES[c]} — ${src || "verge dependency unverified"}`;
+                })
+                .join(" · ")}. The solver cannot verify from your colors
+              alone that the dependency is satisfied, so the color is not
+              shown as met.
+            </p>
           )}
           <div className="mb-lands">
             {result.lands.map((l) => (
@@ -355,7 +391,10 @@ export function ManaBase() {
             opponents. Shock lands are scored in pay_life mode (untapped, pay
             2 life) when they cover an early-priority color, else tapped
             mode — the paid mode is an explicit scoring assumption, not a
-            promise about the entry choice. Prices are a {result.meta?.priceSnapshot || "2026-11-04"} snapshot
+            promise about the entry choice. A color shown as conditional only
+            is met only if the verge dependency (for example, controlling a
+            Plains or Island) is satisfied — the solver cannot verify that
+            from your colors alone. Prices are a {result.meta?.priceSnapshot || "2026-11-04"} snapshot
             of cheapest printings — verify at checkout. Life costs are modeled
             scoring values, not measured per-game loss.
             {(() => {

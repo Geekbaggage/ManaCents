@@ -12,8 +12,27 @@
  * - Full suffix-table bounds + weighted-gain bound
  * - Deterministic node/work budget (frozen-clock safe)
  *
- * Version: 1.4.2-js
+ * Version: 1.4.3-js
  * Reference: solver_optimized.py (review-1.4.0)
+ *
+ * 1.4.3-js (2026-11-06, Charlie review corrections — guards + reporting,
+ * search and objectives unchanged):
+ * - P1: per-color output separates guaranteed from conditional/assumed
+ *   coverage (guaranteed_qualifying, conditional_qualifying,
+ *   guaranteed_shortfall, conditional_only, conditional_sources). The
+ *   search still scores conditional main/splash coverage (explicit pilot
+ *   assumption), but a conditional-only completion is NEVER reported as
+ *   met/guaranteed. Unknown dependencies remain unknown.
+ * - P2: validateLand rejects malformed etbModes/conditionalColors
+ *   (exactly one pay_life + one tapped, explicit numeric costs with
+ *   correct mode semantics, no duplicates, no unknown modes) and uses a
+ *   Map for basic land types so inherited property names
+ *   ("constructor", "toString", "__proto__") are never accepted.
+ * - Shock preselection preserved per Charlie's 120-query comparison
+ *   (zero mismatches vs all eight fixed mode combinations); see the
+ *   dominance note in resolveEtbMode and the mixed-priority tests.
+ * - The four lexicographic objectives, their order, the search, the
+ *   bounds, and the tie-break are unchanged.
  *
  * 1.4.2-js (2026-11-06, ManaBase Designs A/B — additive, search unchanged):
  * - Design A (shocks): a land with etbModes gets its mode resolved per
@@ -121,6 +140,12 @@ function toCents(value) {
 const WEIGHTS = { early: 3, main: 2, splash: 1 };
 const BRACKET3_GC_MAX = 3;
 const VALID_COLORS = new Set(['W', 'U', 'B', 'R', 'G']);
+// Basic land types and the color each produces. A Map (not a plain
+// object) so inherited property names ("constructor", "toString",
+// "__proto__") are never mistaken for real basic land types.
+const BASIC_TYPE_COLORS = new Map([
+  ['Plains', 'W'], ['Island', 'U'], ['Swamp', 'B'], ['Mountain', 'R'], ['Forest', 'G'],
+]);
 
 function targetFor(priority, slots) {
   if (priority === 'early') return Math.min(slots, 3);
@@ -166,18 +191,28 @@ function validateLand(land) {
       throw new Error(`Invalid color '${c}' in colors for land '${land.name}'`);
     }
   }
-  // Design A: etbModes (shocks) — both modes, payment already resolved by
-  // the converter; the solver only reads them. Must carry exactly the
-  // pay_life and tapped modes with boolean untapped/conditional and a
-  // finite non-negative lifeCost.
+  // basicTypes must be actual basic land types (a Map lookup, so
+  // inherited property names are never accepted as types).
+  for (const t of land.basicTypes || []) {
+    if (!BASIC_TYPE_COLORS.has(t)) {
+      throw new Error(`Invalid basic land type '${t}' for land '${land.name}'`);
+    }
+  }
+  // Design A: etbModes (shocks) — exactly one pay_life and one tapped
+  // mode, no duplicates, no unknown modes, with explicit numeric costs
+  // and correct mode semantics. A missing lifeCost must NEVER default to
+  // zero (a missing cost is malformed data, not a free shock).
   if (land.etbModes !== undefined && land.etbModes !== null) {
     if (!Array.isArray(land.etbModes)) {
       throw new Error(`etbModes must be an array for land '${land.name}'`);
     }
-    const modes = land.etbModes.map((m) => m && m.mode);
-    if (!modes.includes("pay_life") || !modes.includes("tapped")) {
+    const modeNames = land.etbModes.map((m) =>
+      (m && typeof m === "object" ? m.mode : undefined));
+    if (modeNames.length !== 2 || new Set(modeNames).size !== 2 ||
+        !modeNames.includes("pay_life") || !modeNames.includes("tapped")) {
       throw new Error(
-        `etbModes for land '${land.name}' must include pay_life and tapped modes`
+        `etbModes for land '${land.name}' must contain exactly one pay_life ` +
+        `and one tapped mode, got ${JSON.stringify(modeNames)}`
       );
     }
     for (const m of land.etbModes) {
@@ -186,19 +221,36 @@ function validateLand(land) {
           `etbModes mode '${m.mode}' for land '${land.name}' needs boolean untapped/conditional`
         );
       }
-      parseDecimal(m.lifeCost ?? 0, `etbModes lifeCost for '${land.name}'`);
-      if ((m.lifeCost ?? 0) < 0) {
+      if (typeof m.lifeCost !== "number" || !Number.isFinite(m.lifeCost)) {
+        throw new Error(
+          `etbModes mode '${m.mode}' for land '${land.name}' needs an explicit ` +
+          `finite numeric lifeCost, got ${JSON.stringify(m.lifeCost)}`
+        );
+      }
+      if (m.lifeCost < 0) {
         throw new Error(`etbModes lifeCost must be nonnegative for land '${land.name}'`);
+      }
+      // Mode semantics: pay_life pays life (> 0); tapped costs no life.
+      if (m.mode === "pay_life" && m.lifeCost <= 0) {
+        throw new Error(
+          `etbModes pay_life for land '${land.name}' must have lifeCost > 0, got ${m.lifeCost}`
+        );
+      }
+      if (m.mode === "tapped" && m.lifeCost !== 0) {
+        throw new Error(
+          `etbModes tapped for land '${land.name}' must have lifeCost 0, got ${m.lifeCost}`
+        );
       }
     }
   }
   // Design B: conditionalColors (verges) — each entry is one color plus a
-  // basic_land_type dependency with known types.
+  // basic_land_type dependency with known types. The type check uses a
+  // Set/Map lookup so inherited property names ("constructor", "toString",
+  // "__proto__") are never accepted as basic land types.
   if (land.conditionalColors !== undefined && land.conditionalColors !== null) {
     if (!Array.isArray(land.conditionalColors)) {
       throw new Error(`conditionalColors must be an array for land '${land.name}'`);
     }
-    const typeMap = { Plains: 1, Island: 1, Swamp: 1, Mountain: 1, Forest: 1 };
     for (const cc of land.conditionalColors) {
       if (!VALID_COLORS.has(cc.color)) {
         throw new Error(
@@ -212,7 +264,7 @@ function validateLand(land) {
         );
       }
       for (const t of cc.dependency.types) {
-        if (!typeMap[t]) {
+        if (!BASIC_TYPE_COLORS.has(t)) {
           throw new Error(
             `Unknown basic land type '${t}' in conditionalColors for land '${land.name}'`
           );
@@ -265,9 +317,11 @@ class OptimizedSolver {
     for (const c of land.colorIdentity || []) {
       if (!colorsSet.has(c)) return [false, 'color_identity'];
     }
-    const typeMap = { Plains: 'W', Island: 'U', Swamp: 'B', Mountain: 'R', Forest: 'G' };
+    // Map lookup (not a plain object): unknown types, including inherited
+    // property names, yield undefined and are skipped here — validateLand
+    // rejects them outright as malformed basicTypes.
     for (const t of land.basicTypes || []) {
-      const c = typeMap[t];
+      const c = BASIC_TYPE_COLORS.get(t);
       if (c && !colorsSet.has(c)) return [false, 'basic_land_type'];
     }
     if (land.banned) return [false, 'banned'];
@@ -282,6 +336,17 @@ class OptimizedSolver {
   // choice is the player's, and a paid shock still enters tapped if
   // another effect forces tapped. Returns {mode, untapped, conditional,
   // lifeCost} or null for lands without etbModes.
+  //
+  // Dominance (why preselection is safe — Charlie's 120-query comparison,
+  // 2026-11-06): under the preserved lexicographic objective, paid mode
+  // adds an uncapped early-source count whenever the shock covers an early
+  // axis, so it dominates tapped mode there (objective 2 outranks the
+  // 2.0-vs-1.0 penalty gap at objective 3). Without an early axis, tapped
+  // mode has lower penalty at the same coverage, so it dominates. Charlie
+  // compared all eight fixed combinations of the three shock modes over
+  // 120 deterministic queries: zero mismatches vs preselection, zero
+  // interrupted runs. The claimed one-point loss was not reproduced.
+  // Mixed-priority coverage is tested in _manabase_solver.test.mjs.
   resolveEtbMode(land, priorities, axes) {
     const modes = land.etbModes;
     if (!modes || !modes.length) return null;
@@ -315,6 +380,22 @@ class OptimizedSolver {
       for (const cc of land.conditionalColors || []) {
         if (cc.color === color) return true;
       }
+    }
+    return false;
+  }
+
+  // Guaranteed qualification: unconditional colors only. A conditional
+  // color (verge) is NEVER guaranteed — it counts toward the scored
+  // objective (explicit pilot assumption) but is reported separately in
+  // finish() so the UI cannot present it as met. Unknown dependencies
+  // remain unknown.
+  guaranteesFor(land, color, priority) {
+    if (land.productionConditional) return false;
+    if ((land.colors || []).includes(color)) {
+      if (priority === "early") {
+        return land.untapped && !land.conditional;
+      }
+      return true;
     }
     return false;
   }
@@ -368,6 +449,16 @@ class OptimizedSolver {
           ? (this.qualifiesFor(eff, c, priorities[c] || 'main') ? 1 : 0)
           : (this.qualifiesColorless(eff) ? 1 : 0)
       );
+      // Guaranteed qualification (unconditional only) — tracked separately
+      // so finish() can report guaranteed vs conditional shortfalls. The
+      // search uses `qualifies` (conditional counts toward the objective,
+      // the explicit pilot assumption); reporting never presents
+      // conditional coverage as guaranteed.
+      const guaranteedQualifies = axes.map(c =>
+        colorArr.length
+          ? (this.guaranteesFor(eff, c, priorities[c] || 'main') ? 1 : 0)
+          : (this.qualifiesColorless(eff) ? 1 : 0)
+      );
       const early = (eff.untapped && !eff.conditional && !eff.productionConditional &&
         (colorArr.length
           ? axes.some((c, i) => (priorities[c] || 'main') === 'early' && qualifies[i])
@@ -383,7 +474,7 @@ class OptimizedSolver {
       const condInt = eff.conditional ? 1 : 0;
       const prodInt = eff.productionConditional ? 1 : 0;
       const condColorInt = (land.conditionalColors && land.conditionalColors.length) ? 1 : 0;
-      penaltyParsed.push({ land, price, qualifies, early, lc, ut, condInt, prodInt,
+      penaltyParsed.push({ land, price, qualifies, guaranteedQualifies, early, lc, ut, condInt, prodInt,
         condColorInt, gameChanger: land.gameChanger ? 1 : 0,
         assumedMode: etb ? etb.mode : null,
         effUntapped: eff.untapped, effConditional: eff.conditional,
@@ -400,7 +491,8 @@ class OptimizedSolver {
         scaleTo(p.lc, maxScale) + BigInt(p.condInt + p.prodInt + p.condColorInt) * (10n ** BigInt(maxScale))
         - scaleTo(p.ut, maxScale);
       rows.push({
-        land: p.land, price: p.price, qualifies: p.qualifies, early: p.early,
+        land: p.land, price: p.price, qualifies: p.qualifies,
+        guaranteedQualifies: p.guaranteedQualifies, early: p.early,
         penalty: penaltyBig, gameChanger: p.gameChanger,
         assumedMode: p.assumedMode,
         effUntapped: p.effUntapped, effConditional: p.effConditional,
@@ -508,14 +600,54 @@ class OptimizedSolver {
         const perColor = {};
         axes.forEach((c, i) => {
           const q = bestIndices.reduce((s, idx) => s + rows[idx].qualifies[i], 0);
-          perColor[c] = { target: targets[i], qualifying: q, shortfall: Math.max(0, targets[i] - q) };
+          const gq = bestIndices.reduce((s, idx) => s + rows[idx].guaranteedQualifies[i], 0);
+          const cq = q - gq;
+          const guaranteedShortfall = Math.max(0, targets[i] - gq);
+          // Conditional sources: which selected lands supply this color
+          // only conditionally, and whether the dependency types appear
+          // among the selected lands' basic types. "Present in package"
+          // is a fact about the package — NOT a verification that the
+          // player controls the land, so the color stays conditional.
+          const sources = [];
+          for (const idx of bestIndices) {
+            const r = rows[idx];
+            if (r.qualifies[i] && !r.guaranteedQualifies[i]) {
+              const pkgTypes = new Set(
+                bestIndices.flatMap((j) => rows[j].land.basicTypes || [])
+              );
+              for (const cc of (r.land.conditionalColors || []).filter((x) => x.color === c)) {
+                sources.push({
+                  land: r.land.name,
+                  dependency_types: cc.dependency.types,
+                  dependency_in_package: cc.dependency.types.some((t) => pkgTypes.has(t)),
+                });
+              }
+            }
+          }
+          perColor[c] = {
+            target: targets[i],
+            qualifying: q,
+            shortfall: Math.max(0, targets[i] - q),
+            guaranteed_qualifying: gq,
+            conditional_qualifying: cq,
+            guaranteed_shortfall: guaranteedShortfall,
+            // Conditional-only: the scored shortfall is 0, but the
+            // guaranteed shortfall is not — this color is NOT met.
+            conditional_only: Math.max(0, targets[i] - q) === 0 && guaranteedShortfall > 0,
+            conditional_sources: sources,
+          };
         });
         score = [bestKey[0], -bestKey[1], penaltyToNumber(bestKey[2]), bestKey[3] / 100,
           { cards: bestKey[4].split('\0'), total_price: bestKey[3] / 100, per_color: perColor }];
       } else {
         const perColor = {};
         axes.forEach((c, i) => {
-          perColor[c] = { target: targets[i], qualifying: 0, shortfall: targets[i] };
+          perColor[c] = {
+            target: targets[i], qualifying: 0, shortfall: targets[i],
+            guaranteed_qualifying: 0, conditional_qualifying: 0,
+            guaranteed_shortfall: targets[i], conditional_only: false,
+            conditional_sources: [],
+          };
         });
         const totalWs = weights.reduce((s, w, i) => s + w * targets[i], 0);
         score = [totalWs, 0, 0, 0, { cards: [], total_price: 0, per_color: perColor }];
@@ -779,4 +911,4 @@ class OptimizedSolver {
 }
 
 export { OptimizedSolver, toCents, parseDecimal };
-export const SOLVER_VERSION = '1.4.2-js';
+export const SOLVER_VERSION = '1.4.3-js';

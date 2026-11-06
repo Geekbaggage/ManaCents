@@ -1,6 +1,6 @@
 // GET /api/manabase?colors=WU&priorities={"W":"early","U":"main"}&budget=25&slots=10&opponents=3&bracket=3
 //
-// ManaBase solver API. Runs solver v1.4.2-js against catalog seed
+// ManaBase solver API. Runs solver v1.4.3-js against catalog seed
 // v0.4.2 (43 eligible lands, scoring policy v1, price snapshot 2026-11-04).
 // Preview only — no production approval.
 //
@@ -65,6 +65,9 @@ export async function onRequestGet({ request, env }) {
         seed: landData.seed_version,
         priceSnapshot: landData.price_snapshot,
         landCount: landData.land_count,
+        // Defect D: per-card served/held status. Every land in this list
+        // is served; heldExcluded names the lands held from optimization.
+        heldExcluded: landData.held_excluded ?? [],
         pilotNote: "Pilot catalog: 43 lands — a small subset of all Commander-legal lands, not a complete catalog.",
         shockAssumption: "Shock lands are scored in pay_life mode (untapped, pay 2 life, one-time) when they cover an early-priority color, else tapped mode. The paid mode is an explicit scoring assumption; the actual entry choice is the player's. A paid shock still enters tapped if another effect forces tapped.",
       },

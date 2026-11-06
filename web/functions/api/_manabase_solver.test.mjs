@@ -86,8 +86,8 @@ function run(catalog, colors, priorities, budget, slots, opts = {}) {
   return s.optimize(colors, priorities, budget, slots, opts);
 }
 
-test("solver version is 1.4.2-js", () => {
-  assert.equal(SOLVER_VERSION, "1.4.2-js");
+test("solver version is 1.4.3-js", () => {
+  assert.equal(SOLVER_VERSION, "1.4.3-js");
 });
 
 test("Design A: shock qualifies early in pay_life mode (penalty 2.0)", () => {
@@ -228,4 +228,230 @@ test("Full catalog: WU early picks the shock over a tapped check land", () => {
   // untapped lands only.
   assert.ok(score[1] >= 1, "at least one early source");
   assert.ok(!check || check.assumedEtbMode === undefined);
+});
+
+// --- Charlie review corrections (2026-11-06, solver v1.4.3-js) ---
+
+// P1: conditional coverage is reported separately from guaranteed
+// coverage. A conditional-only completion is NEVER "met".
+test("P1: Floodfarm Verge alone does NOT meet U (Charlie reproduction)", () => {
+  // Exact reproduction: the verge as the entire fixture catalog; W/U
+  // both splash, budget $25, one slot. Result is the verge alone with
+  // scored shortfall 0 — but U is conditional-only, NOT guaranteed met.
+  const [pkg, score, stats] = run(
+    [VERGE], ["W", "U"], { W: "splash", U: "splash" }, 25, 1
+  );
+  assert.equal(stats.status, "optimal");
+  assert.deepEqual(pkg.map((l) => l.name), ["Floodfarm Verge"]);
+  // Scored shortfall stays 0 (conditional counts toward the objective —
+  // the explicit pilot assumption), but the guaranteed shortfall is 1.
+  const u = score[4].per_color.U;
+  assert.equal(u.qualifying, 1);
+  assert.equal(u.shortfall, 0);
+  assert.equal(u.guaranteed_qualifying, 0);
+  assert.equal(u.conditional_qualifying, 1);
+  assert.equal(u.guaranteed_shortfall, 1);
+  assert.equal(u.conditional_only, true);
+  assert.deepEqual(u.conditional_sources, [{
+    land: "Floodfarm Verge",
+    dependency_types: ["Plains", "Island"],
+    dependency_in_package: false, // unknown: no enabling land in the package
+  }]);
+  // W is unconditional: genuinely met.
+  const w = score[4].per_color.W;
+  assert.equal(w.guaranteed_qualifying, 1);
+  assert.equal(w.guaranteed_shortfall, 0);
+  assert.equal(w.conditional_only, false);
+});
+
+const W_LAND = land({
+  name: "W Land", price: 0.5, colors: ["W"], colorIdentity: ["W"],
+  basicTypes: [], oracleId: "88888888-8888-8888-8888-888888888888",
+});
+
+test("P1: absent prerequisite — package provably lacks the enabling type", () => {
+  // Verge + a W land with no basic types, W main / U splash: the package
+  // must contain both lands (W needs 2), and it provably contains no
+  // Plains/Island, so the U dependency is absent (not just unknown).
+  const [pkg, score] = run(
+    [VERGE, W_LAND], ["W", "U"], { W: "main", U: "splash" }, 25, 2
+  );
+  assert.deepEqual(pkg.map((l) => l.name).sort(), ["Floodfarm Verge", "W Land"]);
+  const u = score[4].per_color.U;
+  assert.equal(u.conditional_only, true);
+  assert.equal(u.guaranteed_shortfall, 1);
+  assert.equal(u.conditional_sources[0].dependency_in_package, false);
+});
+
+test("P1: present prerequisite — enabling land is in the package, still conditional", () => {
+  // Verge + Plains, W main / U splash: the package must contain both
+  // lands, and a Plains IS in it, so the dependency could be satisfied —
+  // but control is still unverified, so U stays conditional-only (never
+  // guaranteed).
+  const [pkg, score] = run(
+    [VERGE, PLAINS], ["W", "U"], { W: "main", U: "splash" }, 25, 2
+  );
+  assert.deepEqual(pkg.map((l) => l.name).sort(), ["Floodfarm Verge", "Plains"]);
+  const u = score[4].per_color.U;
+  assert.equal(u.qualifying, 1);
+  assert.equal(u.conditional_only, true);
+  assert.equal(u.guaranteed_shortfall, 1);
+  assert.equal(u.conditional_sources[0].dependency_in_package, true);
+  // W is met outright (verge unconditional + Plains).
+  assert.equal(score[4].per_color.W.guaranteed_shortfall, 0);
+  assert.equal(score[4].per_color.W.conditional_only, false);
+});
+
+test("P1: unconditional colors are unaffected by the reporting split", () => {
+  // Plain basics: guaranteed == qualifying, no conditional sources.
+  const [, score] = run(
+    [PLAINS, ISLAND], ["W", "U"], { W: "main", U: "main" }, 25, 2
+  );
+  for (const c of ["W", "U"]) {
+    const v = score[4].per_color[c];
+    assert.equal(v.guaranteed_qualifying, v.qualifying);
+    assert.equal(v.conditional_qualifying, 0);
+    assert.equal(v.guaranteed_shortfall, v.shortfall);
+    assert.equal(v.conditional_only, false);
+    assert.deepEqual(v.conditional_sources, []);
+  }
+});
+
+// P2: malformed solver metadata is rejected (no silent defaults).
+test("P2: missing pay_life lifeCost does NOT default to zero", () => {
+  const bad = { ...SHOCK, etbModes: [
+    { mode: "pay_life", untapped: true, conditional: false },
+    { mode: "tapped", untapped: false, conditional: true, lifeCost: 0 },
+  ] };
+  assert.throws(
+    () => run([bad], ["W", "U"], { W: "early", U: "early" }, 25, 10),
+    /explicit finite numeric lifeCost/
+  );
+});
+
+test("P2: duplicate pay_life (zero-cost first) is rejected", () => {
+  const bad = { ...SHOCK, etbModes: [
+    { mode: "pay_life", untapped: true, conditional: false, lifeCost: 0 },
+    { mode: "pay_life", untapped: true, conditional: false, lifeCost: 2 },
+    { mode: "tapped", untapped: false, conditional: true, lifeCost: 0 },
+  ] };
+  assert.throws(
+    () => run([bad], ["W", "U"], { W: "early", U: "early" }, 25, 10),
+    /exactly one pay_life and one tapped/
+  );
+});
+
+test("P2: unknown third etbMode is rejected", () => {
+  const bad = { ...SHOCK, etbModes: [
+    { mode: "pay_life", untapped: true, conditional: false, lifeCost: 2 },
+    { mode: "tapped", untapped: false, conditional: true, lifeCost: 0 },
+    { mode: "free", untapped: true, conditional: false, lifeCost: 0 },
+  ] };
+  assert.throws(
+    () => run([bad], ["W", "U"], { W: "early", U: "early" }, 25, 10),
+    /exactly one pay_life and one tapped/
+  );
+});
+
+test("P2: pay_life with zero cost and tapped with nonzero cost are rejected", () => {
+  const zeroPay = { ...SHOCK, etbModes: [
+    { mode: "pay_life", untapped: true, conditional: false, lifeCost: 0 },
+    { mode: "tapped", untapped: false, conditional: true, lifeCost: 0 },
+  ] };
+  assert.throws(
+    () => run([zeroPay], ["W", "U"], { W: "early", U: "early" }, 25, 10),
+    /pay_life.*lifeCost > 0/
+  );
+  const paidTap = { ...SHOCK, etbModes: [
+    { mode: "pay_life", untapped: true, conditional: false, lifeCost: 2 },
+    { mode: "tapped", untapped: false, conditional: true, lifeCost: 2 },
+  ] };
+  assert.throws(
+    () => run([paidTap], ["W", "U"], { W: "early", U: "early" }, 25, 10),
+    /tapped.*lifeCost 0/
+  );
+});
+
+test("P2: inherited property names are NOT basic land types", () => {
+  for (const badType of ["constructor", "toString", "__proto__"]) {
+    const badVerge = { ...VERGE, conditionalColors: [
+      { color: "U", dependency: { type: "basic_land_type", types: [badType] } },
+    ] };
+    assert.throws(
+      () => run([badVerge], ["W", "U"], { W: "main", U: "main" }, 25, 3),
+      /Unknown basic land type/
+    );
+    const badBasic = { ...PLAINS, basicTypes: [badType] };
+    assert.throws(
+      () => run([badBasic], ["W"], { W: "main" }, 25, 1),
+      /Invalid basic land type/
+    );
+  }
+});
+
+// Dominance: preselection matches every fixed mode combination.
+// Charlie compared 120 deterministic queries against all eight fixed
+// combinations of the three shock modes (zero mismatches). This test
+// reproduces the comparison on a focused mixed-priority set: for each
+// query, the pre-chosen result must equal the result of every fixed
+// combination (same cards, penalty, price, shortfall, early count).
+test("Dominance: shock preselection matches all 8 fixed mode combinations", () => {
+  const shock2 = { ...SHOCK, name: "Watery Grave", colors: ["B", "U"],
+    colorIdentity: ["B", "U"], basicTypes: ["Island", "Swamp"],
+    oracleId: "66666666-6666-6666-6666-666666666666" };
+  const shock3 = { ...SHOCK, name: "Blood Crypt", colors: ["B", "R"],
+    colorIdentity: ["B", "R"], basicTypes: ["Mountain", "Swamp"],
+    oracleId: "77777777-7777-7777-7777-777777777777" };
+  const shocks = [SHOCK, shock2, shock3];
+  const fixed = (shock, mode) => {
+    const l = { ...shock };
+    delete l.etbModes;
+    if (mode === "pay_life") {
+      l.untapped = true; l.conditional = false; l.lifeCost = 2.0;
+    } else {
+      l.untapped = false; l.conditional = true; l.lifeCost = 0;
+    }
+    return l;
+  };
+  const queries = [
+    { colors: ["W", "U"], pri: { W: "early", U: "main" }, budget: 25, slots: 10 },
+    { colors: ["W", "U", "B"], pri: { W: "early", U: "main", B: "splash" }, budget: 25, slots: 10 },
+    { colors: ["W", "U", "B", "R"], pri: { W: "early", U: "early", B: "main", R: "splash" }, budget: 50, slots: 10 },
+    { colors: ["U", "B"], pri: { U: "early", B: "main" }, budget: 25, slots: 5 },
+    { colors: ["W", "U", "B", "R", "G"], pri: { W: "early", U: "early", B: "early", R: "early", G: "early" }, budget: 200, slots: 10 },
+    { colors: ["W", "U"], pri: { W: "main", U: "main" }, budget: 10, slots: 5 },
+  ];
+  for (const q of queries) {
+    const [prePkg, preScore] = run(shocks, q.colors, q.pri, q.budget, q.slots, { bracket: 3 });
+    const pre = {
+      cards: prePkg.map((l) => l.name).sort(),
+      penalty: preScore[2], price: preScore[3],
+      shortfall: preScore[0], early: preScore[1],
+    };
+    for (let mask = 0; mask < 8; mask++) {
+      const catalog = shocks.map((s, i) =>
+        fixed(s, (mask >> i) & 1 ? "pay_life" : "tapped"));
+      const [pkg, score] = run(catalog, q.colors, q.pri, q.budget, q.slots, { bracket: 3 });
+      const got = {
+        cards: pkg.map((l) => l.name).sort(),
+        penalty: score[2], price: score[3],
+        shortfall: score[0], early: score[1],
+      };
+      // Preselection must be at least as good as every fixed combination
+      // on the lexicographic key (shortfall, -early, penalty, price).
+      const preKey = [pre.shortfall, -pre.early, pre.penalty, pre.price];
+      const gotKey = [got.shortfall, -got.early, got.penalty, got.price];
+      const cmp = (a, b) => {
+        for (let i = 0; i < a.length; i++) {
+          if (a[i] !== b[i]) return a[i] < b[i] ? -1 : 1;
+        }
+        return 0;
+      };
+      assert.ok(
+        cmp(preKey, gotKey) <= 0,
+        `preselection worse than fixed combo ${mask} on ${JSON.stringify(q)}: ` +
+        `pre ${JSON.stringify(preKey)} vs fixed ${JSON.stringify(gotKey)}`
+      );
+    }
+  }
 });
