@@ -188,6 +188,31 @@ export function LandSearch() {
     setColors((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]));
   };
 
+  // "Fetch lands" quick filter (CEO, Nov 7): fetchlands produce no mana, so
+  // they never match a produces color filter, and they have no budget-type
+  // record — showing all 10 means cycle=fetch plus clearing every filter
+  // that could exclude them (colors, type, max price, untapped-only, Game
+  // Changers, and best_budget, which needs a type to run). Tapping it again
+  // while active clears just the cycle, leaving the other filters as they
+  // are; the Cycle dropdown ("All cycles") and any other filter change also
+  // leave the fetch view. Fetch cards already show the colorless pip: their
+  // colors_produced is [] (see the API test), so the card's pip branch takes
+  // its colorless fallback — only the true color identity is kept, for the
+  // fits legality check (a fetchland is never suggested for a commander it
+  // cannot legally go in).
+  const applyFetchFilter = () => {
+    if (cycle === "fetch") { setCycle(""); return; }
+    setCycle("fetch");
+    setColors([]);
+    setMode("produces");
+    setType("");
+    if (sort === "best_budget") setSort("price_asc");
+    setUntappedOnly(false);
+    setGameChanger("any");
+    setMaxPrice("");
+    setMaxPriceDebounced("");
+  };
+
   const toggleSelect = (name) => {
     setSelected((prev) => {
       const next = new Set(prev);
@@ -342,6 +367,15 @@ export function LandSearch() {
           />
           Untapped only
         </label>
+        <button
+          type="button"
+          className={`mb-search-mode${cycle === "fetch" ? " on" : ""}`}
+          onClick={applyFetchFilter}
+          aria-pressed={cycle === "fetch"}
+          title="Show the 10 fetchlands"
+        >
+          Fetch lands
+        </button>
       </div>
 
       <button
