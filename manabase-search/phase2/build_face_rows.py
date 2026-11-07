@@ -66,17 +66,17 @@ from eligibility import validate_game_changer_metadata
 
 BASE = Path("/home/hatch/workspace/manabase-search")
 ROSTER_PATH = BASE / "phase1/roster.json"
-ORACLE_BULK = BASE / "bulk/oracle-cards-20261106220205.jsonl.gz"
-DEFAULT_BULK = BASE / "bulk/default-cards-20261106220652.jsonl.gz"
+ORACLE_BULK = BASE / "bulk/oracle-cards-20261107100202.jsonl.gz"
+DEFAULT_BULK = BASE / "bulk/default-cards-20261107100655.jsonl.gz"
 GC_PATH = BASE / "phase1/gamechangers_checked_2026-11-07.json"
 SEARCH_DATA_PATH = BASE / "phase2/search_data.json"
 OUT_PATH = BASE / "phase2/face_rows.json"
 REPORT_PATH = BASE / "phase2/face_rows_report.md"
 
-EXPECTED_ORACLE_SHA = "ccbc99fd81dd4fd1a6109b40f61b9d449253204217a93cd4037ba490e452135f"
-EXPECTED_DEFAULT_SHA = "dc826f98adc6d1d9715613d6e45f8833ccfc52cd23b53efccb88aa96f90799bf"
-PRICE_BULK_UPDATED = "2026-11-06T22:06:52Z"  # from bulk_manifest.json
-PRICE_SNAPSHOT = "2026-11-06"
+EXPECTED_ORACLE_SHA = "3a2ad385b3791fa3997fca5d6ffc9fcd4d6a8837ffe8871c1e120ed6a6318ed1"
+EXPECTED_DEFAULT_SHA = "dab6246b7bdaefce96d1f49fe5f99359cc09fce3580dafa743d1fd916ebb8065"
+PRICE_BULK_UPDATED = "2026-11-07T10:06:55Z"  # from bulk_manifest.json
+PRICE_SNAPSHOT = "2026-11-07"
 
 PRICE_FIELDS = (("usd", "nonfoil"), ("usd_foil", "foil"), ("usd_etched", "etched"))
 BASIC_TYPES = ("Plains", "Island", "Swamp", "Mountain", "Forest")
@@ -475,9 +475,9 @@ def main():
         "generator": "build_face_rows.py (phase2, Q4)",
         "roster": "phase1/roster.json (1312 rows)",
         "price_snapshot": PRICE_SNAPSHOT,
-        "price_bulk": "default-cards-20261106220652.jsonl.gz",
+        "price_bulk": DEFAULT_BULK.name,
         "price_bulk_sha256": EXPECTED_DEFAULT_SHA,
-        "oracle_bulk": "oracle-cards-20261106220205.jsonl.gz",
+        "oracle_bulk": ORACLE_BULK.name,
         "oracle_bulk_sha256": EXPECTED_ORACLE_SHA,
         "gc_snapshot": "gamechangers_checked_2026-11-07.json (53 cards)",
         "policy": "cheapest RELEASED printing in ANY finish (foils count); one whole-card quote per canonical identity (Q4); preorder/unreleased printings excluded (corrected Nov 7, Phase 5)",

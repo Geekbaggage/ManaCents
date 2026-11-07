@@ -54,7 +54,7 @@ test("no params: full served set, cheapest first, honest meta", async () => {
   assert.equal(body.meta.total, 1202);
   assert.equal(body.meta.returned, 50);
   assert.equal(body.meta.sort, "price_asc");
-  assert.equal(body.meta.priceSnapshot, "2026-11-06");
+  assert.equal(body.meta.priceSnapshot, "2026-11-07");
   // Phase 5: Charlie's editorial sort is the ranking now (Q14); most-used
   // is still unavailable (Q3) — the note says both, plainly.
   assert.equal(body.meta.rankingSnapshot, "2026-11-07");
@@ -66,7 +66,7 @@ test("no params: full served set, cheapest first, honest meta", async () => {
   assert.equal(body.meta.heldFaceRows, 0);
   assert.equal(body.meta.heldFetchRows, 10);
   assert.equal(body.meta.faceRows, 101);
-  assert.equal(body.meta.cheapestSetTotal, 19945);
+  assert.equal(body.meta.cheapestSetTotal, 19950.58);
   assert.equal(body.meta.budgetTypes.length, 25);
   assert.equal(body.meta.preorderWatch.length, 7);
   assert.match(body.meta.coverageNote, /1,202 of 1,212/);
@@ -384,7 +384,7 @@ test("best_budget: two_color_fixing ranked view — rank order, ties, unranked t
   const rank1 = ranked.filter((r) => r.budget_rank === 1);
   assert.equal(rank1.length, 10);
   assert.equal(rank1[0].name, "Battlefield Forge");
-  assert.equal(rank1[0].cheapest.price, 0.2);
+  assert.equal(rank1[0].cheapest.price, 0.23);
   const norm = (n) => n.toLowerCase().replace(/[^a-z0-9]/g, "");
   for (let i = 1; i < rank1.length; i++) {
     const a = rank1[i - 1], b = rank1[i];
@@ -468,13 +468,13 @@ test("best_budget: preorder separation — the 7 preorder-only cards", async () 
   // The served prices are the corrected RELEASED prices (Phase 5 preorder
   // fix), not the Nov 13 preorder prices the old data showed.
   const fountain = rows.find((r) => r.name === "Hallowed Fountain");
-  assert.equal(fountain.cheapest.price, 7.39);
+  assert.equal(fountain.cheapest.price, 7.55);
   assert.equal(fountain.cheapest.printing, "ECL #265");
 });
 
 test("max_price boundary: inclusive at the cheapest row, 1004 rows at $5", async () => {
   const at6 = await getOk("max_price=0.06&limit=100");
-  assert.equal(at6.meta.total, 3);
+  assert.equal(at6.meta.total, 4);
   const at5c = await getOk("max_price=0.05&limit=100");
   assert.equal(at5c.meta.total, 0);
   const at5 = await getOk("max_price=5&limit=1");
@@ -633,6 +633,19 @@ test("ManaBase renders a Search lands tab next to the optimizer", async () => {
     assert.match(html, /Search lands/);
     assert.match(html, /Find my lands/);
     assert.match(html, /Browse lands/);
+    // Render the tabs themselves: LandSearch / LandGallery only mount when
+    // their tab is active, so rendering ManaBase alone never executes them.
+    // e676b3e shipped a Search-tab crash (useCallback used but never
+    // imported) precisely because nothing rendered LandSearch — the render
+    // below executes every hook call in both tabs and would throw the same
+    // ReferenceError. Effects do not run in static markup; the crash was at
+    // render time, so this catches it.
+    const searchHtml = renderToStaticMarkup(React.createElement(ui.LandSearch));
+    assert.match(searchHtml, /Best budget — researched/);
+    assert.match(searchHtml, /Type \/ role/);
+    assert.match(searchHtml, /Search lands/);
+    const galleryHtml = renderToStaticMarkup(React.createElement(ui.LandGallery));
+    assert.match(galleryHtml, /Loading lands/);
     // Note: the Search tab renders only when active, so the Best budget
     // sort option is verified in the built bundle + live preview, not here.
     // The Search-fix + Browse-full-catalog controls must be in the bundle:
@@ -646,7 +659,7 @@ test("ManaBase renders a Search lands tab next to the optimizer", async () => {
     // "Updating…" is emitted as \u2026 — match the ASCII prefix.
     assert.match(bundleText, /Updating/);
     assert.match(bundleText, /cycleCounts/);
-    assert.match(bundleText, /Every land by set/);
+    assert.match(bundleText, /Every land by cycle/);
   } finally {
     const { unlink } = await import("node:fs/promises");
     await unlink(tmpPath).catch(() => {});

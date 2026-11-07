@@ -94,7 +94,7 @@ function entryBadge(entry) {
   );
 }
 
-function LandSearch() {
+export function LandSearch() {
   const [colors, setColors] = useState([]);
   const [mode, setMode] = useState("produces");
   const [sort, setSort] = useState("price_asc");
@@ -608,7 +608,7 @@ const LAND_TRAITS = Object.fromEntries(
   LAND_CYCLES.map((c) => [c.id, c.trait])
 );
 
-function LandGallery() {
+export function LandGallery() {
   const [cycleCounts, setCycleCounts] = useState(null);
   const [open, setOpen] = useState(null);
   const [members, setMembers] = useState({});
@@ -687,8 +687,8 @@ function LandGallery() {
   return (
     <div className="mb-gallery">
       <p className="combos-sub">
-        Every land by set — {cycleCounts.reduce((n, c) => n + c.count, 0).toLocaleString()} searchable
-        lands, full sets, cheapest released version shown. Tap a set to see all of it.
+        Every land by cycle — {cycleCounts.reduce((n, c) => n + c.count, 0).toLocaleString()} searchable
+        lands, full cycles, cheapest released version shown. Tap a cycle to see all of it.
       </p>
       {error && <p className="mb-error">{error}</p>}
       {ordered.map((id) => {
@@ -822,7 +822,7 @@ export function ManaBase() {
       <p className="combos-sub">
         Suggested land purchases optimized for your selected colors,
         priorities and budget under the stated assumptions. Or browse every
-        land by set, or search the full catalog by color and type.
+        land by cycle, or search the full catalog by color and type.
       </p>
 
       <div className="mb-tabs" role="tablist">

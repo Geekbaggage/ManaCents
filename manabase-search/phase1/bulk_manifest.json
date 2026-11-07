@@ -2,12 +2,20 @@
   "checked_date": "2026-11-07",
   "bulk_files": [
     {
-      "file": "oracle-cards-20261106220205.jsonl.gz",
+      "file": "oracle-cards-20261107100202.jsonl.gz",
       "type": "oracle_cards",
-      "updated_at": "2026-11-06T22:02:05.872+00:00",
-      "compressed_size": 25322776,
-      "sha256": "ccbc99fd81dd4fd1a6109b40f61b9d449253204217a93cd4037ba490e452135f",
-      "download_uri": "https://data.scryfall.io/oracle-cards/oracle-cards-20261106220205.jsonl.gz"
+      "updated_at": "2026-11-07T10:02:02.783+00:00",
+      "compressed_size": 25360661,
+      "sha256": "3a2ad385b3791fa3997fca5d6ffc9fcd4d6a8837ffe8871c1e120ed6a6318ed1",
+      "download_uri": "https://data.scryfall.io/oracle-cards/oracle-cards-20261107100202.jsonl.gz"
+    },
+    {
+      "file": "default-cards-20261107100655.jsonl.gz",
+      "type": "default_cards",
+      "updated_at": "2026-11-07T10:06:55.230+00:00",
+      "compressed_size": 80897089,
+      "sha256": "dab6246b7bdaefce96d1f49fe5f99359cc09fce3580dafa743d1fd916ebb8065",
+      "download_uri": "https://data.scryfall.io/default-cards/default-cards-20261107100655.jsonl.gz"
     }
   ],
   "game_changers": {
