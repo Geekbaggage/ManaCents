@@ -102,6 +102,7 @@ function LandSearch() {
   const [hideBasics, setHideBasics] = useState(false);
   const [untappedOnly, setUntappedOnly] = useState(false);
   const [maxPrice, setMaxPrice] = useState("");
+  const [maxPriceDebounced, setMaxPriceDebounced] = useState("");
   const [cycle, setCycle] = useState("");
   const [gameChanger, setGameChanger] = useState("any");
   const [results, setResults] = useState([]);
@@ -110,60 +111,114 @@ function LandSearch() {
   const [error, setError] = useState(null);
   const [selected, setSelected] = useState(() => new Set());
   const [copied, setCopied] = useState(null);
-  const ranOnce = useRef(false);
+  const [showAllBusy, setShowAllBusy] = useState(false);
+  // Monotonic generation: a newer search supersedes older in-flight ones,
+  // and a filter change aborts a running show-all.
+  const seqRef = useRef(0);
 
-  const toggleSearchColor = (c) => {
-    setColors((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]));
-    setResults([]);
-    setMeta(null);
+  // Debounce Max price so typing does not fire a search per keystroke.
+  useEffect(() => {
+    const t = setTimeout(() => setMaxPriceDebounced(maxPrice), 500);
+    return () => clearTimeout(t);
+  }, [maxPrice]);
+
+  // The filters a search runs with. Read through a ref so the stable search
+  // callback always sees the latest values.
+  const filtersRef = useRef(null);
+  filtersRef.current = {
+    colors, mode, sort, type, hideBasics, untappedOnly,
+    maxPrice: maxPriceDebounced, cycle, gameChanger,
   };
 
-  const search = async (offset = 0, append = false) => {
+  const fetchPage = async (f, offset, limit) => {
+    const params = new URLSearchParams({
+      sort: f.sort,
+      mode: f.mode,
+      include_basics: f.hideBasics ? "0" : "1",
+      untapped_only: f.untappedOnly ? "1" : "0",
+      game_changer: f.gameChanger,
+      limit: String(limit),
+      offset: String(offset),
+    });
+    if (f.colors.length > 0) params.set("colors", f.colors.join(""));
+    if (f.type) params.set("type", f.type);
+    if (f.maxPrice !== "") {
+      const n = Number(f.maxPrice);
+      if (!Number.isFinite(n) || n < 0) throw new Error("Max price must be a number of $0 or more.");
+      params.set("max_price", String(n));
+    }
+    if (f.cycle) params.set("cycle", f.cycle);
+    const res = await fetch(`/api/manabase-search?${params}`);
+    if (res.status === 429) {
+      throw new Error("Too many requests — please wait a moment and try again.");
+    }
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Search failed");
+    return data;
+  };
+
+  // Stale-while-revalidate: a filter change re-searches, but the previous
+  // results + meta stay on screen until the new page lands — the list never
+  // goes blank on a filter change, and the Type dropdown (fed by meta)
+  // keeps its options. Only a successful empty response clears the list
+  // (a genuine "no lands match"); errors keep the stale list and show the
+  // error instead.
+  const search = useCallback(async (offset = 0, append = false, overrides = null) => {
+    const f = { ...filtersRef.current, ...(overrides ?? {}) };
+    const seq = ++seqRef.current;
     setLoading(true);
     setError(null);
     setCopied(null);
     try {
-      const params = new URLSearchParams({
-        sort,
-        mode,
-        include_basics: hideBasics ? "0" : "1",
-        untapped_only: untappedOnly ? "1" : "0",
-        game_changer: gameChanger,
-        limit: "50",
-        offset: String(offset),
-      });
-      if (colors.length > 0) params.set("colors", colors.join(""));
-      if (type) params.set("type", type);
-      if (maxPrice !== "") {
-        const n = Number(maxPrice);
-        if (!Number.isFinite(n) || n < 0) throw new Error("Max price must be a number of $0 or more.");
-        params.set("max_price", String(n));
-      }
-      if (cycle) params.set("cycle", cycle);
-      const res = await fetch(`/api/manabase-search?${params}`);
-      if (res.status === 429) {
-        throw new Error("Too many requests — please wait a moment and try again.");
-      }
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Search failed");
+      const data = await fetchPage(f, offset, 50);
+      if (seq !== seqRef.current) return; // superseded by a newer search
       setMeta(data.meta);
       setResults((prev) => (append ? [...prev, ...data.results] : data.results));
     } catch (e) {
-      if (!append) { setResults([]); setMeta(null); }
+      if (seq !== seqRef.current) return;
       setError(e.message);
     } finally {
-      setLoading(false);
+      if (seq === seqRef.current) setLoading(false);
+    }
+  }, []);
+
+  // Auto re-search on any filter change (and once on mount) — no manual
+  // "Search lands" press is needed after changing a filter.
+  useEffect(() => {
+    search(0, false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [colors, mode, sort, type, hideBasics, untappedOnly, cycle, gameChanger, maxPriceDebounced]);
+
+  // "Show all" for a picked type: page through the rest of the type's set
+  // (API limit is 100/page) until meta.total is reached. Bounded sets only —
+  // never shown for the unfiltered whole catalog. Aborts if the filters
+  // change mid-load (the new search supersedes it).
+  const showAll = async () => {
+    if (!meta || !type || showAllBusy) return;
+    const f = { ...filtersRef.current };
+    const seq = seqRef.current;
+    setShowAllBusy(true);
+    setError(null);
+    try {
+      let offset = results.length;
+      while (offset < meta.total) {
+        const data = await fetchPage(f, offset, 100);
+        if (seq !== seqRef.current) return; // filters changed — stop
+        setMeta(data.meta);
+        setResults((prev) => [...prev, ...data.results]);
+        offset += data.results.length;
+        if (data.results.length < 100) break;
+      }
+    } catch (e) {
+      if (seq === seqRef.current) setError(e.message);
+    } finally {
+      setShowAllBusy(false);
     }
   };
 
-  // Run once when the tab first opens, so the search is not an empty page.
-  useEffect(() => {
-    if (!ranOnce.current) {
-      ranOnce.current = true;
-      search(0, false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const toggleSearchColor = (c) => {
+    setColors((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]));
+  };
 
   const toggleSelect = (name) => {
     setSelected((prev) => {
@@ -207,7 +262,7 @@ function LandSearch() {
         <button
           type="button"
           className={`mb-search-mode${mode === "produces" ? " on" : ""}`}
-          onClick={() => { setMode("produces"); setResults([]); setMeta(null); }}
+          onClick={() => { setMode("produces"); }}
           aria-pressed={mode === "produces"}
         >
           Produces these colors
@@ -215,7 +270,7 @@ function LandSearch() {
         <button
           type="button"
           className={`mb-search-mode${mode === "fits" ? " on" : ""}`}
-          onClick={() => { setMode("fits"); setResults([]); setMeta(null); }}
+          onClick={() => { setMode("fits"); }}
           aria-pressed={mode === "fits"}
         >
           Fits my commander
@@ -265,7 +320,6 @@ function LandSearch() {
             // without a type picks the first type list (Two Color Fixing);
             // the type picker stays visible so it can be switched.
             if (next === "best_budget" && !type) setType("two_color_fixing");
-            setResults([]); setMeta(null);
           }}>
             <option value="price_asc">Cheapest first</option>
             <option value="price_desc">Most expensive first</option>
@@ -276,7 +330,14 @@ function LandSearch() {
         </label>
         <label>
           Type / role
-          <select value={type} onChange={(e) => { setType(e.target.value); setResults([]); setMeta(null); }}>
+          <select value={type} onChange={(e) => {
+            const next = e.target.value;
+            setType(next);
+            // Best budget needs a type — clearing the type while it is the
+            // sort would 400, so fall back to cheapest-first instead of
+            // leaving the user on an error.
+            if (next === "" && sort === "best_budget") setSort("price_asc");
+          }}>
             <option value="">All lands</option>
             {(meta?.budgetTypes ?? []).map((t) => (
               <option key={t.id} value={t.id}>{t.label} ({t.ranked} ranked)</option>
@@ -285,7 +346,7 @@ function LandSearch() {
         </label>
         <label>
           Cycle
-          <select value={cycle} onChange={(e) => { setCycle(e.target.value); setResults([]); setMeta(null); }}>
+          <select value={cycle} onChange={(e) => { setCycle(e.target.value); }}>
             {SEARCH_CYCLES.map(([id, label]) => (
               <option key={id} value={id}>{label}</option>
             ))}
@@ -293,7 +354,7 @@ function LandSearch() {
         </label>
         <label>
           Game Changers
-          <select value={gameChanger} onChange={(e) => { setGameChanger(e.target.value); setResults([]); setMeta(null); }}>
+          <select value={gameChanger} onChange={(e) => { setGameChanger(e.target.value); }}>
             <option value="any">Any</option>
             <option value="include">Only Game Changers</option>
             <option value="exclude">No Game Changers</option>
@@ -309,20 +370,30 @@ function LandSearch() {
         <label className="mb-search-check">
           <input
             type="checkbox" checked={hideBasics}
-            onChange={(e) => { setHideBasics(e.target.checked); setResults([]); setMeta(null); }}
+            onChange={(e) => { setHideBasics(e.target.checked); }}
           />
           Hide basics
         </label>
         <label className="mb-search-check">
           <input
             type="checkbox" checked={untappedOnly}
-            onChange={(e) => { setUntappedOnly(e.target.checked); setResults([]); setMeta(null); }}
+            onChange={(e) => { setUntappedOnly(e.target.checked); }}
           />
           Untapped only
         </label>
       </div>
 
-      <button type="button" className="mb-run" onClick={() => search(0, false)} disabled={loading}>
+      <button
+        type="button" className="mb-run"
+        onClick={() => {
+          // Manual re-run: use the Max price as typed right now (don't wait
+          // for the debounce), and sync the debounced value so the effect
+          // does not fire the same search again a moment later.
+          setMaxPriceDebounced(maxPrice);
+          search(0, false, { maxPrice });
+        }}
+        disabled={loading}
+      >
         {loading ? "Searching…" : "Search lands"}
       </button>
 
@@ -336,6 +407,7 @@ function LandSearch() {
           {meta.typeLabel && (
             <>{" "}Showing {meta.typeLabel} — {meta.rankedCount} budget-ranked, the rest alphabetical.</>
           )}
+          {loading && <>{" "}Updating…</>}
           <PriceStaleNote snapshot={meta.priceSnapshot} />
         </p>
       )}
@@ -495,11 +567,20 @@ function LandSearch() {
       </div>
 
       {meta && results.length > 0 && results.length < meta.total && (
-        <button
-          type="button" className="mb-run" onClick={() => search(results.length, true)} disabled={loading}
-        >
-          {loading ? "Loading…" : `Show more (${meta.total - results.length} left)`}
-        </button>
+        <>
+          <button
+            type="button" className="mb-run" onClick={() => search(results.length, true)} disabled={loading || showAllBusy}
+          >
+            {loading ? "Loading…" : `Show more (${meta.total - results.length} left)`}
+          </button>
+          {type && (
+            <button
+              type="button" className="mb-run" onClick={showAll} disabled={loading || showAllBusy}
+            >
+              {showAllBusy ? "Loading all…" : `Show all (${meta.total} in this type)`}
+            </button>
+          )}
+        </>
       )}
     </div>
   );
@@ -514,69 +595,158 @@ function finishLabel(printing) {
     .replace(" (usd)", " · nonfoil");
 }
 
+// Browse lands by cycle — the FULL catalog (1,202 searchable), not the
+// 43-land pilot. Collapsed rows show true full counts + price ranges from
+// meta.cycleCounts (one cheap request); expanding a cycle loads that cycle's
+// complete membership by paging the search API (limit 100/page) until the
+// count is reached — no 50-cap, no truncation. Unclassified lands get their
+// own group at the end: they are 861 of 1,202 lands, and leaving them out
+// of Browse would silently hide most of the catalog. The optimizer's
+// pilot-only gallery is gone; Search remains the place for color/type
+// filtering and the buy set.
+const LAND_TRAITS = Object.fromEntries(
+  LAND_CYCLES.map((c) => [c.id, c.trait])
+);
+
 function LandGallery() {
-  const [lands, setLands] = useState(null);
+  const [cycleCounts, setCycleCounts] = useState(null);
   const [open, setOpen] = useState(null);
+  const [members, setMembers] = useState({});
+  const [loadingCycle, setLoadingCycle] = useState(null);
+  const [error, setError] = useState(null);
+  const openSeq = useRef(0);
 
   useEffect(() => {
-    fetch("/api/manabase?list=all")
+    let cancelled = false;
+    fetch("/api/manabase-search?limit=1")
       .then((r) => r.json())
-      .then((d) => setLands(d.lands))
-      .catch(() => setLands([]));
+      .then((d) => {
+        if (!cancelled) setCycleCounts(d.meta?.cycleCounts ?? []);
+      })
+      .catch(() => {
+        if (!cancelled) setError("Could not load the land list — try again.");
+      });
+    return () => { cancelled = true; };
   }, []);
 
-  if (lands === null) return <p className="combos-sub">Loading lands…</p>;
-  const byName = Object.fromEntries(lands.map((l) => [l.name, l]));
+  const toggleCycle = async (id) => {
+    const next = open === id ? null : id;
+    setOpen(next);
+    if (next === null || members[id]) return;
+    const total = (cycleCounts ?? []).find((c) => c.id === id)?.count ?? 0;
+    const mySeq = ++openSeq.current;
+    setLoadingCycle(id);
+    setError(null);
+    try {
+      const rows = [];
+      for (let offset = 0; offset < total; offset += 100) {
+        const res = await fetch(
+          `/api/manabase-search?cycle=${id}&sort=name&limit=100&offset=${offset}`
+        );
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Browse failed");
+        if (mySeq !== openSeq.current) return; // user closed/switched — stop
+        rows.push(...data.results);
+        if (data.results.length < 100) break;
+      }
+      if (mySeq !== openSeq.current) return;
+      if (rows.length !== total) {
+        throw new Error(
+          `Expected ${total} lands in this set but loaded ${rows.length} — try again.`
+        );
+      }
+      setMembers((prev) => ({ ...prev, [id]: rows }));
+    } catch (e) {
+      if (mySeq === openSeq.current) setError(e.message);
+    } finally {
+      if (mySeq === openSeq.current) setLoadingCycle(null);
+    }
+  };
+
+  if (cycleCounts === null) {
+    return error
+      ? <p className="mb-error">{error}</p>
+      : <p className="combos-sub">Loading lands…</p>;
+  }
+
+  const byId = Object.fromEntries(cycleCounts.map((c) => [c.id, c]));
+  const labelOf = (id) =>
+    (SEARCH_CYCLES.find(([cid]) => cid === id) ?? [id, id])[1];
+  // Order: the Search tab's cycle order, then any cycle the data has that
+  // the list does not, with Unclassified last.
+  const ordered = [
+    ...SEARCH_CYCLES
+      .filter(([id]) => id !== "" && id !== "unclassified" && byId[id])
+      .map(([id]) => id),
+    ...Object.keys(byId).filter(
+      (id) => id !== "unclassified" && !SEARCH_CYCLES.some(([cid]) => cid === id)
+    ),
+    ...(byId.unclassified ? ["unclassified"] : []),
+  ];
 
   return (
     <div className="mb-gallery">
-      {LAND_CYCLES.map((cycle) => {
-        const members = cycle.members
-          .map((n) => byName[n])
-          .filter(Boolean);
-        if (members.length === 0) return null;
-        const prices = members.map((m) => m.price).filter((p) => p != null);
-        const lo = Math.min(...prices), hi = Math.max(...prices);
-        const isOpen = open === cycle.id;
+      <p className="combos-sub">
+        Every land by set — {cycleCounts.reduce((n, c) => n + c.count, 0).toLocaleString()} searchable
+        lands, full sets, cheapest released version shown. Tap a set to see all of it.
+      </p>
+      {error && <p className="mb-error">{error}</p>}
+      {ordered.map((id) => {
+        const c = byId[id];
+        const isOpen = open === id;
+        const rows = members[id] ?? null;
         return (
-          <div key={cycle.id} className={`mb-cycle${isOpen ? " open" : ""}`}>
+          <div key={id} className={`mb-cycle${isOpen ? " open" : ""}`}>
             <button
               type="button" className="mb-cycle-head"
-              onClick={() => setOpen(isOpen ? null : cycle.id)}
+              onClick={() => toggleCycle(id)}
               aria-expanded={isOpen}
             >
-              <span className="mb-cycle-name">{cycle.name}</span>
-              <span className="mb-cycle-count">{members.length}</span>
+              <span className="mb-cycle-name">{labelOf(id)}</span>
+              <span className="mb-cycle-count">{c.count}</span>
               <span className="mb-cycle-range">
-                {money(lo)}{lo !== hi && ` – ${money(hi)}`}
+                {money(c.minPrice)}{c.minPrice !== c.maxPrice && ` – ${money(c.maxPrice)}`}
               </span>
               <span className="mb-cycle-arrow">{isOpen ? "▾" : "▸"}</span>
             </button>
             {isOpen && (
               <div className="mb-cycle-body">
-                <p className="mb-cycle-trait">{cycle.trait}</p>
-                <div className="mb-lands">
-                  {members.map((l) => (
-                    <div key={l.name} className="mb-land">
-                      <div className="mb-land-name">{l.name}</div>
-                      <div className="mb-land-meta">
-                        <span className="mb-land-price">{money(l.price)}</span>
-                        {l.lifeCost > 0 && (
-                          <span className="mb-land-life">−{l.lifeCost} ♥</span>
-                        )}
-                        {l.conditional && <span className="mb-land-cond">conditional</span>}
+                {LAND_TRAITS[id] && <p className="mb-cycle-trait">{LAND_TRAITS[id]}</p>}
+                {loadingCycle === id && <p className="combos-sub">Loading all {c.count} lands…</p>}
+                {rows && (
+                  <div className="mb-lands">
+                    {rows.map((l) => (
+                      <div key={l.oracle_id} className="mb-land">
+                        <div className="mb-land-name">{l.name}</div>
+                        <div className="mb-land-meta">
+                          <span className="mb-land-price">{money(l.cheapest.price)}</span>
+                          {l.entry && entryBadge(l.entry)}
+                          {l.game_changer && <span className="mb-land-gc">Game Changer</span>}
+                          {l.status === "face_row" && (
+                            <span className="mb-land-face-tag" title={l.land_drop.note}>
+                              {l.land_drop.code === "requires_transformation"
+                                ? "Requires transformation — not a land drop from hand"
+                                : l.land_drop.code === "playable_choice"
+                                  ? "Land face: playable choice"
+                                  : l.land_drop.code === "land_front"
+                                    ? "Land on the front face"
+                                    : "One card — land + Adventure"}
+                            </span>
+                          )}
+                        </div>
+                        <div className="mb-land-print">{l.cheapest.printing} · {l.cheapest.finish}</div>
+                        <a
+                          className="btn-copy combo-eq-buy"
+                          href={manaPoolCardUrl(l.name)}
+                          target="_blank" rel="noopener noreferrer"
+                          onClick={() => trackAffiliateClick("manapool", { view: "manabase-browse" })}
+                        >
+                          Buy this card
+                        </a>
                       </div>
-                      <a
-                        className="btn-copy combo-eq-buy"
-                        href={manaPoolCardUrl(l.name)}
-                        target="_blank" rel="noopener noreferrer"
-                        onClick={() => trackAffiliateClick("manapool", { view: "manabase-browse" })}
-                      >
-                        Buy this card
-                      </a>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -652,7 +822,7 @@ export function ManaBase() {
       <p className="combos-sub">
         Suggested land purchases optimized for your selected colors,
         priorities and budget under the stated assumptions. Or browse every
-        land by cycle.
+        land by set, or search the full catalog by color and type.
       </p>
 
       <div className="mb-tabs" role="tablist">

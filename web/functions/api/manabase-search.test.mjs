@@ -521,6 +521,56 @@ test("coverage arithmetic: 1,202 served + 10 held = 1,212 legal; + 100 excluded 
   assert.equal(body.meta.excludedCount, 100);
 });
 
+// ---- Search-fix + Browse-full-catalog (Nov 7): cycleCounts + paging ----
+
+test("meta.cycleCounts: true full counts + price ranges per cycle (Browse tab)", async () => {
+  const body = await getOk("limit=1");
+  const counts = body.meta.cycleCounts;
+  assert.ok(Array.isArray(counts), "cycleCounts must be an array");
+  assert.equal(counts.length, 28, "one entry per cycle in the serving data");
+  // Counts sum to the full served set, and every row's cycle is listed.
+  assert.equal(counts.reduce((n, c) => n + c.count, 0), 1202);
+  const rows = await allRows();
+  const byCycle = {};
+  for (const r of rows) byCycle[r.cycle] = (byCycle[r.cycle] ?? 0) + 1;
+  assert.deepEqual(
+    Object.fromEntries(counts.map((c) => [c.id, c.count])),
+    byCycle
+  );
+  // Min/max prices match an independent scan of the same rows.
+  for (const c of counts) {
+    const prices = rows.filter((r) => r.cycle === c.id).map((r) => r.cheapest.price);
+    assert.equal(c.minPrice, Math.min(...prices), `${c.id} min price`);
+    assert.equal(c.maxPrice, Math.max(...prices), `${c.id} max price`);
+  }
+  // Largest group is unclassified (861) — it gets its own Browse group at
+  // the end, not dropped. Sorted count-desc, then id (deterministic).
+  assert.equal(counts[0].id, "unclassified");
+  assert.equal(counts[0].count, 861);
+  const sorted = [...counts].sort((a, b) => b.count - a.count || (a.id < b.id ? -1 : 1));
+  assert.deepEqual(counts.map((c) => c.id), sorted.map((c) => c.id));
+});
+
+test("cycle paging: full membership, no truncation, no duplicates (Browse tab)", async () => {
+  // Unclassified is the biggest cycle (861 rows = 9 pages at limit 100).
+  const rows = await allRows("cycle=unclassified&sort=name");
+  assert.equal(rows.length, 861);
+  assert.equal(new Set(rows.map((r) => r.oracle_id)).size, 861);
+  assert.ok(rows.every((r) => r.cycle === "unclassified"));
+  const names = rows.map((r) => r.name);
+  assert.deepEqual(names, [...names].sort());
+  // A small cycle pages cleanly too (shock, 11 rows, one page).
+  const shock = await allRows("cycle=shock&sort=name");
+  assert.equal(shock.length, 11);
+  assert.ok(shock.every((r) => r.cycle === "shock"));
+  // cycle + type combine: 10 of the 11 shock-cycle rows are members of
+  // two_color_fixing; the 11th (Multiversal Passage, a utility land) has no
+  // type record and is correctly excluded from the type view.
+  const shockInType = await getOk("cycle=shock&type=two_color_fixing&limit=100");
+  assert.equal(shockInType.meta.total, 10);
+  assert.ok(!shockInType.results.some((r) => r.name === "Multiversal Passage"));
+});
+
 // ---- Buy-set helpers (pure module, no bundling needed) ----
 
 test("buildDeckText + Mana Pool add-deck URL: ref appended (Q2 verified), round-trips", () => {
@@ -585,6 +635,18 @@ test("ManaBase renders a Search lands tab next to the optimizer", async () => {
     assert.match(html, /Browse lands/);
     // Note: the Search tab renders only when active, so the Best budget
     // sort option is verified in the built bundle + live preview, not here.
+    // The Search-fix + Browse-full-catalog controls must be in the bundle:
+    // "Show all" (type sets), the auto-search "Updating…" indicator, and
+    // the Browse tab's full-catalog copy.
+    const { readFile } = await import("node:fs/promises");
+    const bundleText = await readFile(tmpPath, "utf8");
+    assert.match(bundleText, /Show all \(/);
+    assert.match(bundleText, /Loading all/);
+    // esbuild escapes non-ASCII in the bundle, so the ellipsis in
+    // "Updating…" is emitted as \u2026 — match the ASCII prefix.
+    assert.match(bundleText, /Updating/);
+    assert.match(bundleText, /cycleCounts/);
+    assert.match(bundleText, /Every land by set/);
   } finally {
     const { unlink } = await import("node:fs/promises");
     await unlink(tmpPath).catch(() => {});

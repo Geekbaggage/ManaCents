@@ -56,9 +56,12 @@
 //   offset: integer ≥ 0 (default 0)
 //
 // Returns: { meta, results } — meta always carries the price snapshot date,
-// the ranking snapshot + note, and the served/held counts, so the UI can show
-// staleness honestly. Coverage is stated as actual served/held counts — this
-// is NOT the full 1,212-card universe while rows are held (10 fetchlands).
+// the ranking snapshot + note, the served/held counts, the budget type list,
+// and per-cycle membership counts + price ranges (cycleCounts), so the UI
+// can show staleness honestly and the Browse tab can show true full counts
+// without loading all 1,202 rows. Coverage is stated as actual served/held
+// counts — this is NOT the full 1,212-card universe while rows are held
+// (10 fetchlands).
 import searchData from "./_manabase_search.json";
 import {
   matchesProduces,
@@ -71,6 +74,22 @@ const META = searchData.meta;
 const CYCLES = new Set(ROWS.map((r) => r.cycle));
 const TYPES = new Map(META.budget_types.map((t) => [t.id, t]));
 const COLOR_ORDER = "WUBRGC";
+
+// Per-cycle membership counts + price ranges, for the Browse tab: one
+// request gives honest collapsed-row counts without loading all 1,202 rows.
+// Computed once from the serving data (not from a separate source), so the
+// counts can never drift from what the API itself serves.
+const CYCLE_COUNTS = (() => {
+  const byId = new Map();
+  for (const r of ROWS) {
+    const e = byId.get(r.cycle) ?? { id: r.cycle, count: 0, minPrice: Infinity, maxPrice: -Infinity };
+    e.count += 1;
+    e.minPrice = Math.min(e.minPrice, r.cheapest.price);
+    e.maxPrice = Math.max(e.maxPrice, r.cheapest.price);
+    byId.set(r.cycle, e);
+  }
+  return [...byId.values()].sort((a, b) => b.count - a.count || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+})();
 
 // $5.00-inclusive gate on the RELEASED quote (Charlie's sort, Q14).
 const BUDGET_GATE_CENTS = META.ranking.budget_gate_cents;
@@ -330,6 +349,9 @@ export async function onRequestGet({ request }) {
       rankingLabel: META.ranking.label,
       rankingNote: META.ranking_note,
       budgetTypes: META.budget_types,
+      // Browse tab: per-cycle membership counts + price ranges (true full
+      // counts, computed from the same rows this API serves).
+      cycleCounts: CYCLE_COUNTS,
       preorderWatch: META.preorder_watch,
       servedCount: META.served_rows,
       heldCount: META.held_count,
