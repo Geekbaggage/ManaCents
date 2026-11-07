@@ -1,0 +1,19 @@
+{
+  "checked_date": "2026-11-07",
+  "bulk_files": [
+    {
+      "file": "oracle-cards-20261106220205.jsonl.gz",
+      "type": "oracle_cards",
+      "updated_at": "2026-11-06T22:02:05.872+00:00",
+      "compressed_size": 25322776,
+      "sha256": "ccbc99fd81dd4fd1a6109b40f61b9d449253204217a93cd4037ba490e452135f",
+      "download_uri": "https://data.scryfall.io/oracle-cards/oracle-cards-20261106220205.jsonl.gz"
+    }
+  ],
+  "game_changers": {
+    "checked_date": "2026-11-07",
+    "total_cards": 53,
+    "pages": 1
+  },
+  "classifier_version": "structural-v1-2026-11-07"
+}
