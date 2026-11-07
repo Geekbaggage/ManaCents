@@ -142,7 +142,7 @@ fails); the node render test + hook guard are what run in prebuild.
 
 ## 5. Files
 
-- This document: Drive 04_Handoffs + `manabase-search/phase3/gate2-evidence-2026-11-07.md` (committed on the review branch)
+- This document: Drive 04_Handoffs (`ManaBase-Search-Gate2-Evidence-2026-11-07.md`, file ID `1kT2tnXylks-sQ36BivfYFetbHezgS5MY`) + `manabase-search/phase3/gate2-evidence-2026-11-07.md` (committed on the review branch)
 - Comparison script: `manabase-search/phase3/check_budget_divergence.py` (commit `7d52e42`)
 - Matrix runner: `manabase-search/phase3/search_matrix.mjs` (commit `7d52e42`)
 - Closeout handoff (incl. Charlie's reassessment): Drive `10su5mO5TeKX3ahn-kDVP5Uwq1q3dyStD`
