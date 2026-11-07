@@ -218,13 +218,6 @@ export function LandSearch() {
 
   return (
     <div className="mb-search">
-      <p className="combos-sub">
-        Search every land by color — cheapest released version shown. Sort by
-        “Best budget — researched” for type-by-type budget picks from
-        community + official research (Charlie, Nov 7), or by cheapest price.
-        Most-used ranking is still coming once our data source is confirmed.
-      </p>
-
       <div className="mb-search-modes" role="group" aria-label="Search mode">
         <button
           type="button"
