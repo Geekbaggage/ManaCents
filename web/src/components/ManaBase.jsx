@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { money } from "../api.js";
 import { manaPoolCardUrl, tcgplayerMassEntryUrl } from "../affiliates.js";
 import { trackAffiliateClick } from "../analytics.js";
