@@ -461,7 +461,7 @@ export function LandSearch() {
               <span className="mb-land-cycle">{r.cycle === "unclassified" ? "" : r.cycle}</span>
               {r.is_basic && <span className="mb-land-basic">basic</span>}
               {r.budget_rank != null && (
-                <span className="mb-land-rank" title={r.budget_rank_context || ""}>
+                <span className="mb-land-rank">
                   #{r.budget_rank} budget
                 </span>
               )}
