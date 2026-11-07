@@ -359,26 +359,6 @@ export function LandSearch() {
 
       {error && <p className="mb-error">{error}</p>}
 
-      {meta && (
-        <p className="combos-sub">
-          {meta.total.toLocaleString()} lands match · {meta.servedCount.toLocaleString()} searchable ·{" "}
-          {meta.heldCount} held (fetchlands) · prices from{" "}
-          {meta.priceSnapshot}.
-          {meta.typeLabel && (
-            <>{" "}Showing {meta.typeLabel} — {meta.rankedCount} budget-ranked, the rest alphabetical.</>
-          )}
-          {loading && <>{" "}Updating…</>}
-          <PriceStaleNote snapshot={meta.priceSnapshot} />
-        </p>
-      )}
-
-      {meta && sort === "best_budget" && meta.preorderWatch.length > 0 && (
-        <p className="combos-sub">
-          Preorder watch list — under $5 only on preorder prices (releasing Nov 13);
-          their released prices are higher:{" "}
-          {meta.preorderWatch.map((w) => `${w.name} ($${w.all_quoted_usd} preorder / $${w.released_usd} released)`).join(", ")}.
-        </p>
-      )}
 
       {results.length > 0 && (
         <div className="mb-buybar">
@@ -541,6 +521,13 @@ export function LandSearch() {
             </button>
           )}
         </>
+      )}
+
+      {meta && (
+        <p className="combos-sub">
+          Prices as of {meta.priceSnapshot}.
+          <PriceStaleNote snapshot={meta.priceSnapshot} />
+        </p>
       )}
     </div>
   );
