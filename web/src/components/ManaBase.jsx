@@ -5,7 +5,6 @@ import { trackAffiliateClick } from "../analytics.js";
 import { buildDeckText, buildManaPoolAddDeckUrl, buildBuySet } from "./searchBuySet.js";
 import { LAND_CYCLES } from "./landCycles.js";
 
-const COLORS = ["W", "U", "B", "R", "G"];
 const COLOR_NAMES = { W: "White", U: "Blue", B: "Black", R: "Red", G: "Green" };
 const PIP_IMG = {
   W: "/mana/white-v2.png",
@@ -15,38 +14,6 @@ const PIP_IMG = {
   G: "/mana/green-v2.png",
   C: "/mana/colorless-v2.png",
 };
-const PRIORITIES = ["early", "main", "splash"];
-
-function ColorToggle({ color, selected, priority, onToggle, onPriority }) {
-  return (
-    <div className={`mb-color${selected ? " on" : ""}`}>
-      <button
-        type="button"
-        className="mb-color-btn"
-        onClick={() => onToggle(color)}
-        aria-pressed={selected}
-        aria-label={`${COLOR_NAMES[color]}${selected ? " (selected)" : ""}`}
-      >
-        <img src={PIP_IMG[color]} alt={COLOR_NAMES[color]} draggable="false" />
-      </button>
-      {selected && (
-        <div className="mb-priority" role="group" aria-label={`${COLOR_NAMES[color]} priority`}>
-          {PRIORITIES.map((p) => (
-            <button
-              key={p}
-              type="button"
-              className={`mb-prio${priority === p ? " on" : ""}`}
-              onClick={() => onPriority(color, p)}
-            >
-              {p}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 const SEARCH_CYCLES = [
   ["", "All cycles"], ["basic", "Basic"], ["bicycle", "Bicycle"], ["bond", "Bond"],
   ["bounce", "Bounce"], ["check", "Check"], ["fast", "Fast"], ["filter", "Filter"],
@@ -586,23 +553,12 @@ export function LandSearch() {
   );
 }
 
-function finishLabel(printing) {
-  // "PLST #DMU-243 (usd)" → "PLST #DMU-243 · nonfoil"
-  if (!printing) return "";
-  return printing
-    .replace(" (usd_foil)", " · foil")
-    .replace(" (usd_etched)", " · etched")
-    .replace(" (usd)", " · nonfoil");
-}
-
-// Browse lands by cycle — the FULL catalog (1,202 searchable), not the
-// 43-land pilot. Collapsed rows show true full counts + price ranges from
+// Browse lands by cycle — the FULL catalog (1,202 searchable). Collapsed rows show true full counts + price ranges from
 // meta.cycleCounts (one cheap request); expanding a cycle loads that cycle's
 // complete membership by paging the search API (limit 100/page) until the
 // count is reached — no 50-cap, no truncation. Unclassified lands get their
 // own group at the end: they are 861 of 1,202 lands, and leaving them out
-// of Browse would silently hide most of the catalog. The optimizer's
-// pilot-only gallery is gone; Search remains the place for color/type
+// of Browse would silently hide most of the catalog. Search remains the place for color/type
 // filtering and the buy set.
 const LAND_TRAITS = Object.fromEntries(
   LAND_CYCLES.map((c) => [c.id, c.trait])
@@ -757,81 +713,24 @@ export function LandGallery() {
 }
 
 export function ManaBase() {
-  const [tab, setTab] = useState("solver");
-  const [colors, setColors] = useState([]);
-  const [priorities, setPriorities] = useState({});
-  const [budget, setBudget] = useState(25);
-  const [slots, setSlots] = useState(10);
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const toggleColor = (c) => {
-    setColors((prev) => {
-      if (prev.includes(c)) {
-        const next = prev.filter((x) => x !== c);
-        setPriorities((pp) => {
-          const np = { ...pp };
-          delete np[c];
-          return np;
-        });
-        return next;
-      }
-      setPriorities((pp) => ({ ...pp, [c]: pp[c] || "main" }));
-      return [...prev, c];
-    });
-    setResult(null);
-  };
-
-  const setPriority = (c, p) => {
-    setPriorities((pp) => ({ ...pp, [c]: p }));
-    setResult(null);
-  };
-
-  const run = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const params = new URLSearchParams({
-        colors: colors.join(""),
-        priorities: JSON.stringify(priorities),
-        budget: String(budget),
-        slots: String(slots),
-        opponents: "3",
-        bracket: "3",
-      });
-      const res = await fetch(`/api/manabase?${params}`);
-      if (res.status === 429) {
-        throw new Error("Too many requests — please wait a moment and try again.");
-      }
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Solver failed");
-      setResult(data);
-    } catch (e) {
-      setResult(null); // never leave a stale package after a failed request
-      setError(e.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [tab, setTab] = useState("search");
 
   return (
     <div className="combos-page manabase-page">
       <div className="combo-card-ep">Beta</div>
       <h1>Fix My Mana Base</h1>
       <p className="combos-sub">
-        Suggested land purchases optimized for your selected colors,
-        priorities and budget under the stated assumptions. Or browse every
-        land by cycle, or search the full catalog by color and type.
+        Search the full catalog of Commander-legal lands by color and type,
+        ranked by budget, or browse every land by cycle.
       </p>
 
       <div className="mb-tabs" role="tablist">
         <button
-          type="button" role="tab" aria-selected={tab === "solver"}
-          className={`mb-tab${tab === "solver" ? " on" : ""}`}
-          onClick={() => setTab("solver")}
+          type="button" role="tab" aria-selected={tab === "search"}
+          className={`mb-tab${tab === "search" ? " on" : ""}`}
+          onClick={() => setTab("search")}
         >
-          Find my lands
+          Search lands
         </button>
         <button
           type="button" role="tab" aria-selected={tab === "browse"}
@@ -840,150 +739,10 @@ export function ManaBase() {
         >
           Browse lands
         </button>
-        <button
-          type="button" role="tab" aria-selected={tab === "search"}
-          className={`mb-tab${tab === "search" ? " on" : ""}`}
-          onClick={() => setTab("search")}
-        >
-          Search lands
-        </button>
       </div>
 
       {tab === "search" && <LandSearch />}
       {tab === "browse" && <LandGallery />}
-      {tab === "solver" && (
-      <>
-      <h2>1. Your colors</h2>
-      <div className="mb-colors" role="group" aria-label="Choose colors">
-        {COLORS.map((c) => (
-          <ColorToggle
-            key={c}
-            color={c}
-            selected={colors.includes(c)}
-            priority={priorities[c] || "main"}
-            onToggle={toggleColor}
-            onPriority={setPriority}
-          />
-        ))}
-      </div>
-
-      <h2>2. Budget &amp; size</h2>
-      <div className="mb-controls">
-        <label>
-          Budget: <strong>{money(budget)}</strong>
-          <input
-            type="range" min="5" max="200" step="5" value={budget}
-            onChange={(e) => { setBudget(Number(e.target.value)); setResult(null); }}
-          />
-        </label>
-        <label>
-          Max lands: <strong>{slots}</strong>
-          <input
-            type="range" min="1" max="10" step="1" value={slots}
-            onChange={(e) => { setSlots(Number(e.target.value)); setResult(null); }}
-          />
-        </label>
-      </div>
-
-      <button type="button" className="mb-run" onClick={run} disabled={loading}>
-        {loading ? "Solving…" : colors.length === 0 ? "Find colorless lands 💎" : "Find my lands 💎"}
-      </button>
-      {colors.length === 0 && (
-        <p className="combos-sub">No colors picked — this searches colorless-producing lands only.</p>
-      )}
-
-      {error && <p className="mb-error">{error}</p>}
-
-      {result && (
-        <div className="mb-results">
-          <h2>
-            Your package — {money(result.score.priceDollars)}
-            <span className={`mb-status mb-status-${result.stats.status}`}>
-              {result.stats.status === "optimal"
-                ? "Optimal"
-                : result.stats.status === "best_found"
-                  ? `Best found (interrupted: ${result.stats.interruptReason || "node budget"})`
-                  : result.stats.status === "interrupted_without_result"
-                    ? "No result before interruption"
-                    : result.stats.status === "empty_proven"
-                      ? "No lands match these colors and budget"
-                      : result.stats.status}
-            </span>
-          </h2>
-          <p className="combos-sub">
-            {result.lands.length} lands · penalty {result.score.penalty} ·
-            {result.stats.nodesVisited.toLocaleString()} nodes searched
-          </p>
-          {result.perColor && Object.keys(result.perColor).length > 0 && (
-            <div className="mb-shortfalls">
-              {Object.entries(result.perColor).map(([c, v]) => (
-                <span key={c} className={`mb-short${v.shortfall > 0 ? " unmet" : " met"}`}>
-                  <img src={PIP_IMG[c] ?? PIP_IMG.C} alt={COLOR_NAMES[c] ?? c} width={16} height={16} draggable="false" /> {v.qualifying}/{v.target}
-                  {v.shortfall > 0 ? ` (short ${v.shortfall})` : " ✓"}
-                </span>
-              ))}
-            </div>
-          )}
-          <div className="mb-lands">
-            {result.lands.map((l) => (
-              <div key={l.name} className="mb-land">
-                <div className="mb-land-name">{l.name}</div>
-                <div className="mb-land-meta">
-                  <span className="mb-land-price">{money(l.price)}</span>
-                  {l.lifeCost > 0 && (
-                    <span className="mb-land-life" title="Modeled life cost under the 3-use scoring scenario, not measured per-game loss">
-                      −{l.lifeCost} ♥
-                    </span>
-                  )}
-                  {l.conditional && <span className="mb-land-cond">conditional</span>}
-                </div>
-                <div className="mb-land-print">{finishLabel(l.pricePrinting)}</div>
-                <a
-                  className="btn-copy combo-eq-buy"
-                  href={manaPoolCardUrl(l.name)}
-                  target="_blank" rel="noopener noreferrer"
-                  onClick={() => trackAffiliateClick("manapool", { view: "manabase" })}
-                >
-                  Buy this card
-                </a>
-              </div>
-            ))}
-          </div>
-          <p className="mb-disclaimer">
-            Suggested land purchases optimized for your selected colors,
-            priorities and budget under the stated assumptions. Prototype:
-            43 lands, scoring policy v1, bond lands resolved for 3 opponents.
-            Prices are a {result.meta?.priceSnapshot || "2026-11-04"} snapshot
-            of cheapest printings — verify at checkout. Life costs are modeled
-            scoring values, not measured per-game loss.
-            {(() => {
-              const snap = result.meta?.priceSnapshot;
-              if (!snap) return null;
-              const ageDays = Math.floor(
-                (Date.now() - new Date(snap + "T00:00:00Z").getTime()) / 86400000
-              );
-              if (ageDays > 30) {
-                return (
-                  <span className="mb-stale mb-stale-expired">
-                    {" "}Pricing is over 30 days old — treat prices as
-                    expired and verify every card before buying.
-                  </span>
-                );
-              }
-              if (ageDays > 7) {
-                return (
-                  <span className="mb-stale">
-                    {" "}Prices are {ageDays} days old and may be stale —
-                    verify before you buy.
-                  </span>
-                );
-              }
-              return null;
-            })()}
-          </p>
-        </div>
-      )}
-      </>)}
     </div>
   );
 }

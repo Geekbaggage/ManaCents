@@ -613,7 +613,7 @@ test("buildBuySet excludes basics, dedupes, caps at 100", () => {
 
 // ---- UI smoke: the Search lands tab renders in the ManaBase tool ----
 
-test("ManaBase renders a Search lands tab next to the optimizer", async () => {
+test("ManaBase renders Search as the landing tab with Browse second (optimizer removed Nov 7)", async () => {
   // The bundle must live on disk (not a data: URL) so the bundled React
   // resolves to the same node_modules instance as this test's React —
   // otherwise renderToStaticMarkup throws "Invalid hook call" (two copies
@@ -631,8 +631,10 @@ test("ManaBase renders a Search lands tab next to the optimizer", async () => {
     const ui = await import(pathToFileURL(tmpPath));
     const html = renderToStaticMarkup(React.createElement(ui.ManaBase));
     assert.match(html, /Search lands/);
-    assert.match(html, /Find my lands/);
     assert.match(html, /Browse lands/);
+    assert.doesNotMatch(html, /Find my lands/);
+    // Search is the landing tab: it carries aria-selected="true".
+    assert.match(html, /aria-selected="true"[^>]*>\s*Search lands/s);
     // Render the tabs themselves: LandSearch / LandGallery only mount when
     // their tab is active, so rendering ManaBase alone never executes them.
     // e676b3e shipped a Search-tab crash (useCallback used but never
