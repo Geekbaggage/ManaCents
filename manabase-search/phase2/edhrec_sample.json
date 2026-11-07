@@ -1,0 +1,64 @@
+{
+ "fetched_at": "2026-11-07T05:33:34Z",
+ "top_lands_count": 100,
+ "top_lands_first5": [
+  {
+   "name": "Forest",
+   "slug": "forest",
+   "num_decks": 4498393,
+   "potential_decks": 4807524,
+   "inclusion": 0.9356985009331207
+  },
+  {
+   "name": "Mountain",
+   "slug": "mountain",
+   "num_decks": 4821658,
+   "potential_decks": 5218271,
+   "inclusion": 0.923995323355188
+  },
+  {
+   "name": "Plains",
+   "slug": "plains",
+   "num_decks": 4528649,
+   "potential_decks": 4903338,
+   "inclusion": 0.9235849129715308
+  },
+  {
+   "name": "Island",
+   "slug": "island",
+   "num_decks": 4765528,
+   "potential_decks": 5171671,
+   "inclusion": 0.9214677422442379
+  },
+  {
+   "name": "Swamp",
+   "slug": "swamp",
+   "num_decks": 4889193,
+   "potential_decks": 5316377,
+   "inclusion": 0.9196475344017175
+  }
+ ],
+ "sample_cards": {
+  "command-tower": {
+   "slug": "command-tower",
+   "name": "Command Tower",
+   "num_decks": 7737286,
+   "potential_decks": 10507954,
+   "inclusion": 0.736326596024307
+  },
+  "hallowed-fountain": {
+   "slug": "hallowed-fountain",
+   "name": "Hallowed Fountain",
+   "num_decks": 1008456,
+   "potential_decks": 2427109,
+   "inclusion": 0.41549679062621414
+  },
+  "forest": {
+   "slug": "forest",
+   "name": "Forest",
+   "num_decks": 4498393,
+   "potential_decks": 4807524,
+   "inclusion": 0.9356985009331207
+  }
+ }
+}

@@ -813,3 +813,53 @@ input:focus, select:focus, button:focus-visible {
 .mb-status-best_found, .mb-status-interrupted_without_result { color: #f59e0b; border-color: #f59e0b; }
 .mb-stale { color: #f59e0b; font-weight: 700; }
 .mb-stale-expired { color: #f43f5e; font-weight: 700; }
+
+/* ---- ManaBase land search (Phase 4) ---- */
+.mb-search-modes { display: flex; gap: 8px; flex-wrap: wrap; margin: 0.75rem 0 0.25rem; }
+.mb-search-mode {
+  background: none; border: 1px solid #334155; border-radius: 10px;
+  color: #94a3b8; font-size: 0.95rem; font-weight: 600;
+  padding: 0.6rem 1.2rem; cursor: pointer;
+}
+.mb-search-mode.on { border-color: #22d3ee; color: #22d3ee; }
+.mb-search-filters {
+  display: flex; gap: 1.25rem; flex-wrap: wrap; align-items: flex-end;
+  margin: 1rem 0;
+}
+.mb-search-filters label { display: flex; flex-direction: column; gap: 6px; color: #cbd5e1; font-size: 0.9rem; }
+.mb-search-filters select,
+.mb-search-filters input[type="number"] {
+  background: #0f172a; border: 1px solid #334155; border-radius: 8px;
+  color: #f1f5f9; padding: 0.5rem 0.7rem; font-size: 0.95rem; min-width: 140px;
+}
+.mb-search-filters select:disabled { opacity: 0.55; }
+.mb-search-check { flex-direction: row !important; align-items: center; padding-bottom: 0.55rem; }
+.mb-search-check input { accent-color: #22d3ee; width: 18px; height: 18px; }
+.mb-buybar {
+  background: rgba(15, 23, 42, 0.6); border: 1px solid #22d3ee;
+  border-radius: 10px; padding: 0.9rem 1rem; margin: 1rem 0;
+}
+.mb-buybar-summary { color: #f1f5f9; margin-bottom: 0.25rem; }
+.mb-buybar-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 0.6rem; }
+.mb-buybar-actions button {
+  background: none; border: 1px solid #334155; border-radius: 8px;
+  color: #cbd5e1; padding: 0.5rem 0.9rem; cursor: pointer; font-size: 0.9rem;
+}
+.mb-buybar-actions button:disabled { opacity: 0.45; cursor: default; }
+.mb-search-pick { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; }
+.mb-search-pick input { accent-color: #22d3ee; width: 18px; height: 18px; margin-top: 2px; flex-shrink: 0; }
+.mb-land-entry { color: #94a3b8; font-size: 0.75rem; }
+.mb-land-entry-untapped { color: #10b981; }
+.mb-land-gc { color: #f59e0b; border: 1px solid #f59e0b; border-radius: 6px; font-size: 0.72rem; font-weight: 700; padding: 1px 7px; }
+.mb-land-cond-colors { color: #94a3b8; font-size: 0.75rem; font-style: italic; display: inline-flex; gap: 2px; align-items: center; }
+.mb-land-cycle { color: #64748b; font-size: 0.75rem; }
+.mb-land-basic { color: #94a3b8; font-size: 0.72rem; font-style: italic; }
+.mb-land-utility { margin-top: 6px; }
+.mb-land-utility-tag { color: #f59e0b; font-size: 0.72rem; font-weight: 700; }
+.mb-land-oracle { color: #94a3b8; font-size: 0.78rem; white-space: pre-line; margin: 4px 0 0; }
+.mb-land-rank { color: #22d3ee; border: 1px solid #22d3ee; border-radius: 6px; font-size: 0.72rem; font-weight: 700; padding: 1px 7px; }
+.mb-land-preorder { color: #f59e0b; border: 1px solid #f59e0b; border-radius: 6px; font-size: 0.72rem; font-weight: 700; padding: 1px 7px; }
+.mb-land-rank-note { color: #94a3b8; font-size: 0.75rem; margin-top: 4px; }
+.mb-land-face { margin-top: 6px; display: flex; flex-direction: column; gap: 2px; }
+.mb-land-face-tag { color: #c084fc; font-size: 0.72rem; font-weight: 700; }
+.mb-land-faces { color: #94a3b8; font-size: 0.75rem; }
