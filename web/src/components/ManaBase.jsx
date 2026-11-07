@@ -356,6 +356,7 @@ export function LandSearch() {
       >
         {loading ? "Searching…" : "Search lands"}
       </button>
+      {loading && <span className="combos-sub">Updating…</span>}
 
       {error && <p className="mb-error">{error}</p>}
 
