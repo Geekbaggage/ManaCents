@@ -342,6 +342,10 @@ test("fetchlands served with the fetch model; no banned rows; face rows served (
   // The 10 fetchlands are SERVED now (fetch modeling done Nov 7): whole-card
   // CI from the tutored types, no production, conditional tutor entry, cycle
   // fetch, in the buy set by default like any other non-basic.
+  // Display consequence (CEO, Nov 7): colors_produced [] + conditional_colors
+  // [] is exactly what makes a Search card render the colorless pip — the
+  // card's pip branch takes its colorless fallback when nothing is produced.
+  // The true CI stays in the data (and in fits) — see the legality test below.
   const expectedCI = {
     "Arid Mesa": ["W", "R"], "Bloodstained Mire": ["B", "R"],
     "Flooded Strand": ["W", "U"], "Marsh Flats": ["W", "B"],
@@ -622,6 +626,42 @@ test("cycle paging: full membership, no truncation, no duplicates (Browse tab)",
   assert.ok(!shockInType.results.some((r) => r.name === "Multiversal Passage"));
 });
 
+test("Fetch lands button filter: the exact request it issues shows all 10 (CEO, Nov 7)", async () => {
+  // applyFetchFilter (ManaBase.jsx) issues mode=produces + cycle=fetch with
+  // no colors, no type, no max price — the combination that cannot hide a
+  // fetchland. Assert it returns exactly the 10, cheapest first.
+  const body = await getOk("mode=produces&cycle=fetch&limit=100");
+  assert.equal(body.meta.total, 10);
+  assert.equal(body.results.length, 10);
+  assert.ok(body.results.every((r) => r.cycle === "fetch"));
+  assert.deepEqual(
+    body.results.map((r) => r.name).sort(),
+    ["Arid Mesa", "Bloodstained Mire", "Flooded Strand", "Marsh Flats",
+      "Misty Rainforest", "Polluted Delta", "Scalding Tarn",
+      "Verdant Catacombs", "Windswept Heath", "Wooded Foothills"].sort()
+  );
+  assert.equal(body.results[0].name, "Windswept Heath");
+  assert.equal(body.results[0].cheapest.price, 11.75);
+});
+
+test("fetchlands fits legality at the API (CEO, Nov 7): WU yes, R never", async () => {
+  // The true whole-card CI is kept for fits even though fetch cards display
+  // the colorless pip: Flooded Strand is WU, so it is legal in a WU deck
+  // and illegal in a mono-red deck — the tool must never suggest it there.
+  const wu = await allRows("mode=fits&colors=WU");
+  assert.ok(wu.some((r) => r.name === "Flooded Strand"), "Flooded Strand fits WU");
+  const red = await allRows("mode=fits&colors=R");
+  assert.ok(!red.some((r) => r.cycle === "fetch"), "no fetchland fits mono-red");
+  const wubrg = await allRows("mode=fits&colors=WUBRG");
+  assert.equal(wubrg.filter((r) => r.cycle === "fetch").length, 10);
+  // Produces never matches a fetchland, not even colorless (see the
+  // classifier test) — confirmed here at the API level too.
+  const prodW = await allRows("mode=produces&colors=W");
+  assert.ok(!prodW.some((r) => r.cycle === "fetch"));
+  const prodC = await allRows("mode=produces&colors=C");
+  assert.ok(!prodC.some((r) => r.cycle === "fetch"));
+});
+
 // ---- Buy-set helpers (pure module, no bundling needed) ----
 
 test("buildDeckText + Mana Pool add-deck URL: ref appended (Q2 verified), round-trips", () => {
@@ -697,6 +737,12 @@ test("ManaBase renders Search as the landing tab with Browse second (optimizer r
     assert.match(searchHtml, /Best budget — researched/);
     assert.match(searchHtml, /Type \/ role/);
     assert.match(searchHtml, /Search lands/);
+    // "Fetch lands" quick-filter button (CEO, Nov 7): present in the
+    // filters, inactive on first render (cycle is empty, so aria-pressed
+    // is false). Its click behavior is covered at the API level by the
+    // button-filter test above (the exact request it issues).
+    assert.match(searchHtml, /Fetch lands/);
+    assert.match(searchHtml, /aria-pressed="false"[^>]*>Fetch lands/);
     const galleryHtml = renderToStaticMarkup(React.createElement(ui.LandGallery));
     assert.match(galleryHtml, /Loading lands/);
     // Note: the Search tab renders only when active, so the Best budget
