@@ -11,6 +11,10 @@ import {
   buildBuySet,
   BUY_SET_MAX_LINES,
 } from "../../src/components/searchBuySet.js";
+import {
+  matchesProduces,
+  matchesFits,
+} from "./_manabase_search_filters.js";
 
 // Exercise the real Pages handler. esbuild bundles its JSON import, the same
 // dependency set the production build uses.
@@ -57,6 +61,8 @@ test("no params: full served set, cheapest first, honest meta", async () => {
   assert.equal(body.meta.heldCount, 111);
   assert.equal(body.meta.heldFaceRows, 101);
   assert.equal(body.meta.heldFetchRows, 10);
+  assert.match(body.meta.coverageNote, /1,101 of 1,212/);
+  assert.match(body.meta.coverageNote, /not full 1,212-card coverage/);
   // Cheapest first: non-decreasing prices across the page.
   const prices = body.results.map((r) => r.cheapest.price);
   assert.deepEqual(prices, [...prices].sort((a, b) => a - b));
@@ -84,6 +90,92 @@ test("colors=C returns only colorless-only lands", async () => {
   for (const r of body.results) {
     assert.deepEqual(r.colors_produced, [], `${r.name} produces colors but matched C`);
   }
+});
+
+test("mode=fits: whole-card CI + basic land types (CR 903.5c/d)", async () => {
+  // Sunken Hollow produces U and B but its whole-card CI is [U, B] — it
+  // produces for a U search but does NOT fit a U-only commander.
+  const produces = await allRows("colors=U");
+  assert.ok(produces.some((r) => r.name === "Sunken Hollow"));
+  const fits = await allRows("colors=U&mode=fits");
+  assert.ok(!fits.some((r) => r.name === "Sunken Hollow"));
+  // Hallowed Fountain CI is [W, U]: fits WU, not U alone.
+  assert.ok(!fits.some((r) => r.name === "Hallowed Fountain"));
+  const fitsWU = await allRows("colors=WU&mode=fits");
+  assert.ok(fitsWU.some((r) => r.name === "Hallowed Fountain"));
+  // Plains CI is [W]: fits W, not U.
+  assert.ok(!fits.some((r) => r.name === "Plains"));
+  for (const r of fits) {
+    assert.ok(
+      r.color_identity.every((c) => ["U"].includes(c)),
+      `${r.name} CI ${r.color_identity} does not fit U`
+    );
+    const basicColors = (r.basic_types ?? []).map(
+      (t) => ({ Plains: "W", Island: "U", Swamp: "B", Mountain: "R", Forest: "G" })[t]
+    );
+    assert.ok(
+      basicColors.every((c) => ["U"].includes(c)),
+      `${r.name} basic types ${r.basic_types} do not fit U`
+    );
+  }
+  // Fits is NOT a subset of produces: a U-identity land that produces no
+  // colored mana (e.g. Academy Ruins) fits a U commander but does not produce U.
+  assert.ok(fits.some((r) => r.name === "Academy Ruins"));
+  assert.ok(!produces.some((r) => r.name === "Academy Ruins"));
+  // Colorless identity: only empty-CI, no-basic-type rows fit.
+  const fitsC = await getOk("colors=C&mode=fits&limit=100");
+  assert.ok(fitsC.results.every((r) => r.color_identity.length === 0 && (r.basic_types ?? []).length === 0));
+  assert.ok(fitsC.results.some((r) => r.name === "Command Tower"));
+  const { status } = await get("mode=bogus");
+  assert.equal(status, 400);
+});
+
+test("filter semantics on synthetic rows: off-identity, modal, transform, colorless", () => {
+  // Off-identity utility land: produces W, but whole-card CI includes B.
+  const offIdentity = {
+    name: "Test Utility Land", colors_produced: ["W"], color_identity: ["W", "B"], basic_types: [],
+  };
+  assert.equal(matchesProduces(offIdentity, ["W"], false), true);
+  assert.equal(matchesFits(offIdentity, ["W"]), false);
+  assert.equal(matchesFits(offIdentity, ["W", "B"]), true);
+  // Modal DFC: land face produces U, whole-card CI is [U, B].
+  const modal = {
+    name: "Test Modal // Land Face", colors_produced: ["U"], color_identity: ["U", "B"], basic_types: [],
+  };
+  assert.equal(matchesProduces(modal, ["U"], false), true);
+  assert.equal(matchesFits(modal, ["U"]), false);
+  assert.equal(matchesFits(modal, ["U", "B"]), true);
+  // Transforming card, land only on the back: front is a creature, whole-card
+  // CI is [B], land face produces B. Fits a B commander, not a W one.
+  const transformBack = {
+    name: "Test Transform (back: Land)", colors_produced: ["B"], color_identity: ["B"], basic_types: [],
+  };
+  assert.equal(matchesProduces(transformBack, ["B"], false), true);
+  assert.equal(matchesFits(transformBack, ["B"]), true);
+  assert.equal(matchesFits(transformBack, ["W"]), false);
+  assert.equal(matchesProduces(transformBack, ["W"], false), false);
+  // Basic land type without the color in CI: the basic-type check must catch
+  // what CI alone misses (a Dryad-Arbor-like row).
+  const basicTyped = {
+    name: "Test Forest Land", colors_produced: ["G"], color_identity: [], basic_types: ["Forest"],
+  };
+  assert.equal(matchesFits(basicTyped, ["G"]), true);
+  assert.equal(matchesFits(basicTyped, ["W"]), false);
+  // Colorless query: produces-C matches only rows with no colored production
+  // (conditional production does not count); fits-C matches only empty-CI,
+  // no-basic-type rows.
+  const colorlessOnly = {
+    name: "Test Wastes", colors_produced: [], color_identity: [], basic_types: [],
+  };
+  const conditionalOnly = {
+    name: "Test Tainted", colors_produced: [], conditional_colors: [{ color: "B", dependency: "Swamp" }],
+    color_identity: ["B", "W"], basic_types: [],
+  };
+  assert.equal(matchesProduces(colorlessOnly, [], true), true);
+  assert.equal(matchesProduces(conditionalOnly, [], true), true); // no unconditional production
+  assert.equal(matchesProduces(conditionalOnly, ["B"], false), false); // conditional never counts
+  assert.equal(matchesFits(colorlessOnly, []), true);
+  assert.equal(matchesFits(conditionalOnly, []), false);
 });
 
 test("include_basics=0 hides the 12 basics", async () => {
@@ -174,18 +266,22 @@ test("no banned, face or fetch rows anywhere in the served set", async () => {
 
 // ---- Buy-set helpers (pure module, no bundling needed) ----
 
-test("buildDeckText + Mana Pool add-deck URL: no ref, round-trips", () => {
+test("buildDeckText + Mana Pool add-deck URL: ref appended (Q2 verified), round-trips", () => {
   const names = ["Hallowed Fountain", "Watery Grave"];
   assert.equal(buildDeckText(names), "1 Hallowed Fountain\n1 Watery Grave");
   const url = buildManaPoolAddDeckUrl(names);
   assert.ok(url.startsWith("https://manapool.com/add-deck?deck="));
-  assert.ok(!url.includes("ref="), "Q2 unverified — no ref appended");
-  const encoded = url.split("deck=")[1];
+  // Q2 (Charlie, Nov 6/7): ref placement on the add-deck link is verified by
+  // Mana Pool's own affiliate docs + a real browser check — ref IS appended.
+  // Account-side commission attribution is still unverified, so nothing in
+  // the UI may promise it.
+  assert.ok(url.includes("ref=manacents"), "ref=manacents must be appended (Q2 verified)");
+  const encoded = url.split("deck=")[1].split("&")[0];
   const decoded = Buffer.from(
     encoded.replace(/-/g, "+").replace(/_/g, "/"), "base64"
   ).toString("utf8");
   assert.equal(decoded, buildDeckText(names));
-  assert.equal(buildManaPoolAddDeckUrl([]), "https://manapool.com/");
+  assert.equal(buildManaPoolAddDeckUrl([]), "https://manapool.com/?ref=manacents");
 });
 
 test("buildBuySet excludes basics, dedupes, caps at 100", () => {

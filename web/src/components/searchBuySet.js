@@ -2,16 +2,18 @@
 // no DOM, no fetch — so they are unit-testable in Node as well as the browser).
 //
 // Q1 (Val, Nov 6): basics are EXCLUDED from the buy set by default.
-// Q2 (open — ref tracking on the add-deck link unverified): the Mana Pool
-// add-deck URL built here does NOT append ref=manacents, and nothing in the
-// UI claims affiliate tracking on it.
-//
-// DIVERGENCE NOTE (recorded, not hidden): web/src/affiliates.js already has
-// manaPoolDeckUrl(), which DOES append &ref=manacents and has been live in
-// production since Oct 20, 2026 (commit 1cf73c8, used by CheckoutBar.jsx for
-// the upgrades buy-all). This search flow deliberately does not use it until
-// Q2 is answered — the two flows are inconsistent on purpose for now, and
-// must be reconciled (one helper, one rule) when Q2 clears.
+// Q2 (Charlie, Nov 6/7 — VERIFIED): the Mana Pool add-deck link imports a
+// list into the review/mass-entry step (3/3 in stock in a real browser
+// check) and Mana Pool's own affiliate docs explicitly document the URL
+// with `&ref=YOUR_REFERRAL_CODE`. So the add-deck link is built WITH
+// `ref=manacents`, via the established `manaPoolDeckUrl()` helper in
+// affiliates.js (live in production for the upgrades buy-all since Oct 20,
+// 2026). What is STILL unverified is account-side commission attribution —
+// the UI must never promise commission tracking, and the link is presented
+// as "Review selected lands on Mana Pool", not as a completed purchase
+// (the link does not itself complete a cart or purchase).
+
+import { manaPoolDeckUrl } from "../affiliates.js";
 
 export const BUY_SET_MAX_LINES = 100;
 
@@ -19,19 +21,10 @@ export function buildDeckText(names) {
   return names.map((n) => `1 ${n}`).join("\n");
 }
 
-function base64UrlEncode(text) {
-  // Same encoding as affiliates.js (Brin's documented format): UTF-8 bytes
-  // -> base64 -> URL-safe, no padding.
-  const bytes = new TextEncoder().encode(text);
-  let bin = "";
-  for (const b of bytes) bin += String.fromCharCode(b);
-  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
-}
-
 export function buildManaPoolAddDeckUrl(names) {
-  // No ref appended (Q2 unverified). Empty selection -> Mana Pool home.
-  if (!Array.isArray(names) || names.length === 0) return "https://manapool.com/";
-  return `https://manapool.com/add-deck?deck=${base64UrlEncode(buildDeckText(names))}`;
+  // Thin wrapper over the established helper so the search buy flow and the
+  // upgrades buy flow use one helper and one rule (ref appended, per Q2).
+  return manaPoolDeckUrl(names.map((n) => ({ name: n })));
 }
 
 export function buildBuySet(rows, selectedNames) {

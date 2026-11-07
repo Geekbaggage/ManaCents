@@ -6,20 +6,27 @@
 // Preview only — no production approval.
 //
 // Color match semantics (decided in Phase 3; the plan left this open):
-// search is "useful in these colors", NOT the optimizer's deck-legality
-// subset rule (CR 903.5c). A land matches if it produces AT LEAST ONE of the
-// requested colors. So Command Tower (any color) matches every color search,
-// and a WUB land matches a WU search. Lands that produce no colored mana
-// (colorless-only: Ancient Tomb, Wastes, Strip Mine, …) match ONLY on an
-// explicit colorless request (colors=C). No colors param = no color filter.
+// two DISTINCT modes (Charlie's plan correction #1, Nov 6/7).
+//   mode=produces (default) — "produces these colors": a land matches if it
+//     produces AT LEAST ONE of the requested colors. Command Tower matches
+//     every color search; a WUB land matches a WU search. Lands that produce
+//     no colored mana match ONLY on an explicit colorless request (C).
+//     Conditional production never counts toward a produces match.
+//   mode=fits — "fits my commander" (CR 903.5c/d): the WHOLE-CARD color
+//     identity must be a subset of the requested colors AND every basic land
+//     type must produce a color in the requested set. A colorless request
+//     (C, no colors) matches only empty-CI, no-basic-type rows.
+// The plan's original `colors_produced ⊆ requested` test is NOT CR 903.5c
+// and is not used anywhere here.
 //
 // Sorting: most-used is the planned default, but the ranking data does NOT
-// exist yet (Q3 — EDHREC terms with Charlie). Until Q3 clears, the visible
-// default is price_asc and sort=most_used / sort=inclusion is rejected with
-// a 400 that says so plainly. Most-used numbers are never faked.
+// exist yet (Q3 — EDHREC terms with Charlie; NOT cleared Nov 6/7). Until Q3
+// clears, the visible default is price_asc and sort=most_used / sort=inclusion
+// is rejected with a 400 that says so plainly. Most-used numbers are never faked.
 //
 // Params (all validated; invalid input → 400, never silently rewritten):
 //   colors: string of WUBRG chars + optional C (colorless-only); absent = all
+//   mode: produces (default) · fits
 //   sort: price_asc (default) · price_desc · name
 //   include_basics: 1/0 (default 1 — Q1, Val Nov 6: basics shown by default)
 //   max_price: number ≥ 0 (cheapest price must be ≤ this)
@@ -31,8 +38,10 @@
 //
 // Returns: { meta, results } — meta always carries the price snapshot date,
 // the (null) ranking snapshot + note, and the served/held counts, so the UI
-// can show staleness honestly.
+// can show staleness honestly. Coverage is stated as actual served/held
+// counts — this is NOT the full 1,212-card universe while rows are held.
 import searchData from "./_manabase_search.json";
+import { matchesProduces, matchesFits } from "./_manabase_search_filters.js";
 
 const ROWS = searchData.rows;
 const META = searchData.meta;
@@ -75,6 +84,7 @@ function publicRow(r) {
     game_changer: r.legality.game_changer,
     banned: r.legality.banned,
     in_buy_set_by_default: r.in_buy_set_by_default,
+    basic_types: r.basic_types,
   };
 }
 
@@ -104,6 +114,11 @@ export async function onRequestGet({ request }) {
   }
   if (!["price_asc", "price_desc", "name"].includes(sort)) {
     return jsonError(`invalid sort: "${sort}" — use price_asc, price_desc or name`);
+  }
+
+  const mode = q.get("mode") ?? "produces";
+  if (!["produces", "fits"].includes(mode)) {
+    return jsonError(`invalid mode: "${mode}" — use produces or fits`);
   }
 
   let includeBasics, untappedOnly, limit, offset;
@@ -143,10 +158,14 @@ export async function onRequestGet({ request }) {
   // ---- Filters ----
   let results = ROWS;
   if (colors.length > 0) {
-    results = results.filter((r) => {
-      if (r.colors_produced.length === 0) return wantColorless;
-      return r.colors_produced.some((c) => wantColors.includes(c));
-    });
+    if (mode === "fits") {
+      // Whole-card CI + basic-land-type restriction (CR 903.5c/d). In fits
+      // mode the C pip means colorless identity: requested colors are the
+      // WUBRG chars only, so colors=C alone requests the empty set.
+      results = results.filter((r) => matchesFits(r, wantColors));
+    } else {
+      results = results.filter((r) => matchesProduces(r, wantColors, wantColorless));
+    }
   }
   if (!includeBasics) results = results.filter((r) => !r.is_basic);
   if (maxPrice !== null) results = results.filter((r) => r.cheapest.price <= maxPrice);
@@ -176,6 +195,7 @@ export async function onRequestGet({ request }) {
       total,
       returned: page.length,
       sort,
+      mode,
       priceSnapshot: META.price_snapshot,
       rankingSnapshot: META.ranking,
       rankingNote: META.ranking_note,
@@ -186,6 +206,10 @@ export async function onRequestGet({ request }) {
       excludedCount: META.excluded_count,
       utilityDisplayOnly: META.served_utility_display_only,
       cheapestSetTotal: META.cheapest_set_total,
+      coverageNote:
+        "1,101 of 1,212 Commander-legal lands searchable; 111 held " +
+        "(101 double-faced/adventure + 10 fetchlands); 100 excluded " +
+        "(3 banned + 97 not Commander-legal). This is not full 1,212-card coverage.",
     },
     results: page.map(publicRow),
   });

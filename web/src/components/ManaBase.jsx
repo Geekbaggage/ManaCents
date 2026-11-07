@@ -96,6 +96,7 @@ function entryBadge(entry) {
 
 function LandSearch() {
   const [colors, setColors] = useState([]);
+  const [mode, setMode] = useState("produces");
   const [sort, setSort] = useState("price_asc");
   const [hideBasics, setHideBasics] = useState(false);
   const [untappedOnly, setUntappedOnly] = useState(false);
@@ -123,6 +124,7 @@ function LandSearch() {
     try {
       const params = new URLSearchParams({
         sort,
+        mode,
         include_basics: hideBasics ? "0" : "1",
         untapped_only: untappedOnly ? "1" : "0",
         game_changer: gameChanger,
@@ -198,6 +200,30 @@ function LandSearch() {
         cheapest price.
       </p>
 
+      <div className="mb-search-modes" role="group" aria-label="Search mode">
+        <button
+          type="button"
+          className={`mb-search-mode${mode === "produces" ? " on" : ""}`}
+          onClick={() => { setMode("produces"); setResults([]); setMeta(null); }}
+          aria-pressed={mode === "produces"}
+        >
+          Produces these colors
+        </button>
+        <button
+          type="button"
+          className={`mb-search-mode${mode === "fits" ? " on" : ""}`}
+          onClick={() => { setMode("fits"); setResults([]); setMeta(null); }}
+          aria-pressed={mode === "fits"}
+        >
+          Fits my commander
+        </button>
+      </div>
+      <p className="combos-sub">
+        {mode === "produces"
+          ? "Produces: a land matches if it can produce at least one of the picked colors."
+          : "Fits my commander: only lands legal in a deck with this color identity (whole-card color identity + basic land types)."}
+      </p>
+
       <h2>Your colors</h2>
       <div className="mb-colors" role="group" aria-label="Choose colors">
         {SEARCH_COLORS.map((c) => (
@@ -217,8 +243,12 @@ function LandSearch() {
       <p className="combos-sub">
         {colors.length === 0
           ? "No colors picked — showing every land."
-          : "A land matches if it produces at least one of these colors."}
-        {" "}Colorless-only lands match only when the colorless pip is picked.
+          : mode === "fits"
+            ? "Only lands legal in a deck with this color identity."
+            : "A land matches if it produces at least one of these colors."}
+        {" "}{mode === "fits"
+          ? "The colorless pip means a colorless commander identity."
+          : "Colorless-only lands match only when the colorless pip is picked."}
       </p>
 
       <h2>Sort &amp; filters</h2>
@@ -314,7 +344,7 @@ function LandSearch() {
                   href={buildManaPoolAddDeckUrl(buySet.names)}
                   target="_blank" rel="noopener noreferrer"
                 >
-                  Buy on Mana Pool
+                  Review selected lands on Mana Pool
                 </a>
                 <button type="button" onClick={() => copyFor("manapool")}>
                   {copied === "manapool" ? "Copied ✓" : "Copy list for Mana Pool"}
@@ -338,7 +368,11 @@ function LandSearch() {
             </p>
           )}
           {buySet.names.length > 0 && (
-            <p className="combos-sub">Buying on Mana Pool opens the list ready to add to cart.</p>
+            <p className="combos-sub">
+              Reviewing on Mana Pool opens your list ready to check — it does
+              not complete a purchase. Prices shown here are Scryfall
+              cheapest-printing quotes, not a guaranteed Mana Pool checkout price.
+            </p>
           )}
         </div>
       )}
@@ -364,6 +398,14 @@ function LandSearch() {
                 ))
               ) : (
                 <img src={PIP_IMG.C} alt="Colorless" width={16} height={16} draggable="false" />
+              )}
+              {r.conditional_colors && r.conditional_colors.length > 0 && (
+                <span className="mb-land-cond-colors" title={r.conditional_colors.map((cc) => `${cc.color}: ${cc.dependency}`).join("; ")}>
+                  conditional:{" "}
+                  {[...new Set(r.conditional_colors.map((cc) => cc.color))].map((c) => (
+                    <img key={c} src={PIP_IMG[c]} alt={`${COLOR_NAMES[c]} (conditional)`} width={16} height={16} draggable="false" />
+                  ))}
+                </span>
               )}
               {entryBadge(r.entry)}
               {r.game_changer && <span className="mb-land-gc">Game Changer</span>}

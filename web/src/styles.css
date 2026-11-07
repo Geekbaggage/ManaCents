@@ -815,6 +815,13 @@ input:focus, select:focus, button:focus-visible {
 .mb-stale-expired { color: #f43f5e; font-weight: 700; }
 
 /* ---- ManaBase land search (Phase 4) ---- */
+.mb-search-modes { display: flex; gap: 8px; flex-wrap: wrap; margin: 0.75rem 0 0.25rem; }
+.mb-search-mode {
+  background: none; border: 1px solid #334155; border-radius: 10px;
+  color: #94a3b8; font-size: 0.95rem; font-weight: 600;
+  padding: 0.6rem 1.2rem; cursor: pointer;
+}
+.mb-search-mode.on { border-color: #22d3ee; color: #22d3ee; }
 .mb-search-filters {
   display: flex; gap: 1.25rem; flex-wrap: wrap; align-items: flex-end;
   margin: 1rem 0;
@@ -844,6 +851,7 @@ input:focus, select:focus, button:focus-visible {
 .mb-land-entry { color: #94a3b8; font-size: 0.75rem; }
 .mb-land-entry-untapped { color: #10b981; }
 .mb-land-gc { color: #f59e0b; border: 1px solid #f59e0b; border-radius: 6px; font-size: 0.72rem; font-weight: 700; padding: 1px 7px; }
+.mb-land-cond-colors { color: #94a3b8; font-size: 0.75rem; font-style: italic; display: inline-flex; gap: 2px; align-items: center; }
 .mb-land-cycle { color: #64748b; font-size: 0.75rem; }
 .mb-land-basic { color: #94a3b8; font-size: 0.72rem; font-style: italic; }
 .mb-land-utility { margin-top: 6px; }
