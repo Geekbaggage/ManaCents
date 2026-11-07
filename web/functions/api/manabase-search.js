@@ -8,10 +8,12 @@
 // Color match semantics (decided in Phase 3; the plan left this open):
 // two DISTINCT modes (Charlie's plan correction #1, Nov 6/7).
 //   mode=produces (default) — "produces these colors": a land matches if it
-//     produces AT LEAST ONE of the requested colors. Command Tower matches
-//     every color search; a WUB land matches a WU search. Lands that produce
-//     no colored mana match ONLY on an explicit colorless request (C).
-//     Conditional production never counts toward a produces match.
+//     produces AT LEAST ONE of the requested colors, unconditionally OR
+//     conditionally (CEO decision, Nov 6). Command Tower matches every color
+//     search; a WUB land matches a WU search. Lands that produce no colored
+//     mana at all match ONLY on an explicit colorless request (C).
+//     A conditional match is a "may produce" result, never a guaranteed
+//     source — the row carries the dependency and the UI shows it.
 //   mode=fits — "fits my commander" (CR 903.5c/d): the WHOLE-CARD color
 //     identity must be a subset of the requested colors AND every basic land
 //     type must produce a color in the requested set. A colorless request

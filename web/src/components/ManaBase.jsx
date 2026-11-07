@@ -220,7 +220,7 @@ function LandSearch() {
       </div>
       <p className="combos-sub">
         {mode === "produces"
-          ? "Produces: a land matches if it can produce at least one of the picked colors."
+          ? "Produces: a land matches if it can produce at least one of the picked colors — including conditionally, when the condition is met. Conditional matches are marked “conditional” and are not guaranteed sources."
           : "Fits my commander: only lands legal in a deck with this color identity (whole-card color identity + basic land types)."}
       </p>
 

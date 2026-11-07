@@ -69,17 +69,25 @@ test("no params: full served set, cheapest first, honest meta", async () => {
   assert.equal(body.results[0].cheapest.price, 0.06);
 });
 
-test("colors=WU: every result produces W or U; Tower in, Blood Crypt out", async () => {
+test("colors=WU: every result produces W or U (unconditionally or conditionally); Tower in, Blood Crypt out", async () => {
   const rows = await allRows("colors=WU");
   const names = new Set(rows.map((r) => r.name));
   assert.ok(names.has("Command Tower"), "Command Tower produces any color");
   assert.ok(names.has("Hallowed Fountain"), "WU land matches a WU search");
   assert.ok(!names.has("Blood Crypt"), "BR-only land must not match WU");
   assert.ok(!names.has("Ancient Tomb"), "colorless-only land must not match a color search");
+  // CEO decision (Nov 6): conditional production counts — Nimbus Maze
+  // produces W/U only conditionally and now matches a WU search, with its
+  // dependency carried on the row (a "may produce" match, never guaranteed).
+  assert.ok(names.has("Nimbus Maze"), "conditional W/U land matches a WU search");
+  const maze = rows.find((r) => r.name === "Nimbus Maze");
+  assert.deepEqual(maze.conditional_colors.map((cc) => cc.color).sort(), ["U", "W"]);
+  assert.ok(maze.conditional_colors.some((cc) => cc.dependency === "Island"));
   for (const r of rows) {
+    const produced = [...r.colors_produced, ...r.conditional_colors.map((cc) => cc.color)];
     assert.ok(
-      r.colors_produced.some((c) => ["W", "U"].includes(c)),
-      `${r.name} produces ${r.colors_produced} but matched WU`
+      produced.some((c) => ["W", "U"].includes(c)),
+      `${r.name} produces ${r.colors_produced} (conditional ${JSON.stringify(r.conditional_colors)}) but matched WU`
     );
   }
 });
@@ -162,7 +170,7 @@ test("filter semantics on synthetic rows: off-identity, modal, transform, colorl
   assert.equal(matchesFits(basicTyped, ["G"]), true);
   assert.equal(matchesFits(basicTyped, ["W"]), false);
   // Colorless query: produces-C matches only rows with no colored production
-  // (conditional production does not count); fits-C matches only empty-CI,
+  // (unconditional or conditional); fits-C matches only empty-CI,
   // no-basic-type rows.
   const colorlessOnly = {
     name: "Test Wastes", colors_produced: [], color_identity: [], basic_types: [],
@@ -173,9 +181,52 @@ test("filter semantics on synthetic rows: off-identity, modal, transform, colorl
   };
   assert.equal(matchesProduces(colorlessOnly, [], true), true);
   assert.equal(matchesProduces(conditionalOnly, [], true), true); // no unconditional production
-  assert.equal(matchesProduces(conditionalOnly, ["B"], false), false); // conditional never counts
+  // CEO decision (Nov 6): conditional production counts toward a produces
+  // match — a "may produce" match, with the dependency carried on the row.
+  assert.equal(matchesProduces(conditionalOnly, ["B"], false), true);
+  assert.equal(matchesProduces(conditionalOnly, ["R"], false), false); // cannot produce R even conditionally
   assert.equal(matchesFits(colorlessOnly, []), true);
   assert.equal(matchesFits(conditionalOnly, []), false);
+});
+
+test("conditional production matches color searches (CEO decision, Nov 6)", async () => {
+  // Before/after totals (live preview, before this change): W 361 → 369,
+  // U 364 → 372, B 368 → 378, R 361 → 368, G 361 → 368, WU 534 → 545,
+  // WUBRG 802 → 814; C unchanged at 299. The 12 conditional-only rows and
+  // the 10 one-color verges gain matches only via their conditional color.
+  for (const [q, expected] of [
+    ["colors=W", 369], ["colors=U", 372], ["colors=B", 378],
+    ["colors=R", 368], ["colors=G", 368], ["colors=WU", 545],
+    ["colors=WUBRG", 814], ["colors=C", 299],
+  ]) {
+    const body = await getOk(`${q}&limit=1`);
+    assert.equal(body.meta.total, expected, `${q}: expected ${expected}, got ${body.meta.total}`);
+  }
+  // Nimbus Maze (conditional U/W) matches W and U, not B; Tainted Field
+  // (conditional B/W) matches B; both still match C (no unconditional production).
+  const wRows = await allRows("colors=W");
+  assert.ok(wRows.some((r) => r.name === "Nimbus Maze"));
+  const uRows = await allRows("colors=U");
+  assert.ok(uRows.some((r) => r.name === "Nimbus Maze"));
+  const bRows = await allRows("colors=B");
+  assert.ok(!bRows.some((r) => r.name === "Nimbus Maze"), "Nimbus Maze cannot produce B");
+  assert.ok(bRows.some((r) => r.name === "Tainted Field"));
+  const cRows = await allRows("colors=C");
+  assert.ok(cRows.some((r) => r.name === "Nimbus Maze"), "conditional-only rows still match C");
+  // The dependency is carried on the returned row (UI shows it as the
+  // "conditional" badge — a may-produce match, never a guaranteed source).
+  const maze = wRows.find((r) => r.name === "Nimbus Maze");
+  assert.deepEqual(maze.conditional_colors, [
+    { color: "U", dependency: "Plains" },
+    { color: "W", dependency: "Island" },
+  ]);
+  // A verge's conditional color also counts: Floodfarm Verge (W + conditional
+  // U) now matches a U search.
+  assert.ok(uRows.some((r) => r.name === "Floodfarm Verge"));
+  // mode=fits is unchanged by this decision (whole-card CI, CR 903.5c/d).
+  const fitsU = await allRows("colors=U&mode=fits");
+  assert.equal(fitsU.length, 396);
+  assert.ok(!fitsU.some((r) => r.name === "Nimbus Maze"), "Nimbus Maze CI is [U, W] — does not fit U");
 });
 
 test("include_basics=0 hides the 12 basics", async () => {
