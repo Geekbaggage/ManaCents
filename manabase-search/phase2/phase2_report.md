@@ -170,3 +170,21 @@ No merge to main, no production deploy, no posts, no serving-data writes
 to `web/`, no nightly-refresh changes, no optimizer-release changes.
 Bulk SHAs verified before use (oracle `ccbc99fd…`, default `dc826f98…`).
 Producer exits 0; classifier tests 65/65.
+
+## Addendum — preorder price correction (Phase 5, Nov 7, 2026)
+
+**Finding (Phase 5 live spot-check vs Scryfall):** the Nov 6 cheapest
+selection had picked Nov 13 Star Trek preorder prices for **18 rows** —
+the pinned Nov 6 default bulk already contains the unreleased TRK/TRC/SDS
+printings with preorder prices, and nothing filtered them out. Worst cases:
+Hallowed Fountain $4.18 (TRK #286 foil) vs $7.55 released; Training Center
+$1.05 vs $16.08; Sacred Foundry $2.03 vs $10.30. All 18 corrected rows are
+listed in `phase3/phase5-report.md`.
+
+**Fix:** both producers now skip printings with `released_at` after the
+price snapshot date (2026-11-06). Re-ran `build_search_data.py`: exactly
+18 rows changed (cheapest field only); cheapest set total $19,372.78 →
+$19,558.88; 196 preorder printings skipped across 85 rows; 0 held on price
+gaps, 0 held on legality. Policy string now reads "cheapest RELEASED
+printing in ANY finish". The pre-correction $19,372.78 total in this report
+is superseded.

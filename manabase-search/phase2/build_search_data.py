@@ -160,6 +160,7 @@ def main():
     best = {}       # oracle_id -> cheapest dict
     printings_seen = {}  # oracle_id -> count of printings with any USD price
     gold_skipped = {}  # oracle_id -> count of gold-bordered printings skipped
+    preorder_skipped = {}  # oracle_id -> count of unreleased printings skipped
     reversible_resolved = 0
     reversible_anomalies = []
     with gzip.open(DEFAULT_BULK, "rt") as fh:
@@ -176,6 +177,18 @@ def main():
             if via == "faces":
                 reversible_resolved += 1
             prices = c.get("prices") or {}
+            # Preorder/unreleased printings are NOT buyable at the snapshot
+            # date: the pinned Nov 6 bulk already contains the Nov 13 Star
+            # Trek printings (TRK/TRC/SDS) with preorder prices. Without
+            # this filter the cheapest pick for 18 rows was a preorder price
+            # (e.g. Hallowed Fountain $4.18 TRK #286 foil vs $7.55 released)
+            # — a price no buyer could actually pay on Nov 6. Added Nov 7
+            # (Phase 5): only printings released by the price snapshot date
+            # count toward the cheapest quote. Preorder quotes are kept as a
+            # separate view in Charlie's sort data, never as the served price.
+            if (c.get("released_at") or "") > PRICE_SNAPSHOT:
+                preorder_skipped[oid] = preorder_skipped.get(oid, 0) + 1
+                continue
             # Gold-bordered printings (World Championship / Pro Tour
             # Collector sets) are commemorative, not tournament-playable —
             # and Scryfall's card search API does not return them, so the
@@ -221,6 +234,8 @@ def main():
                         "paper": "paper" in games,
                     }
     print(f"cheapest printings found for {len(best)}/{len(target_ids)} target rows")
+    print(f"preorder/unreleased printings skipped: "
+          f"{sum(preorder_skipped.values())} across {len(preorder_skipped)} rows")
     print(f"reversible printings resolved via faces: {reversible_resolved}")
     if reversible_anomalies:
         print(f"LOUD: {len(reversible_anomalies)} ambiguous reversible printings "
@@ -336,7 +351,9 @@ def main():
         "oracle_bulk": "oracle-cards-20261106220205.jsonl.gz",
         "oracle_bulk_sha256": EXPECTED_ORACLE_SHA,
         "gc_snapshot": "gamechangers_checked_2026-11-07.json (53 cards)",
-        "policy": "cheapest printing in ANY finish (foils count)",
+        "policy": "cheapest RELEASED printing in ANY finish (foils count); "
+                  "preorder/unreleased printings excluded (corrected Nov 7, "
+                  "Phase 5 — 18 rows had picked Nov 13 Star Trek preorder prices)",
         "served_rows": len(rows),
         "served_verified": sum(1 for r in rows if r["status"] == "verified"),
         "served_utility_display_only": sum(1 for r in rows if r["status"] == "utility_display_only"),

@@ -50,3 +50,21 @@ export function matchesFits(row, wantColors) {
   const basicTypes = row.basic_types ?? [];
   return basicTypes.every((t) => wantColors.includes(BASIC_TYPE_COLORS[t]));
 }
+
+// Normalized name for deterministic tie-breaking in the best-budget sort:
+// lowercase, non-alphanumerics stripped ("Barkchannel Pathway // Tidechannel
+// Pathway" and "Barkchannel Pathway" sort on letters only). Oracle ID is
+// the final tie-break, so the order is total even for identical names.
+export function normalizeName(name) {
+  return String(name ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+export function compareNormalizedName(a, b) {
+  const na = normalizeName(a.name);
+  const nb = normalizeName(b.name);
+  if (na < nb) return -1;
+  if (na > nb) return 1;
+  if (a.oracle_id < b.oracle_id) return -1;
+  if (a.oracle_id > b.oracle_id) return 1;
+  return 0;
+}

@@ -857,3 +857,9 @@ input:focus, select:focus, button:focus-visible {
 .mb-land-utility { margin-top: 6px; }
 .mb-land-utility-tag { color: #f59e0b; font-size: 0.72rem; font-weight: 700; }
 .mb-land-oracle { color: #94a3b8; font-size: 0.78rem; white-space: pre-line; margin: 4px 0 0; }
+.mb-land-rank { color: #22d3ee; border: 1px solid #22d3ee; border-radius: 6px; font-size: 0.72rem; font-weight: 700; padding: 1px 7px; }
+.mb-land-preorder { color: #f59e0b; border: 1px solid #f59e0b; border-radius: 6px; font-size: 0.72rem; font-weight: 700; padding: 1px 7px; }
+.mb-land-rank-note { color: #94a3b8; font-size: 0.75rem; margin-top: 4px; }
+.mb-land-face { margin-top: 6px; display: flex; flex-direction: column; gap: 2px; }
+.mb-land-face-tag { color: #c084fc; font-size: 0.72rem; font-weight: 700; }
+.mb-land-faces { color: #94a3b8; font-size: 0.75rem; }

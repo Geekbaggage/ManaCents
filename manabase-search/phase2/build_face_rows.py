@@ -208,6 +208,7 @@ def main():
     best = {}
     printings_seen = {}
     gold_skipped = {}
+    preorder_skipped = {}  # oracle_id -> count of unreleased printings skipped
     reversible_resolved = 0
     reversible_anomalies = []
     with gzip.open(DEFAULT_BULK, "rt", encoding="utf-8") as fh:
@@ -224,6 +225,14 @@ def main():
             if via == "faces":
                 reversible_resolved += 1
             prices = c.get("prices") or {}
+            # Preorder/unreleased printings are NOT buyable at the snapshot
+            # date (same correction as build_search_data.py, Phase 5, Nov 7):
+            # the pinned Nov 6 bulk already contains Nov 13 Star Trek
+            # printings with preorder prices. Only printings released by the
+            # price snapshot date count toward the cheapest quote.
+            if (c.get("released_at") or "") > PRICE_SNAPSHOT:
+                preorder_skipped[oid] = preorder_skipped.get(oid, 0) + 1
+                continue
             if c.get("border_color") == "gold":
                 gold_skipped[oid] = gold_skipped.get(oid, 0) + 1
                 continue
@@ -261,6 +270,8 @@ def main():
                         "layout": c.get("layout"),
                     }
     print(f"cheapest printings found for {len(best)}/{len(target_ids)} face-rows")
+    print(f"preorder/unreleased printings skipped: "
+          f"{sum(preorder_skipped.values())} across {len(preorder_skipped)} rows")
     print(f"reversible printings resolved via faces: {reversible_resolved}")
     if reversible_anomalies:
         print(f"LOUD: {len(reversible_anomalies)} ambiguous reversible printings "
@@ -469,7 +480,7 @@ def main():
         "oracle_bulk": "oracle-cards-20261106220205.jsonl.gz",
         "oracle_bulk_sha256": EXPECTED_ORACLE_SHA,
         "gc_snapshot": "gamechangers_checked_2026-11-07.json (53 cards)",
-        "policy": "cheapest printing in ANY finish (foils count); one whole-card quote per canonical identity (Q4)",
+        "policy": "cheapest RELEASED printing in ANY finish (foils count); one whole-card quote per canonical identity (Q4); preorder/unreleased printings excluded (corrected Nov 7, Phase 5)",
         "face_rows": len(rows),
         "class_counts": dict(class_counts),
         "held_price_gap": held_price,

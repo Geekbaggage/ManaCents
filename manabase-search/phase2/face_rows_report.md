@@ -90,3 +90,11 @@ $2.23). Always pass `unique=prints` for cheapest-printing checks.
 - The `entry: "varies"` case does not occur in this data (0 rows) but the
   shape supports it; the API's `untapped_only` filter must decide how a
   varies row is treated when one arises.
+
+## Addendum — preorder filter re-run (Phase 5, Nov 7, 2026)
+
+`build_face_rows.py` got the same released-only filter as the search
+producer (skip printings with `released_at` after 2026-11-06). Re-run:
+**0 rows changed** — no face row had picked a preorder price; cheapest
+101-land face set total unchanged at $386.12; 0 held on price gaps,
+0 held on legality. Policy string updated to "cheapest RELEASED printing".

@@ -98,6 +98,7 @@ function LandSearch() {
   const [colors, setColors] = useState([]);
   const [mode, setMode] = useState("produces");
   const [sort, setSort] = useState("price_asc");
+  const [type, setType] = useState("");
   const [hideBasics, setHideBasics] = useState(false);
   const [untappedOnly, setUntappedOnly] = useState(false);
   const [maxPrice, setMaxPrice] = useState("");
@@ -132,6 +133,7 @@ function LandSearch() {
         offset: String(offset),
       });
       if (colors.length > 0) params.set("colors", colors.join(""));
+      if (type) params.set("type", type);
       if (maxPrice !== "") {
         const n = Number(maxPrice);
         if (!Number.isFinite(n) || n < 0) throw new Error("Max price must be a number of $0 or more.");
@@ -195,9 +197,10 @@ function LandSearch() {
   return (
     <div className="mb-search">
       <p className="combos-sub">
-        Search every land by color — cheapest version shown. Most-used ranking
-        is coming once our data source is confirmed; until then results sort by
-        cheapest price.
+        Search every land by color — cheapest released version shown. Sort by
+        “Best budget — researched” for type-by-type budget picks from
+        community + official research (Charlie, Nov 7), or by cheapest price.
+        Most-used ranking is still coming once our data source is confirmed.
       </p>
 
       <div className="mb-search-modes" role="group" aria-label="Search mode">
@@ -255,11 +258,29 @@ function LandSearch() {
       <div className="mb-search-filters">
         <label>
           Sort
-          <select value={sort} onChange={(e) => { setSort(e.target.value); setResults([]); setMeta(null); }}>
+          <select value={sort} onChange={(e) => {
+            const next = e.target.value;
+            setSort(next);
+            // Best-budget ranks live inside one type — picking the sort
+            // without a type picks the first type list (Two Color Fixing);
+            // the type picker stays visible so it can be switched.
+            if (next === "best_budget" && !type) setType("two_color_fixing");
+            setResults([]); setMeta(null);
+          }}>
             <option value="price_asc">Cheapest first</option>
             <option value="price_desc">Most expensive first</option>
             <option value="name">Name A–Z</option>
+            <option value="best_budget">Best budget — researched</option>
             <option value="most_used" disabled>Most used (coming soon)</option>
+          </select>
+        </label>
+        <label>
+          Type / role
+          <select value={type} onChange={(e) => { setType(e.target.value); setResults([]); setMeta(null); }}>
+            <option value="">All lands</option>
+            {(meta?.budgetTypes ?? []).map((t) => (
+              <option key={t.id} value={t.id}>{t.label} ({t.ranked} ranked)</option>
+            ))}
           </select>
         </label>
         <label>
@@ -310,9 +331,20 @@ function LandSearch() {
       {meta && (
         <p className="combos-sub">
           {meta.total.toLocaleString()} lands match · {meta.servedCount.toLocaleString()} searchable ·{" "}
-          {meta.heldCount} held (double-faced, adventure &amp; fetchlands) · prices from{" "}
+          {meta.heldCount} held (fetchlands) · prices from{" "}
           {meta.priceSnapshot}.
+          {meta.typeLabel && (
+            <>{" "}Showing {meta.typeLabel} — {meta.rankedCount} budget-ranked, the rest alphabetical.</>
+          )}
           <PriceStaleNote snapshot={meta.priceSnapshot} />
+        </p>
+      )}
+
+      {meta && sort === "best_budget" && meta.preorderWatch.length > 0 && (
+        <p className="combos-sub">
+          Preorder watch list — under $5 only on preorder prices (releasing Nov 13);
+          their released prices are higher:{" "}
+          {meta.preorderWatch.map((w) => `${w.name} ($${w.all_quoted_usd} preorder / $${w.released_usd} released)`).join(", ")}.
         </p>
       )}
 
@@ -414,8 +446,44 @@ function LandSearch() {
               <span className="mb-land-price">{money(r.cheapest.price)}</span>
               <span className="mb-land-cycle">{r.cycle === "unclassified" ? "" : r.cycle}</span>
               {r.is_basic && <span className="mb-land-basic">basic</span>}
+              {r.budget_rank != null && (
+                <span className="mb-land-rank" title={r.budget_rank_context || ""}>
+                  #{r.budget_rank} budget
+                </span>
+              )}
+              {r.preorder_only_under_5 && (
+                <span className="mb-land-preorder" title="Under $5 only on a preorder price (releasing Nov 13); the released price is higher.">
+                  Preorder only
+                </span>
+              )}
             </div>
             <div className="mb-land-print">{r.cheapest.printing} · {r.cheapest.finish}</div>
+            {r.budget_rank != null && r.budget_rank_context && (
+              <div className="mb-land-rank-note">{r.budget_rank_context}</div>
+            )}
+            {r.status === "face_row" && (
+              <div className="mb-land-face">
+                <span className="mb-land-face-tag" title={r.land_drop.note}>
+                  {r.land_drop.code === "requires_transformation"
+                    ? "Requires transformation — not a land drop from hand"
+                    : r.land_drop.code === "playable_choice"
+                      ? "Land face: playable choice"
+                      : r.land_drop.code === "land_front"
+                        ? "Land on the front face"
+                        : "One card — land + Adventure"}
+                </span>
+                {r.land_faces.length > 1 && (
+                  <span className="mb-land-faces">
+                    Faces: {r.land_faces.map((f) => f.name).join(" / ")}
+                  </span>
+                )}
+                {r.other_faces.length > 0 && (
+                  <span className="mb-land-faces">
+                    Other face: {r.other_faces.map((f) => `${f.name} (${f.type_line})`).join(", ")}
+                  </span>
+                )}
+              </div>
+            )}
             {r.status === "utility_display_only" && (
               <div className="mb-land-utility">
                 <span className="mb-land-utility-tag">Utility land — shown for reference</span>
