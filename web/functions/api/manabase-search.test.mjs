@@ -51,7 +51,7 @@ async function allRows(query = "") {
 
 test("no params: full served set, cheapest first, honest meta", async () => {
   const body = await getOk("");
-  assert.equal(body.meta.total, 1202);
+  assert.equal(body.meta.total, 1212);
   assert.equal(body.meta.returned, 50);
   assert.equal(body.meta.sort, "price_asc");
   assert.equal(body.meta.priceSnapshot, "2026-11-07");
@@ -61,16 +61,16 @@ test("no params: full served set, cheapest first, honest meta", async () => {
   assert.equal(body.meta.rankingLabel, "Best budget — researched");
   assert.match(body.meta.rankingNote, /editorial sort/i);
   assert.match(body.meta.rankingNote, /Most-used ranking is still not/);
-  assert.equal(body.meta.servedCount, 1202);
-  assert.equal(body.meta.heldCount, 10);
+  assert.equal(body.meta.servedCount, 1212);
+  assert.equal(body.meta.heldCount, 0);
   assert.equal(body.meta.heldFaceRows, 0);
-  assert.equal(body.meta.heldFetchRows, 10);
+  assert.equal(body.meta.heldFetchRows, 0);
   assert.equal(body.meta.faceRows, 101);
-  assert.equal(body.meta.cheapestSetTotal, 19950.58);
+  assert.equal(body.meta.cheapestSetTotal, 20196.94);
   assert.equal(body.meta.budgetTypes.length, 25);
   assert.equal(body.meta.preorderWatch.length, 7);
-  assert.match(body.meta.coverageNote, /1,202 of 1,212/);
-  assert.match(body.meta.coverageNote, /not full 1,212-card coverage/);
+  assert.match(body.meta.coverageNote, /All 1,212 Commander-legal lands searchable/);
+  assert.match(body.meta.coverageNote, /0 held/);
   // Cheapest first: non-decreasing prices across the page.
   const prices = body.results.map((r) => r.cheapest.price);
   assert.deepEqual(prices, [...prices].sort((a, b) => a - b));
@@ -138,10 +138,19 @@ test("mode=fits: whole-card CI + basic land types (CR 903.5c/d)", async () => {
   // colored mana (e.g. Academy Ruins) fits a U commander but does not produce U.
   assert.ok(fits.some((r) => r.name === "Academy Ruins"));
   assert.ok(!produces.some((r) => r.name === "Academy Ruins"));
+  // Fetchlands fit by whole-card CI and never produce: Flooded Strand
+  // (CI WU) fits WU, not U alone, not colorless; it never appears in a
+  // produces search, not even a colorless one (it tutors, it taps for nothing).
+  assert.ok(fitsWU.some((r) => r.name === "Flooded Strand"));
+  assert.ok(!fits.some((r) => r.name === "Flooded Strand"));
+  assert.ok(!produces.some((r) => r.name === "Flooded Strand"));
+  const producesC = await allRows("colors=C");
+  assert.ok(!producesC.some((r) => r.name === "Flooded Strand"));
   // Colorless identity: only empty-CI, no-basic-type rows fit.
   const fitsC = await getOk("colors=C&mode=fits&limit=100");
   assert.ok(fitsC.results.every((r) => r.color_identity.length === 0 && (r.basic_types ?? []).length === 0));
   assert.ok(fitsC.results.some((r) => r.name === "Command Tower"));
+  assert.ok(!fitsC.results.some((r) => r.name === "Flooded Strand"));
   const { status } = await get("mode=bogus");
   assert.equal(status, 400);
 });
@@ -177,6 +186,17 @@ test("filter semantics on synthetic rows: off-identity, modal, transform, colorl
   };
   assert.equal(matchesFits(basicTyped, ["G"]), true);
   assert.equal(matchesFits(basicTyped, ["W"]), false);
+  // Fetchland: produces no mana at all — never matches produces (not even
+  // a colorless request); fits only when its CI is a subset.
+  const fetchland = {
+    name: "Test Fetchland", colors_produced: [], conditional_colors: [],
+    color_identity: ["W", "U"], basic_types: [], cycle: "fetch",
+  };
+  assert.equal(matchesProduces(fetchland, ["W"], false), false);
+  assert.equal(matchesProduces(fetchland, [], true), false);
+  assert.equal(matchesFits(fetchland, ["W", "U"]), true);
+  assert.equal(matchesFits(fetchland, ["U"]), false);
+  assert.equal(matchesFits(fetchland, []), false);
   // Colorless query: produces-C matches only rows with no colored production
   // (unconditional or conditional); fits-C matches only empty-CI,
   // no-basic-type rows.
@@ -241,7 +261,7 @@ test("conditional production matches color searches (CEO decision, Nov 6)", asyn
 
 test("include_basics=0 hides the 12 basics", async () => {
   const body = await getOk("include_basics=0&limit=100");
-  assert.equal(body.meta.total, 1190);
+  assert.equal(body.meta.total, 1200);
   assert.ok(!body.results.some((r) => r.is_basic));
   assert.ok(!body.results.some((r) => r.name === "Plains"));
 });
@@ -263,7 +283,7 @@ test("max_price, untapped_only, game_changer and cycle filters", async () => {
   assert.ok(gcOnly.results.every((r) => r.game_changer));
   const noGc = await getOk("game_changer=exclude&limit=100");
   assert.ok(noGc.results.every((r) => !r.game_changer));
-  assert.equal(noGc.meta.total, 1195);
+  assert.equal(noGc.meta.total, 1205);
   const shock = await getOk("cycle=shock&limit=100");
   assert.equal(shock.meta.total, 11);
   assert.ok(shock.results.every((r) => r.cycle === "shock"));
@@ -312,18 +332,35 @@ test("invalid inputs are 400, never silently rewritten", async () => {
   assert.equal(clamped.meta.returned, 100);
 });
 
-test("no banned or fetch rows anywhere in the served set; face rows served (Phase 5)", async () => {
+test("fetchlands served with the fetch model; no banned rows; face rows served (Nov 7)", async () => {
   const rows = await allRows();
-  assert.equal(rows.length, 1202);
+  assert.equal(rows.length, 1212);
   assert.ok(rows.every((r) => !r.banned), "a banned row leaked");
   for (const banned of ["Karakas", "Library of Alexandria", "Tolarian Academy"]) {
     assert.ok(!rows.some((r) => r.name === banned));
   }
-  // The 10 fetchlands stay held (fetch modeling open) — still out of search.
-  for (const held of ["Arid Mesa", "Bloodstained Mire", "Flooded Strand",
-    "Marsh Flats", "Misty Rainforest", "Polluted Delta", "Scalding Tarn",
-    "Verdant Catacombs", "Windswept Heath", "Wooded Foothills"]) {
-    assert.ok(!rows.some((r) => r.name === held), `${held} leaked into search`);
+  // The 10 fetchlands are SERVED now (fetch modeling done Nov 7): whole-card
+  // CI from the tutored types, no production, conditional tutor entry, cycle
+  // fetch, in the buy set by default like any other non-basic.
+  const expectedCI = {
+    "Arid Mesa": ["W", "R"], "Bloodstained Mire": ["B", "R"],
+    "Flooded Strand": ["W", "U"], "Marsh Flats": ["W", "B"],
+    "Misty Rainforest": ["U", "G"], "Polluted Delta": ["U", "B"],
+    "Scalding Tarn": ["U", "R"], "Verdant Catacombs": ["B", "G"],
+    "Windswept Heath": ["W", "G"], "Wooded Foothills": ["R", "G"],
+  };
+  for (const [name, ci] of Object.entries(expectedCI)) {
+    const row = rows.find((r) => r.name === name);
+    assert.ok(row, `${name} is served`);
+    assert.equal(row.cycle, "fetch");
+    assert.deepEqual(row.colors_produced, [], `${name} must produce nothing`);
+    assert.deepEqual(row.conditional_colors, [], `${name} must produce nothing conditionally`);
+    assert.equal(row.produces_colorless, false);
+    assert.deepEqual(row.color_identity, ci);
+    assert.equal(row.entry.status, "conditional");
+    assert.match(row.entry.condition, /tutor an? .* — produces no mana itself/);
+    assert.ok(row.cheapest.price > 0 && Number.isFinite(row.cheapest.price));
+    assert.equal(row.in_buy_set_by_default, true);
   }
   // Phase 5: the 101 face rows ARE served now (Q4), with land-drop labels.
   const faceRows = rows.filter((r) => r.status === "face_row");
@@ -339,16 +376,21 @@ test("no banned or fetch rows anywhere in the served set; face rows served (Phas
   assert.ok(needsTransform.every((r) => r.face_class === "transform_back"));
   // One canonical identity per row: no duplicate oracle_ids, and a face
   // row's buy name is the full canonical card name (one purchase).
-  assert.equal(new Set(rows.map((r) => r.oracle_id)).size, 1202);
+  assert.equal(new Set(rows.map((r) => r.oracle_id)).size, 1212);
   assert.ok(faceRows.every((r) => r.buy_name === r.name));
   // Buy-set default is exactly the non-basics (Q1) — face rows included.
   assert.ok(rows.every((r) => r.in_buy_set_by_default === !r.is_basic));
   assert.equal(rows.filter((r) => r.is_basic).length, 12);
-  // Utility rows carry their Oracle text and flag; verified rows do not.
+  // Oracle text ships on every non-basic row (CEO, Nov 7 — the Search card
+  // shows the land text under it); basics carry none. Utility rows carry
+  // their text and flag; face rows carry their land face's text.
   const utility = rows.filter((r) => r.status === "utility_display_only");
   assert.equal(utility.length, 48);
   assert.ok(utility.every((r) => r.oracle_text && r.utility_flag));
-  assert.ok(rows.filter((r) => r.status === "verified").every((r) => !r.oracle_text));
+  assert.ok(rows.filter((r) => r.status === "verified" && !r.is_basic)
+    .every((r) => r.oracle_text));
+  assert.ok(rows.filter((r) => r.status === "face_row").every((r) => r.oracle_text));
+  assert.ok(rows.filter((r) => r.is_basic).every((r) => !r.oracle_text));
   // No EDHREC-derived metric anywhere in the served data (Q3): no most-used
   // numbers, no edhrec keys on any row or in meta.
   const dump = JSON.stringify({ rows, meta: (await getOk("limit=1")).meta });
@@ -512,12 +554,12 @@ test("face rows via API: modal Pathway + Adventure render with face data", async
   assert.equal(aclazotz.land_drop.code, "requires_transformation");
 });
 
-test("coverage arithmetic: 1,202 served + 10 held = 1,212 legal; + 100 excluded = 1,312 roster", async () => {
+test("coverage arithmetic: 1,212 served + 0 held = 1,212 legal; + 100 excluded = 1,312 roster", async () => {
   const body = await getOk("limit=1");
   assert.equal(body.meta.servedCount + body.meta.heldCount, 1212);
   assert.equal(body.meta.servedCount + body.meta.heldCount + body.meta.excludedCount, 1312);
-  assert.equal(body.meta.servedCount, 1202);
-  assert.equal(body.meta.heldCount, 10);
+  assert.equal(body.meta.servedCount, 1212);
+  assert.equal(body.meta.heldCount, 0);
   assert.equal(body.meta.excludedCount, 100);
 });
 
@@ -527,9 +569,13 @@ test("meta.cycleCounts: true full counts + price ranges per cycle (Browse tab)",
   const body = await getOk("limit=1");
   const counts = body.meta.cycleCounts;
   assert.ok(Array.isArray(counts), "cycleCounts must be an array");
-  assert.equal(counts.length, 28, "one entry per cycle in the serving data");
+  assert.equal(counts.length, 29, "one entry per cycle in the serving data");
   // Counts sum to the full served set, and every row's cycle is listed.
-  assert.equal(counts.reduce((n, c) => n + c.count, 0), 1202);
+  assert.equal(counts.reduce((n, c) => n + c.count, 0), 1212);
+  // The fetch cycle is served now (10 rows).
+  const fetch = counts.find((c) => c.id === "fetch");
+  assert.ok(fetch, "fetch cycle present in cycleCounts");
+  assert.equal(fetch.count, 10);
   const rows = await allRows();
   const byCycle = {};
   for (const r of rows) byCycle[r.cycle] = (byCycle[r.cycle] ?? 0) + 1;
@@ -563,6 +609,11 @@ test("cycle paging: full membership, no truncation, no duplicates (Browse tab)",
   const shock = await allRows("cycle=shock&sort=name");
   assert.equal(shock.length, 11);
   assert.ok(shock.every((r) => r.cycle === "shock"));
+  // Fetch cycle pages cleanly too (10 rows, one page).
+  const fetch = await allRows("cycle=fetch&sort=name");
+  assert.equal(fetch.length, 10);
+  assert.ok(fetch.every((r) => r.cycle === "fetch"));
+  assert.ok(fetch.some((r) => r.name === "Flooded Strand"));
   // cycle + type combine: 10 of the 11 shock-cycle rows are members of
   // two_color_fixing; the 11th (Multiversal Passage, a utility land) has no
   // type record and is correctly excluded from the type view.
@@ -613,7 +664,7 @@ test("buildBuySet excludes basics, dedupes, caps at 100", () => {
 
 // ---- UI smoke: the Search lands tab renders in the ManaBase tool ----
 
-test("ManaBase renders a Search lands tab next to the optimizer", async () => {
+test("ManaBase renders Search as the landing tab with Browse second (optimizer removed Nov 7)", async () => {
   // The bundle must live on disk (not a data: URL) so the bundled React
   // resolves to the same node_modules instance as this test's React —
   // otherwise renderToStaticMarkup throws "Invalid hook call" (two copies
@@ -631,8 +682,10 @@ test("ManaBase renders a Search lands tab next to the optimizer", async () => {
     const ui = await import(pathToFileURL(tmpPath));
     const html = renderToStaticMarkup(React.createElement(ui.ManaBase));
     assert.match(html, /Search lands/);
-    assert.match(html, /Find my lands/);
     assert.match(html, /Browse lands/);
+    assert.doesNotMatch(html, /Find my lands/);
+    // Search is the landing tab: it carries aria-selected="true".
+    assert.match(html, /aria-selected="true"[^>]*>\s*Search lands/s);
     // Render the tabs themselves: LandSearch / LandGallery only mount when
     // their tab is active, so rendering ManaBase alone never executes them.
     // e676b3e shipped a Search-tab crash (useCallback used but never
@@ -660,6 +713,25 @@ test("ManaBase renders a Search lands tab next to the optimizer", async () => {
     assert.match(bundleText, /Updating/);
     assert.match(bundleText, /cycleCounts/);
     assert.match(bundleText, /Every land by cycle/);
+    // CEO, Nov 7: the Search card shows the land's oracle text, not the
+    // budget-rank research note — the rank-note div must be gone from the
+    // bundle, and the oracle-text render must be present.
+    assert.doesNotMatch(bundleText, /mb-land-rank-note/);
+    assert.match(bundleText, /mb-land-oracle/);
+    // Browse order (CEO, Nov 7): the 8 featured cycles first, then the rest
+    // alphabetically, Unclassified last.
+    const ordered = ui.orderBrowseCycles([
+      { id: "unclassified", count: 861 }, { id: "shock", count: 11 },
+      { id: "basic", count: 12 }, { id: "fetch", count: 10 },
+      { id: "triome", count: 10 }, { id: "vivid", count: 5 },
+      { id: "pain", count: 16 }, { id: "check", count: 25 },
+      { id: "bond", count: 10 }, { id: "surveil", count: 14 },
+      { id: "fast", count: 11 },
+    ]);
+    assert.deepEqual(ordered, [
+      "fetch", "shock", "triome", "pain", "check", "bond", "surveil", "fast",
+      "basic", "vivid", "unclassified",
+    ]);
   } finally {
     const { unlink } = await import("node:fs/promises");
     await unlink(tmpPath).catch(() => {});

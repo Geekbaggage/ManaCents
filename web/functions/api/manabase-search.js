@@ -1,9 +1,9 @@
 // GET /api/manabase-search?colors=WU&sort=best_budget&type=two_color_fixing&limit=50&offset=0
 //     &include_basics=1&max_price=25&untapped_only=0&game_changer=any&cycle=shock
 //
-// ManaBase land SEARCH API. Serves the full-catalog search data (1,202 rows:
+// ManaBase land SEARCH API. Serves the full-catalog search data (1,212 rows:
 // 1,053 verified + 48 utility display-only + 101 double-faced/adventure face
-// rows; price snapshot 2026-11-06; 10 fetchlands held).
+// rows + 10 fetchlands; price snapshot 2026-11-07; 0 held).
 // Preview only — no production approval.
 //
 // Color match semantics (decided in Phase 3; the plan left this open):
@@ -59,9 +59,9 @@
 // the ranking snapshot + note, the served/held counts, the budget type list,
 // and per-cycle membership counts + price ranges (cycleCounts), so the UI
 // can show staleness honestly and the Browse tab can show true full counts
-// without loading all 1,202 rows. Coverage is stated as actual served/held
-// counts — this is NOT the full 1,212-card universe while rows are held
-// (10 fetchlands).
+// without loading all 1,212 rows. Coverage is stated as actual served/held
+// counts — the full 1,212-card legal catalog is served; 100 rows are
+// excluded (3 banned + 97 not Commander-legal) and never enter search.
 import searchData from "./_manabase_search.json";
 import {
   matchesProduces,
@@ -76,7 +76,7 @@ const TYPES = new Map(META.budget_types.map((t) => [t.id, t]));
 const COLOR_ORDER = "WUBRGC";
 
 // Per-cycle membership counts + price ranges, for the Browse tab: one
-// request gives honest collapsed-row counts without loading all 1,202 rows.
+// request gives honest collapsed-row counts without loading all 1,212 rows.
 // Computed once from the serving data (not from a separate source), so the
 // counts can never drift from what the API itself serves.
 const CYCLE_COUNTS = (() => {
@@ -362,9 +362,8 @@ export async function onRequestGet({ request }) {
       faceRows: META.served_face_rows,
       cheapestSetTotal: META.cheapest_set_total,
       coverageNote:
-        "1,202 of 1,212 Commander-legal lands searchable; 10 held " +
-        "(fetchlands — fetch modeling open); 100 excluded " +
-        "(3 banned + 97 not Commander-legal). This is not full 1,212-card coverage.",
+        "All 1,212 Commander-legal lands searchable; 0 held; 100 excluded " +
+        "(3 banned + 97 not Commander-legal).",
     },
     results: page.map((r) => publicRow(r, type)),
   });
