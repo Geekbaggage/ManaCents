@@ -43,19 +43,19 @@ try {
   // --- Search tab mounts (the e676b3e crash: tab blanked the whole app) ---
   await page.getByRole("tab", { name: "Search lands" }).click();
   await page.waitForSelector(".mb-search-land", { timeout: 15000 });
-  const countLine = await page.locator(".combos-sub", { hasText: "lands match" }).first().textContent();
   check("Search tab mounts, no blank screen", true, "list rendered");
-  check("Search auto-loads 1,202 lands",
-    (countLine ?? "").includes("1,202 lands match"), countLine?.trim().slice(0, 80));
+  // The meta count line was removed from the UI (CEO, Nov 7), so the served
+  // total is read off the pager: 50 shown + N left = total.
+  const showMore = page.getByRole("button", { name: /Show more \(/ });
+  check("Search auto-loads 1,212 lands",
+    (await showMore.textContent() ?? "").includes("Show more (1162 left)"),
+    await showMore.textContent());
   check("Search shows 50 rows initially",
     (await page.locator(".mb-search-land").count()) === 50);
 
   // --- Filter change auto-refreshes, list stays, Type options persist ---
   await page.locator("select").first().selectOption("best_budget");
-  await page.waitForFunction(
-    () => document.body.textContent.includes("Showing Two Color Fixing"),
-    { timeout: 15000 },
-  );
+  await page.getByRole("button", { name: /Show all \(208 in this type\)/ }).waitFor({ timeout: 15000 });
   check("sort=best_budget auto-refreshes, list stays visible",
     (await page.locator(".mb-search-land").count()) > 0);
   const typeOptions = await page.locator("select").nth(1).locator("option").allTextContents();
@@ -63,7 +63,7 @@ try {
     typeOptions.length > 10 && typeOptions.some((t) => t.includes("Two Color Fixing")),
     `${typeOptions.length} options`);
   check("best_budget auto-picks Two Color Fixing (208)",
-    (await page.locator(".combos-sub", { hasText: "lands match" }).first().textContent() ?? "").includes("208 lands match"));
+    await page.getByRole("button", { name: /Show all \(208 in this type\)/ }).isVisible());
 
   // --- Show all loads the type's full set ---
   const showAll = page.getByRole("button", { name: /Show all \(208 in this type\)/ });
@@ -79,9 +79,21 @@ try {
   // --- Browse tab: full catalog by cycle, expand a cycle ---
   await page.getByRole("tab", { name: "Browse lands" }).click();
   await page.waitForSelector(".mb-cycle", { timeout: 15000 });
-  check("Browse lists 28 cycle groups",
-    (await page.locator(".mb-cycle").count()) === 28,
+  check("Browse lists 29 cycle groups",
+    (await page.locator(".mb-cycle").count()) === 29,
     `${await page.locator(".mb-cycle").count()} groups`);
+  // Browse order (CEO, Nov 7): Fetch first, then Shock — the 8 featured
+  // cycles lead, the rest alphabetical, Unclassified last.
+  const firstCycle = await page.locator(".mb-cycle .mb-cycle-name").first().textContent();
+  check("Browse leads with Fetch", (firstCycle ?? "").includes("Fetch"), firstCycle ?? "");
+  await page.getByRole("button", { name: /Fetch/ }).first().click();
+  await page.waitForFunction(
+    () => document.body.textContent.includes("Flooded Strand"),
+    { timeout: 30000 },
+  );
+  const fetchNames = await page.locator(".mb-cycle.open .mb-land-name").allTextContents();
+  check("Fetch expands to all 10 members", fetchNames.length === 10,
+    fetchNames.join(", ").slice(0, 120));
   await page.getByRole("button", { name: /Shock/ }).first().click();
   await page.waitForFunction(
     () => document.body.textContent.includes("Blood Crypt"),

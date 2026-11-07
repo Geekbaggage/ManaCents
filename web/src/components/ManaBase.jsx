@@ -16,7 +16,8 @@ const PIP_IMG = {
 };
 const SEARCH_CYCLES = [
   ["", "All cycles"], ["basic", "Basic"], ["bicycle", "Bicycle"], ["bond", "Bond"],
-  ["bounce", "Bounce"], ["check", "Check"], ["fast", "Fast"], ["filter", "Filter"],
+  ["bounce", "Bounce"], ["check", "Check"], ["fast", "Fast"], ["fetch", "Fetch"],
+  ["filter", "Filter"],
   ["gainland", "Gain"], ["guildgate", "Guildgate"], ["horizon", "Horizon"],
   ["pain", "Pain"], ["panorama", "Panorama"], ["rainbow", "Rainbow"],
   ["shock", "Shock"], ["slow", "Slow"], ["snarl", "Snarl"], ["snow_dual", "Snow dual"],
@@ -471,9 +472,7 @@ export function LandSearch() {
               )}
             </div>
             <div className="mb-land-print">{r.cheapest.printing} · {r.cheapest.finish}</div>
-            {r.budget_rank != null && r.budget_rank_context && (
-              <div className="mb-land-rank-note">{r.budget_rank_context}</div>
-            )}
+            {r.oracle_text && <p className="mb-land-oracle">{r.oracle_text}</p>}
             {r.status === "face_row" && (
               <div className="mb-land-face">
                 <span className="mb-land-face-tag" title={r.land_drop.note}>
@@ -500,7 +499,6 @@ export function LandSearch() {
             {r.status === "utility_display_only" && (
               <div className="mb-land-utility">
                 <span className="mb-land-utility-tag">Utility land — shown for reference</span>
-                {r.oracle_text && <p className="mb-land-oracle">{r.oracle_text}</p>}
               </div>
             )}
           </div>
@@ -534,13 +532,32 @@ export function LandSearch() {
   );
 }
 
-// Browse lands by cycle — the FULL catalog (1,202 searchable). Collapsed rows show true full counts + price ranges from
+// Browse lands by cycle — the FULL catalog (1,212 searchable). Collapsed rows show true full counts + price ranges from
 // meta.cycleCounts (one cheap request); expanding a cycle loads that cycle's
 // complete membership by paging the search API (limit 100/page) until the
 // count is reached — no 50-cap, no truncation. Unclassified lands get their
-// own group at the end: they are 861 of 1,202 lands, and leaving them out
+// own group at the end: they are 861 of 1,212 lands, and leaving them out
 // of Browse would silently hide most of the catalog. Search remains the place for color/type
 // filtering and the buy set.
+
+// Browse order (CEO, Nov 7): the 8 most famous/used cycles first, then
+// every other cycle alphabetically by label, Unclassified last (it is the
+// leftover pile, not a cycle). Exported for the unit tests.
+export const FEATURED_BROWSE_CYCLES = ["fetch", "shock", "triome", "pain", "check", "bond", "surveil", "fast"];
+
+const cycleLabel = (id) =>
+  (SEARCH_CYCLES.find(([cid]) => cid === id) ?? [id, id])[1];
+
+export function orderBrowseCycles(cycleCounts) {
+  const byId = Object.fromEntries(cycleCounts.map((c) => [c.id, c]));
+  return [
+    ...FEATURED_BROWSE_CYCLES.filter((id) => byId[id]),
+    ...Object.keys(byId)
+      .filter((id) => id !== "unclassified" && !FEATURED_BROWSE_CYCLES.includes(id))
+      .sort((a, b) => cycleLabel(a).localeCompare(cycleLabel(b))),
+    ...(byId.unclassified ? ["unclassified"] : []),
+  ];
+}
 const LAND_TRAITS = Object.fromEntries(
   LAND_CYCLES.map((c) => [c.id, c.trait])
 );
@@ -607,19 +624,8 @@ export function LandGallery() {
   }
 
   const byId = Object.fromEntries(cycleCounts.map((c) => [c.id, c]));
-  const labelOf = (id) =>
-    (SEARCH_CYCLES.find(([cid]) => cid === id) ?? [id, id])[1];
-  // Order: the Search tab's cycle order, then any cycle the data has that
-  // the list does not, with Unclassified last.
-  const ordered = [
-    ...SEARCH_CYCLES
-      .filter(([id]) => id !== "" && id !== "unclassified" && byId[id])
-      .map(([id]) => id),
-    ...Object.keys(byId).filter(
-      (id) => id !== "unclassified" && !SEARCH_CYCLES.some(([cid]) => cid === id)
-    ),
-    ...(byId.unclassified ? ["unclassified"] : []),
-  ];
+  const labelOf = (id) => cycleLabel(id);
+  const ordered = orderBrowseCycles(cycleCounts);
 
   return (
     <div className="mb-gallery">

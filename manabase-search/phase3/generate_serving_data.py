@@ -2,7 +2,8 @@
 """Generate the search serving file from Phase 2 data + Charlie's Q14 sort.
 
 Reads:
-- ~/workspace/manabase-search/phase2/search_data.json (1,101 rows)
+- ~/workspace/manabase-search/phase2/search_data.json (1,111 rows: 1,053
+  verified + 48 utility display-only + 10 fetchlands)
 - ~/workspace/manabase-search/phase2/face_rows.json (101 rows, Q4)
 - ~/workspace/manabase-search/phase2/charlie-budget-land-sort-2026-11-07.json
   (Charlie's "Best budget — researched" sort, 25 type lists, 284 ranked
@@ -15,6 +16,11 @@ Phase 5 changes (Nov 7, 2026):
   typed fetchlands only. Face-row `basic_types` comes from each face row
   itself (land-face type lines) — NEVER the bulk's combined "X // Y" type
   line, and the generator does not even look face rows up in the bulk.
+- Fetchlands SERVED (Nov 7, 2026, CEO-approved): the 10 typed fetchlands
+  are now in search_data.json (1,111 rows) with the fetch model (whole-card
+  CI from the tutored types, no production, conditional tutor entry, cycle
+  fetch). Served is now 1,111 + 101 = 1,212 rows; held is 0. The
+  FETCH_MUST_NOT_APPEAR guard is gone; the banned-name guard remains.
 - Charlie's sort is attached per row as `budget_rankings` (one record per
   type the row is ranked in, from types[].members — the versioned per-role
   records; cards[].rankings is asserted to match). The $5.00-inclusive gate
@@ -35,10 +41,9 @@ Trims per row (the API never returns these, so they do not ship):
   set_name — provenance keeps price, printing, set, collector_number,
   printing_id, observed_at, legalities_at, finish, currency.
 - legality.source — the source is recorded once in meta.
-- oracle_text on NON-utility, NON-face rows — the UI shows Oracle text only
-  for the 48 utility display-only lands and on face rows' land faces;
-  shipping it for all 1,101 search rows would add ~250 KB of text the API
-  never serves.
+- Oracle text SHIPS on every row (CEO, Nov 7): the Search card shows the
+  land's oracle text under it instead of the budget-rank research note.
+  This adds ~250 KB to the serving file — accepted for readability.
 
 SHA PROVENANCE CAVEAT (do not remove without re-verifying): Charlie's
 handoff states the JSON SHA-256 is
@@ -67,12 +72,15 @@ ORACLE_BULK = SEARCH_DIR / "bulk" / "oracle-cards-20261106220205.jsonl.gz"
 BASIC_TYPES = ("Plains", "Island", "Swamp", "Mountain", "Forest")
 BUDGET_GATE_CENTS = 500  # $5.00 inclusive, on the RELEASED quote (Charlie)
 
-# Names that must never appear in the served set (held/excluded categories).
-FETCH_MUST_NOT_APPEAR = {
+# Names that must never appear in the served set (banned cards).
+BANNED_MUST_NOT_APPEAR = {
+    "Karakas", "Library of Alexandria", "Tolarian Academy",
+}
+
+FETCH_NAMES = {
     "Arid Mesa", "Bloodstained Mire", "Flooded Strand", "Marsh Flats",
     "Misty Rainforest", "Polluted Delta", "Scalding Tarn",
     "Verdant Catacombs", "Windswept Heath", "Wooded Foothills",
-    "Karakas", "Library of Alexandria", "Tolarian Academy",
 }
 
 CHARLIE_SHA_STATED = "dbfbf125d88a3335ee81b31ad8da02cb0497562287101df24df492cfb82b4da6"
@@ -156,16 +164,17 @@ def trim_row(row, basic_types_by_oid, rankings_by_oid, preorder_by_oid):
         "basic_types": basic_types_by_oid[row["oracle_id"]],
         "entry": row["entry"],
         "cycle": row["cycle"],
+        # Oracle text ships on every NON-basic row (CEO, Nov 7 — the Search
+        # card shows it under the land). Basics carry only the "{T}: Add {W}"
+        # reminder text in the bulk, which is not oracle text worth showing,
+        # so they get no oracle_text field and the UI renders nothing.
+        **({} if row["is_basic"] else {"oracle_text": row["oracle_text"]}),
         "cheapest": trim_cheapest(row["cheapest"]),
         "legality": trim_legality(row["legality"]),
         "in_buy_set_by_default": row["in_buy_set_by_default"],
         "budget_rankings": rankings_by_oid.get(row["oracle_id"], []),
         "preorder_only_under_5": preorder_by_oid.get(row["oracle_id"], False),
     }
-    # Oracle text ships only for utility display-only lands (the UI shows it
-    # there; nowhere else on plain rows).
-    if row["status"] == "utility_display_only":
-        out["oracle_text"] = row["oracle_text"]
     return out
 
 
@@ -198,6 +207,9 @@ def trim_face_row(row, rankings_by_oid, preorder_by_oid):
         "basic_types": list(row["basic_types"]),
         "entry": row["entry"],
         "cycle": row["cycle"],
+        # Oracle text is the land face's text (verified: top-level equals
+        # the land face's text on all 101 rows) — the Search card shows it.
+        "oracle_text": row["oracle_text"],
         "cheapest": trim_cheapest(row["cheapest"]),
         "legality": trim_legality(row["legality"]),
         "in_buy_set_by_default": row["in_buy_set_by_default"],
@@ -297,11 +309,20 @@ def main():
 
     basic_types_by_oid = load_basic_types()
 
-    assert len(rows) == 1101, f"expected 1101 rows, got {len(rows)}"
+    assert len(rows) == 1111, f"expected 1111 rows, got {len(rows)}"
     assert len(face_rows) == 101, f"expected 101 face rows, got {len(face_rows)}"
     names = {r["name"] for r in rows} | {r["name"] for r in face_rows}
-    leaked = names & FETCH_MUST_NOT_APPEAR
-    assert not leaked, f"held/excluded names leaked into serving data: {leaked}"
+    leaked = names & BANNED_MUST_NOT_APPEAR
+    assert not leaked, f"banned names leaked into serving data: {leaked}"
+    # The 10 fetchlands are SERVED now (Nov 7) — all must be present with
+    # the fetch model (cycle fetch, no production, conditional tutor entry).
+    fetch_rows = [r for r in rows if r["name"] in FETCH_NAMES]
+    assert len(fetch_rows) == 10, f"expected 10 served fetch rows, got {len(fetch_rows)}"
+    assert all(r["cycle"] == "fetch" for r in fetch_rows), "a fetch row is not cycle fetch"
+    assert all(r["colors_produced"] == [] and r["conditional_colors"] == []
+               for r in fetch_rows), "a fetch row produces mana"
+    assert all(r["entry"]["status"] == "conditional" for r in fetch_rows), \
+        "a fetch row is not a conditional entry"
     assert all(not r["legality"]["banned"] for r in rows + face_rows), "banned row in data"
     assert sum(1 for r in rows if r["is_basic"]) == 12, "expected 12 basics"
     assert sum(1 for r in face_rows if r["is_basic"]) == 0, "face rows must not be basic"
@@ -329,18 +350,12 @@ def main():
     assert basic_types_by_oid[by_name["Hallowed Fountain"]["oracle_id"]] == ["Plains", "Island"]
     assert basic_types_by_oid[by_name["Plains"]["oracle_id"]] == ["Plains"]
     assert basic_types_by_oid[by_name["Wastes"]["oracle_id"]] == []
-    # Coverage reconciles exactly: Charlie 1,212 = served 1,202 + 10 held fetch.
+    # Coverage reconciles exactly: Charlie 1,212 = served 1,212 + 0 held.
     served_ids = {r["oracle_id"] for r in rows} | {r["oracle_id"] for r in face_rows}
     charlie_ids = {c["oracle_id"] for c in charlie["cards"]}
     assert served_ids <= charlie_ids, "served oracle_id missing from Charlie's catalog"
     held_ids = charlie_ids - served_ids
-    assert len(held_ids) == 10, f"expected 10 held oracle_ids, got {len(held_ids)}"
-    held_names = sorted(
-        c["budget"]["name"] for c in charlie["cards"] if c["oracle_id"] in held_ids
-    )
-    assert held_names == sorted(FETCH_MUST_NOT_APPEAR - {
-        "Karakas", "Library of Alexandria", "Tolarian Academy",
-    }), f"held set is not exactly the 10 fetchlands: {held_names}"
+    assert len(held_ids) == 0, f"expected 0 held oracle_ids, got {len(held_ids)}"
     # Every Charlie type member resolves to a served row.
     assert set(rankings_by_oid) <= served_ids, "a ranked member is not served"
     # Face class counts (Q4).
@@ -354,7 +369,7 @@ def main():
                for r in rows]
     trimmed += [trim_face_row(r, rankings_by_oid, preorder_by_oid)
                 for r in face_rows]
-    assert len(trimmed) == 1202
+    assert len(trimmed) == 1212
     cheapest_total = round(
         sum(r["cheapest"]["price"] for r in trimmed), 2
     )
@@ -372,10 +387,12 @@ def main():
             "served_verified": src_meta["served_verified"],
             "served_utility_display_only": src_meta["served_utility_display_only"],
             "served_face_rows": len(face_rows),
-            # Held out of search: the 10 typed fetchlands only (fetch modeling open).
-            "held_count": 10,
+            # Held out of search: none — the full 1,212-card legal catalog
+            # is served (fetchlands joined Nov 7; the 100 excluded rows are
+            # 3 banned + 97 not Commander-legal and never enter search).
+            "held_count": 0,
             "held_face_rows": 0,
-            "held_fetch_rows": 10,
+            "held_fetch_rows": 0,
             "excluded_count": 100,
             "cheapest_set_total": cheapest_total,
             # Ranking: Charlie's editorial "Best budget — researched" sort
@@ -421,7 +438,7 @@ def main():
           f"{FACE_SRC} ({FACE_SRC.stat().st_size:,} bytes)")
     print(f"  price_snapshot: {out['meta']['price_snapshot']}, "
           f"cheapest set total: ${out['meta']['cheapest_set_total']:,.2f}")
-    print(f"  served: 1,101 search + 101 face = 1,202; held: 10 fetch; "
+    print(f"  served: 1,111 search + 101 face = 1,212; held: 0 fetch; "
           f"ranked entries: 284; preorder watch: 7")
     print(f"  SHA caveat: stated {CHARLIE_SHA_STATED[:12]}… != downloaded "
           f"{CHARLIE_SHA_DOWNLOADED[:12]}… — verified-by-content")

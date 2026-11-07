@@ -37,7 +37,7 @@ async function main() {
   // 2-8. No-params defaults (7 sub-checks)
   r = await get("/api/manabase-search");
   const m = r.data?.meta;
-  check("no-params total 1202", m?.total === 1202, `total=${m?.total}`);
+  check("no-params total 1212", m?.total === 1212, `total=${m?.total}`);
   check("no-params returned 50", r.data?.results?.length === 50, `returned=${r.data?.results?.length}`);
   check("no-params snapshots present", Boolean(m?.priceSnapshot) && Boolean(m?.rankingSnapshot), `price=${m?.priceSnapshot} ranking=${m?.rankingSnapshot}`);
   check("no-params ranking label", m?.rankingLabel === "Best budget — researched", `label=${m?.rankingLabel}`);
@@ -54,6 +54,8 @@ async function main() {
   // 11. Cycle filter
   r = await get("/api/manabase-search?cycle=shock&limit=1");
   check("cycle shock 11", r.data?.meta?.total === 11, `total=${r.data?.meta?.total}`);
+  r = await get("/api/manabase-search?cycle=fetch&limit=1");
+  check("cycle fetch 10", r.data?.meta?.total === 10, `total=${r.data?.meta?.total}`);
 
   // 12. Game Changer include
   r = await get("/api/manabase-search?game_changer=include&limit=1");
@@ -61,7 +63,7 @@ async function main() {
 
   // 13. Hide basics
   r = await get("/api/manabase-search?include_basics=0&limit=1");
-  check("include_basics=0 -> 1190", r.data?.meta?.total === 1190, `total=${r.data?.meta?.total}`);
+  check("include_basics=0 -> 1200", r.data?.meta?.total === 1200, `total=${r.data?.meta?.total}`);
 
   // 14-15. Fits mode
   r = await get("/api/manabase-search?mode=fits&colors=U&limit=1");
@@ -110,14 +112,16 @@ async function main() {
   check("untapped_only excludes transform-back", tb.length === 0 && m2?.total === 525,
     `total=${m2?.total} transform-back in page=${tb.length}`);
 
-  // 24. Optimizer untouched
+  // 24. Optimizer removed (CEO, Nov 7): /api/manabase serves no solver
+  // JSON anymore — the endpoint is gone and the SPA fallback answers.
   r = await get("/api/manabase?list=all");
-  check("optimizer still 43 lands", Array.isArray(r.data?.lands) && r.data.lands.length === 43,
-    `lands=${r.data?.lands?.length}`);
+  check("optimizer endpoint gone (no solver JSON)",
+    !(r.data && Array.isArray(r.data.lands)),
+    `status=${r.status} json=${r.data !== null}`);
 
   // 25-27. Paginated lookups (rows past the first 100 cheapest)
   async function findByName(name) {
-    for (let offset = 0; offset < 1202; offset += 100) {
+    for (let offset = 0; offset < 1212; offset += 100) {
       const page = await get(`/api/manabase-search?sort=name&limit=100&offset=${offset}`);
       const row = page.data?.results?.find((x) => x.name === name);
       if (row) return row;
@@ -136,6 +140,12 @@ async function main() {
   check("Aclazotz requires_transformation",
     !!acl && acl.land_drop?.code === "requires_transformation",
     acl ? `drop=${acl.land_drop?.code}` : "not found");
+  const fs = await findByName("Flooded Strand");
+  check("Flooded Strand served, fetch model",
+    !!fs && fs.cycle === "fetch" && fs.entry?.status === "conditional" &&
+    (fs.entry?.condition ?? "").includes("produces no mana itself") &&
+    typeof fs.oracle_text === "string" && fs.oracle_text.includes("Search your library"),
+    fs ? `${fs.cycle} ${fs.entry?.status}` : "not found");
 
   console.log(`\n${pass} pass, ${fail} fail`);
   if (failures.length) console.log("Failures:", failures.join("; "));

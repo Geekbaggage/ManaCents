@@ -10,6 +10,8 @@
 //    Conditional production is a "may produce" match, never a guaranteed
 //    source — the UI must always show the dependency next to a conditional
 //    match (no false zero-color guarantee).
+//    Fetchlands are the exception to the colorless rule: they produce no
+//    mana at all (they tutor), so they never match produces — not even C.
 //
 // 2. "fits" — the land is legal in a Commander deck with the requested
 //    color identity (CR 903.5c/d): the WHOLE-CARD color identity must be a
@@ -32,6 +34,10 @@ export const BASIC_TYPE_COLORS = {
 };
 
 export function matchesProduces(row, wantColors, wantColorless) {
+  // Fetchlands produce no mana at all — they tutor for a land. They never
+  // match a produces filter, not even a colorless request: C is for lands
+  // that tap for {C} (or produce no colored mana), not for tutors.
+  if (row.cycle === "fetch") return false;
   const conditional = row.conditional_colors ?? [];
   if (row.colors_produced.length === 0 && conditional.length === 0) return wantColorless;
   if (row.colors_produced.some((c) => wantColors.includes(c))) return true;
