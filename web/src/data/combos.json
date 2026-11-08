@@ -879,7 +879,7 @@
       "payoff_class": "combat_damage",
       "pieces": [
         {
-          "art": "famished_paladin.jpg",
+          "art": "https://cards.scryfall.io/art_crop/front/d/8/d80e3bc9-7b67-4eab-916a-6d83da06f20a.jpg?1783935339",
           "finish": "nonfoil",
           "name": "Famished Paladin",
           "oracle_id": "f80df9c4-f682-4a70-81fe-03c7c5c256e1",
@@ -889,7 +889,7 @@
           "role": "engine"
         },
         {
-          "art": "sorcerers_wand.jpg",
+          "art": "https://cards.scryfall.io/art_crop/front/6/9/69ee3692-54e3-42de-85c6-0a3b5c6a2402.jpg?1783934953",
           "finish": "nonfoil",
           "name": "Sorcerer's Wand",
           "oracle_id": "0edc8ad3-2920-4b25-8a86-98ce216111d1",
@@ -899,7 +899,7 @@
           "role": "spark"
         },
         {
-          "art": "lifelink.jpg",
+          "art": "https://cards.scryfall.io/art_crop/front/a/8/a8e207d4-9930-4aff-a7c8-b53bd1b5d566.jpg?1783941102",
           "finish": "nonfoil",
           "name": "Lifelink",
           "oracle_id": "4fe8316a-9cff-43e9-a1d5-993a0c9daf3a",
@@ -940,7 +940,7 @@
       "payoff_class": "extra_turns",
       "pieces": [
         {
-          "art": "wormfang_manta.jpg",
+          "art": "https://cards.scryfall.io/art_crop/front/b/c/bc9bf91d-6f7c-4fb5-bbc6-c012212e62e9.jpg?1783945125",
           "finish": "nonfoil",
           "name": "Wormfang Manta",
           "oracle_id": "17abf8c6-70b6-4877-a0f2-a87b22fb2828",
@@ -950,7 +950,7 @@
           "role": "engine"
         },
         {
-          "art": "conjurers_closet.jpg",
+          "art": "https://cards.scryfall.io/art_crop/front/a/f/af2115e4-009e-4432-99bb-05e844bc18b6.jpg?1783908066",
           "finish": "nonfoil",
           "name": "Conjurer's Closet",
           "oracle_id": "cd1eda60-53e4-44d0-9b2c-7a57395e291f",
@@ -960,7 +960,7 @@
           "role": "spark"
         },
         {
-          "art": "torpor_orb.jpg",
+          "art": "https://cards.scryfall.io/art_crop/front/d/b/dbf02a38-d10d-463e-ab99-e7fd848a1bd3.jpg?1784634333",
           "finish": "nonfoil",
           "name": "Torpor Orb",
           "oracle_id": "97326cad-b13c-4e52-82ce-850a39e5ff08",
