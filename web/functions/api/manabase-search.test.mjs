@@ -138,19 +138,22 @@ test("mode=fits: whole-card CI + basic land types (CR 903.5c/d)", async () => {
   // colored mana (e.g. Academy Ruins) fits a U commander but does not produce U.
   assert.ok(fits.some((r) => r.name === "Academy Ruins"));
   assert.ok(!produces.some((r) => r.name === "Academy Ruins"));
-  // Fetchlands fit by whole-card CI and never produce: Flooded Strand
-  // (CI WU) fits WU, not U alone, not colorless; it never appears in a
-  // produces search, not even a colorless one (it tutors, it taps for nothing).
+  // Fetchlands fit by whole-card CI and never produce: Flooded Strand's CI
+  // is [] (colorless — CR 903.4/903.5c, corrected Nov 7; the tutored types
+  // are search targets, not identity), so it fits EVERY commander — WU, U
+  // alone, even colorless. It never appears in a produces search, not even
+  // a colorless one (it tutors, it taps for nothing).
   assert.ok(fitsWU.some((r) => r.name === "Flooded Strand"));
-  assert.ok(!fits.some((r) => r.name === "Flooded Strand"));
+  assert.ok(fits.some((r) => r.name === "Flooded Strand"));
   assert.ok(!produces.some((r) => r.name === "Flooded Strand"));
   const producesC = await allRows("colors=C");
   assert.ok(!producesC.some((r) => r.name === "Flooded Strand"));
-  // Colorless identity: only empty-CI, no-basic-type rows fit.
-  const fitsC = await getOk("colors=C&mode=fits&limit=100");
-  assert.ok(fitsC.results.every((r) => r.color_identity.length === 0 && (r.basic_types ?? []).length === 0));
-  assert.ok(fitsC.results.some((r) => r.name === "Command Tower"));
-  assert.ok(!fitsC.results.some((r) => r.name === "Flooded Strand"));
+  // Colorless identity: only empty-CI, no-basic-type rows fit — the 10
+  // fetchlands are in that set now (CI []), alongside Command Tower.
+  const fitsC = await allRows("colors=C&mode=fits");
+  assert.ok(fitsC.every((r) => r.color_identity.length === 0 && (r.basic_types ?? []).length === 0));
+  assert.ok(fitsC.some((r) => r.name === "Command Tower"));
+  assert.ok(fitsC.some((r) => r.name === "Flooded Strand"));
   const { status } = await get("mode=bogus");
   assert.equal(status, 400);
 });
@@ -187,16 +190,19 @@ test("filter semantics on synthetic rows: off-identity, modal, transform, colorl
   assert.equal(matchesFits(basicTyped, ["G"]), true);
   assert.equal(matchesFits(basicTyped, ["W"]), false);
   // Fetchland: produces no mana at all — never matches produces (not even
-  // a colorless request); fits only when its CI is a subset.
+  // a colorless request); fits EVERY commander, because its CI is []
+  // (colorless — CR 903.4/903.5c, corrected Nov 7; the tutored types are
+  // search targets, not identity). Empty CI is a subset of any request,
+  // including no colors at all.
   const fetchland = {
     name: "Test Fetchland", colors_produced: [], conditional_colors: [],
-    color_identity: ["W", "U"], basic_types: [], cycle: "fetch",
+    color_identity: [], basic_types: [], cycle: "fetch",
   };
   assert.equal(matchesProduces(fetchland, ["W"], false), false);
   assert.equal(matchesProduces(fetchland, [], true), false);
   assert.equal(matchesFits(fetchland, ["W", "U"]), true);
-  assert.equal(matchesFits(fetchland, ["U"]), false);
-  assert.equal(matchesFits(fetchland, []), false);
+  assert.equal(matchesFits(fetchland, ["U"]), true);
+  assert.equal(matchesFits(fetchland, []), true);
   // Colorless query: produces-C matches only rows with no colored production
   // (unconditional or conditional); fits-C matches only empty-CI,
   // no-basic-type rows.
@@ -254,8 +260,10 @@ test("conditional production matches color searches (CEO decision, Nov 6)", asyn
   // U) now matches a U search.
   assert.ok(uRows.some((r) => r.name === "Floodfarm Verge"));
   // mode=fits is unchanged by this decision (whole-card CI, CR 903.5c/d).
+  // The fetchland CI correction (Nov 7, CI [] — colorless) moved fits U
+  // 416 → 426: the 10 fetchlands now fit every commander.
   const fitsU = await allRows("colors=U&mode=fits");
-  assert.equal(fitsU.length, 416);
+  assert.equal(fitsU.length, 426);
   assert.ok(!fitsU.some((r) => r.name === "Nimbus Maze"), "Nimbus Maze CI is [U, W] — does not fit U");
 });
 
@@ -339,19 +347,21 @@ test("fetchlands served with the fetch model; no banned rows; face rows served (
   for (const banned of ["Karakas", "Library of Alexandria", "Tolarian Academy"]) {
     assert.ok(!rows.some((r) => r.name === banned));
   }
-  // The 10 fetchlands are SERVED now (fetch modeling done Nov 7): whole-card
-  // CI from the tutored types, no production, conditional tutor entry, cycle
-  // fetch, in the buy set by default like any other non-basic.
+  // The 10 fetchlands are SERVED now (fetch modeling done Nov 7): colorless
+  // CI [] (CR 903.4/903.5c — corrected Nov 7, Charlie + live Scryfall; the
+  // tutored types are search targets, not identity), no production,
+  // conditional tutor entry, cycle fetch, in the buy set by default like
+  // any other non-basic.
   // Display consequence (CEO, Nov 7): colors_produced [] + conditional_colors
   // [] is exactly what makes a Search card render the colorless pip — the
   // card's pip branch takes its colorless fallback when nothing is produced.
-  // The true CI stays in the data (and in fits) — see the legality test below.
+  // The colorless CI is also what makes a fetchland fit EVERY commander in
+  // fits mode — see the legality test below.
   const expectedCI = {
-    "Arid Mesa": ["W", "R"], "Bloodstained Mire": ["B", "R"],
-    "Flooded Strand": ["W", "U"], "Marsh Flats": ["W", "B"],
-    "Misty Rainforest": ["U", "G"], "Polluted Delta": ["U", "B"],
-    "Scalding Tarn": ["U", "R"], "Verdant Catacombs": ["B", "G"],
-    "Windswept Heath": ["W", "G"], "Wooded Foothills": ["R", "G"],
+    "Arid Mesa": [], "Bloodstained Mire": [], "Flooded Strand": [],
+    "Marsh Flats": [], "Misty Rainforest": [], "Polluted Delta": [],
+    "Scalding Tarn": [], "Verdant Catacombs": [], "Windswept Heath": [],
+    "Wooded Foothills": [],
   };
   for (const [name, ci] of Object.entries(expectedCI)) {
     const row = rows.find((r) => r.name === name);
@@ -644,14 +654,25 @@ test("Fetch lands button filter: the exact request it issues shows all 10 (CEO, 
   assert.equal(body.results[0].cheapest.price, 11.75);
 });
 
-test("fetchlands fits legality at the API (CEO, Nov 7): WU yes, R never", async () => {
-  // The true whole-card CI is kept for fits even though fetch cards display
-  // the colorless pip: Flooded Strand is WU, so it is legal in a WU deck
-  // and illegal in a mono-red deck — the tool must never suggest it there.
-  const wu = await allRows("mode=fits&colors=WU");
-  assert.ok(wu.some((r) => r.name === "Flooded Strand"), "Flooded Strand fits WU");
-  const red = await allRows("mode=fits&colors=R");
-  assert.ok(!red.some((r) => r.cycle === "fetch"), "no fetchland fits mono-red");
+test("fetchlands fits legality at the API (corrected Nov 7): colorless CI fits every commander", async () => {
+  // Fetchlands are colorless (CI [] — CR 903.4/903.5c, corrected Nov 7 after
+  // Charlie + live Scryfall; the first version wrongly assigned CI from the
+  // tutored types). Empty CI is a subset of any commander identity, so all
+  // 10 fit mono-red, mono-blue, colorless, and five-color alike. The queries
+  // below use the exact form Charlie observed (cycle=fetch in the query):
+  // his pre-fix links returned 1 fetch for WU and 0 for U — both must now
+  // return all 10, plus the colorless-commander case (no colors at all).
+  const red = await getOk("mode=fits&colors=R&cycle=fetch&limit=100");
+  assert.equal(red.meta.total, 10, "all 10 fetchlands fit mono-red");
+  assert.ok(red.results.some((r) => r.name === "Flooded Strand"), "Flooded Strand fits mono-red");
+  const monoU = await getOk("mode=fits&colors=U&cycle=fetch&limit=100");
+  assert.equal(monoU.meta.total, 10, "all 10 fetchlands fit mono-blue");
+  const colorless = await getOk("mode=fits&colors=C&cycle=fetch&limit=100");
+  assert.equal(colorless.meta.total, 10, "all 10 fetchlands fit a colorless commander");
+  assert.ok(colorless.results.some((r) => r.name === "Flooded Strand"), "Flooded Strand fits colorless");
+  const wu = await getOk("mode=fits&colors=WU&cycle=fetch&limit=100");
+  assert.equal(wu.meta.total, 10, "all 10 fetchlands fit WU");
+  assert.ok(wu.results.some((r) => r.name === "Flooded Strand"), "Flooded Strand fits WU");
   const wubrg = await allRows("mode=fits&colors=WUBRG");
   assert.equal(wubrg.filter((r) => r.cycle === "fetch").length, 10);
   // Produces never matches a fetchland, not even colorless (see the

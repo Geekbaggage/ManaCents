@@ -17,9 +17,11 @@ Phase 5 changes (Nov 7, 2026):
   itself (land-face type lines) — NEVER the bulk's combined "X // Y" type
   line, and the generator does not even look face rows up in the bulk.
 - Fetchlands SERVED (Nov 7, 2026, CEO-approved): the 10 typed fetchlands
-  are now in search_data.json (1,111 rows) with the fetch model (whole-card
-  CI from the tutored types, no production, conditional tutor entry, cycle
-  fetch). Served is now 1,111 + 101 = 1,212 rows; held is 0. The
+  are now in search_data.json (1,111 rows) with the fetch model (colorless
+  CI [] per CR 903.4/903.5c — corrected Nov 7, Charlie + live Scryfall; the
+  tutored types are search targets, not identity — no production,
+  conditional tutor entry, cycle fetch). Served is now 1,111 + 101 = 1,212
+  rows; held is 0. The
   FETCH_MUST_NOT_APPEAR guard is gone; the banned-name guard remains.
 - Charlie's sort is attached per row as `budget_rankings` (one record per
   type the row is ranked in, from types[].members — the versioned per-role

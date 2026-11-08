@@ -197,9 +197,9 @@ export function LandSearch() {
   // are; the Cycle dropdown ("All cycles") and any other filter change also
   // leave the fetch view. Fetch cards already show the colorless pip: their
   // colors_produced is [] (see the API test), so the card's pip branch takes
-  // its colorless fallback — only the true color identity is kept, for the
-  // fits legality check (a fetchland is never suggested for a commander it
-  // cannot legally go in).
+  // its colorless fallback. Their color identity is [] too (colorless — CR
+  // 903.4/903.5c, corrected Nov 7), so in fits mode a fetchland is legal in
+  // every commander deck.
   const applyFetchFilter = () => {
     if (cycle === "fetch") { setCycle(""); return; }
     setCycle("fetch");
