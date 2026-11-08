@@ -979,6 +979,64 @@
       "total_from_scratch": 6.78,
       "verified_date": "2026-11-07",
       "reel_url": "https://www.instagram.com/reel/DfeM29qDlwx/"
+    },
+    {
+      "caveats": [
+        "All three pieces must be on the battlefield, and Myr Turbine must be untapped to start the loop.",
+        "Casting the three pieces costs 11 mana total, and the loop produces no mana.",
+        "Dross Scorpion only untaps artifacts \u2014 this is not infinite mana and does not untap arbitrary creatures.",
+        "Mill alone does not win \u2014 a player only loses when they try to draw from an empty library, and reshuffle effects can undo the mill."
+      ],
+      "color_identity": [],
+      "combo_type": "infinite",
+      "episode": 18,
+      "id": "dross-scorpion-myr-turbine-grinding-station",
+      "loop_steps": [
+        "Tap Myr Turbine to create a 1/1 Myr token. The Myr enters, so Grinding Station untaps.",
+        "Sacrifice the Myr to Grinding Station: target player mills three cards. The Myr dies, so Dross Scorpion untaps the Turbine.",
+        "Tap the Turbine again to make another Myr. Repeat forever \u2014 infinite mill."
+      ],
+      "outcome": "Infinite mill \u2014 every library emptied, opponents lose on the draw.",
+      "payoff_class": "mill",
+      "pieces": [
+        {
+          "art": "https://cards.scryfall.io/art_crop/front/2/7/27c5381c-2e79-41fa-b1d7-2cf0c6dc1808.jpg?1783944523",
+          "finish": "nonfoil",
+          "name": "Dross Scorpion",
+          "oracle_id": "132786bb-157c-4e2c-8f82-13df6a667448",
+          "oracle_text": "Whenever this creature or another artifact creature dies, you may untap target artifact.",
+          "price": 0.29,
+          "printing": "MRD #164",
+          "role": "engine"
+        },
+        {
+          "art": "https://cards.scryfall.io/art_crop/front/7/1/71a76840-47f7-4e1e-b68b-00cb7da98cdf.jpg?1783941367",
+          "finish": "nonfoil",
+          "name": "Myr Turbine",
+          "oracle_id": "b9043dcd-234f-4144-80db-1cb903c009ea",
+          "oracle_text": "{T}: Create a 1/1 colorless Myr artifact creature token.\n{T}, Tap five untapped Myr you control: Search your library for a Myr creature card, put it onto the battlefield, then shuffle.",
+          "price": 5.62,
+          "printing": "MBS #117",
+          "role": "spark"
+        },
+        {
+          "art": "https://cards.scryfall.io/art_crop/front/d/f/df1df511-b52c-45cd-9503-ffce4271a802.jpg?1783944380",
+          "finish": "nonfoil",
+          "name": "Grinding Station",
+          "oracle_id": "0fcd476f-4db8-4293-9388-1678a0043c9e",
+          "oracle_text": "{T}, Sacrifice an artifact: Target player mills three cards.\nWhenever an artifact enters, you may untap this artifact.",
+          "price": 8.55,
+          "printing": "MB2 #223",
+          "role": "enabler"
+        }
+      ],
+      "prerequisites": [
+        "Dross Scorpion on the battlefield, Myr Turbine on the battlefield (untapped), Grinding Station on the battlefield"
+      ],
+      "slug": "dross-scorpion-myr-turbine-grinding-station",
+      "title": "Dross Scorpion + Myr Turbine + Grinding Station",
+      "total_from_scratch": 14.46,
+      "verified_date": "2026-11-08"
     }
   ]
 }
