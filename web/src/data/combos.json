@@ -857,6 +857,66 @@
       "total_from_scratch": 9.35,
       "verified_date": "2026-11-06",
       "reel_url": "https://www.instagram.com/reel/Dfa3x1LiZ49/"
+    },
+    {
+      "caveats": [
+        "Paladin must be untapped and past summoning sickness (or have haste) before the loop starts.",
+        "Casting the three pieces costs 4 mana total, plus {3} to equip the Wand.",
+        "The Wand hits players or planeswalkers only \u2014 never creatures \u2014 and deals exactly 1, since the Paladin isn't a Wizard."
+      ],
+      "color_identity": [
+        "W"
+      ],
+      "combo_type": "infinite",
+      "episode": 16,
+      "id": "famished-paladin-sorcerers-wand-lifelink",
+      "loop_steps": [
+        "Tap the lifelink Paladin wearing the Wand: deal 1 damage to a player.",
+        "Lifelink gains you 1 life \u2014 the Paladin's trigger untaps it.",
+        "Tap it again. Repeat forever \u2014 infinite damage, and infinite life."
+      ],
+      "outcome": "Infinite damage to players and planeswalkers, one point at a time \u2014 and arbitrarily much life.",
+      "payoff_class": "combat_damage",
+      "pieces": [
+        {
+          "art": "famished_paladin.jpg",
+          "finish": "nonfoil",
+          "name": "Famished Paladin",
+          "oracle_id": "f80df9c4-f682-4a70-81fe-03c7c5c256e1",
+          "oracle_text": "This creature doesn't untap during your untap step.\nWhenever you gain life, untap this creature.",
+          "price": 0.18,
+          "printing": "RIX #8",
+          "role": "engine"
+        },
+        {
+          "art": "sorcerers_wand.jpg",
+          "finish": "nonfoil",
+          "name": "Sorcerer's Wand",
+          "oracle_id": "0edc8ad3-2920-4b25-8a86-98ce216111d1",
+          "oracle_text": "Equipped creature has \"{T}: This creature deals 1 damage to target player or planeswalker. If this creature is a Wizard, it deals 2 damage instead.\"\nEquip {3}",
+          "price": 0.1,
+          "printing": "DOM #231",
+          "role": "spark"
+        },
+        {
+          "art": "lifelink.jpg",
+          "finish": "nonfoil",
+          "name": "Lifelink",
+          "oracle_id": "4fe8316a-9cff-43e9-a1d5-993a0c9daf3a",
+          "oracle_text": "Enchant creature\nEnchanted creature has lifelink. (Damage dealt by the creature also causes its controller to gain that much life.)",
+          "price": 0.27,
+          "printing": "M12 #24",
+          "role": "enabler"
+        }
+      ],
+      "prerequisites": [
+        "Famished Paladin on the battlefield with Sorcerer's Wand equipped and Lifelink enchanting it",
+        "Paladin is untapped and past summoning sickness (or has haste)"
+      ],
+      "slug": "famished-paladin-sorcerers-wand-lifelink",
+      "title": "Famished Paladin + Sorcerer's Wand + Lifelink",
+      "total_from_scratch": 0.55,
+      "verified_date": "2026-11-07"
     }
   ]
 }
