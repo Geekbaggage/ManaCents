@@ -828,7 +828,7 @@
       "payoff_class": "mana",
       "pieces": [
         {
-          "art": "isochron_scepter.jpg",
+          "art": "https://cards.scryfall.io/art_crop/front/2/a/2aa24fe0-e275-4307-b26c-2a656068a451.jpg?1783930107",
           "finish": "nonfoil",
           "name": "Isochron Scepter",
           "oracle_id": "ddd649f4-dbaf-48ec-8ff7-95581257772d",
@@ -838,7 +838,7 @@
           "role": "engine"
         },
         {
-          "art": "dramatic_reversal.jpg",
+          "art": "https://cards.scryfall.io/art_crop/front/2/a/2ad14406-4504-4951-83f0-82c298964d6c.jpg?1783904806",
           "finish": "nonfoil",
           "name": "Dramatic Reversal",
           "oracle_id": "da46904c-8fb8-44c2-b2ab-775a1cc12ec3",
