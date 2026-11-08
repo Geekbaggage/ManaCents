@@ -918,6 +918,66 @@
       "total_from_scratch": 0.55,
       "verified_date": "2026-11-07",
       "reel_url": "https://www.instagram.com/reel/DfdowUajwa9/"
+    },
+    {
+      "caveats": [
+        "Torpor Orb must be on the battlefield BEFORE the Manta enters, or you owe a skipped turn.",
+        "Casting the three pieces costs 14 mana total.",
+        "Extra turns are not a damage win \u2014 you still need a finishing plan, and normal draw steps still consume your library."
+      ],
+      "color_identity": [
+        "U"
+      ],
+      "combo_type": "infinite",
+      "episode": 17,
+      "id": "wormfang-manta-torpor-orb-conjurers-closet",
+      "loop_steps": [
+        "At your end step, Conjurer's Closet exiles the Manta, then returns it to the battlefield.",
+        "The Manta leaves, so you take an extra turn \u2014 and Torpor Orb stops the return's skip-your-next-turn trigger from ever firing.",
+        "On the next extra turn, Closet blinks the Manta again. Repeat forever \u2014 every turn is yours."
+      ],
+      "outcome": "Infinite extra turns \u2014 every turn from here on is yours.",
+      "payoff_class": "extra_turns",
+      "pieces": [
+        {
+          "art": "wormfang_manta.jpg",
+          "finish": "nonfoil",
+          "name": "Wormfang Manta",
+          "oracle_id": "17abf8c6-70b6-4877-a0f2-a87b22fb2828",
+          "oracle_text": "Flying\nWhen this creature enters, you skip your next turn.\nWhen this creature leaves the battlefield, you take an extra turn after this one.",
+          "price": 0.48,
+          "printing": "JUD #58",
+          "role": "engine"
+        },
+        {
+          "art": "conjurers_closet.jpg",
+          "finish": "nonfoil",
+          "name": "Conjurer's Closet",
+          "oracle_id": "cd1eda60-53e4-44d0-9b2c-7a57395e291f",
+          "oracle_text": "At the beginning of your end step, you may exile target creature you control, then return that card to the battlefield under your control.",
+          "price": 2.86,
+          "printing": "DRC #126",
+          "role": "spark"
+        },
+        {
+          "art": "torpor_orb.jpg",
+          "finish": "nonfoil",
+          "name": "Torpor Orb",
+          "oracle_id": "97326cad-b13c-4e52-82ce-850a39e5ff08",
+          "oracle_text": "Creatures entering don't cause abilities to trigger.",
+          "price": 3.44,
+          "printing": "MB2 #236",
+          "role": "enabler"
+        }
+      ],
+      "prerequisites": [
+        "Torpor Orb on the battlefield, Wormfang Manta on the battlefield, Conjurer's Closet on the battlefield",
+        "Torpor Orb was out before the Manta entered"
+      ],
+      "slug": "wormfang-manta-torpor-orb-conjurers-closet",
+      "title": "Wormfang Manta + Torpor Orb + Conjurer's Closet",
+      "total_from_scratch": 6.78,
+      "verified_date": "2026-11-07"
     }
   ]
 }
