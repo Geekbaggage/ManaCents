@@ -72,6 +72,10 @@ async function main() {
   check("fits U 426", r.data?.meta?.total === 426, `total=${r.data?.meta?.total}`);
   r = await get("/api/manabase-search?mode=fits&colors=C&limit=1");
   check("fits C 364", r.data?.meta?.total === 364, `total=${r.data?.meta?.total}`);
+  // Colorless-commander fetch case (Charlie's correction, Nov 7): fits with
+  // no colors + cycle=fetch returns all 10 (CI [] — colorless).
+  r = await get("/api/manabase-search?mode=fits&colors=C&cycle=fetch&limit=1");
+  check("fits C + cycle fetch 10", r.data?.meta?.total === 10, `total=${r.data?.meta?.total}`);
 
   // 16-19. Honest 400s
   for (const [name, path] of [

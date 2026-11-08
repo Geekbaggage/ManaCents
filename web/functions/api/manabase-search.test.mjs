@@ -658,15 +658,21 @@ test("fetchlands fits legality at the API (corrected Nov 7): colorless CI fits e
   // Fetchlands are colorless (CI [] — CR 903.4/903.5c, corrected Nov 7 after
   // Charlie + live Scryfall; the first version wrongly assigned CI from the
   // tutored types). Empty CI is a subset of any commander identity, so all
-  // 10 fit mono-red, mono-blue, colorless, and five-color alike.
-  const red = await allRows("mode=fits&colors=R");
-  assert.equal(red.filter((r) => r.cycle === "fetch").length, 10, "all 10 fetchlands fit mono-red");
-  assert.ok(red.some((r) => r.name === "Flooded Strand"), "Flooded Strand fits mono-red");
-  const colorless = await allRows("mode=fits&colors=C");
-  assert.equal(colorless.filter((r) => r.cycle === "fetch").length, 10, "all 10 fetchlands fit colorless");
-  const wu = await allRows("mode=fits&colors=WU");
-  assert.equal(wu.filter((r) => r.cycle === "fetch").length, 10, "all 10 fetchlands fit WU");
-  assert.ok(wu.some((r) => r.name === "Flooded Strand"), "Flooded Strand fits WU");
+  // 10 fit mono-red, mono-blue, colorless, and five-color alike. The queries
+  // below use the exact form Charlie observed (cycle=fetch in the query):
+  // his pre-fix links returned 1 fetch for WU and 0 for U — both must now
+  // return all 10, plus the colorless-commander case (no colors at all).
+  const red = await getOk("mode=fits&colors=R&cycle=fetch&limit=100");
+  assert.equal(red.meta.total, 10, "all 10 fetchlands fit mono-red");
+  assert.ok(red.results.some((r) => r.name === "Flooded Strand"), "Flooded Strand fits mono-red");
+  const monoU = await getOk("mode=fits&colors=U&cycle=fetch&limit=100");
+  assert.equal(monoU.meta.total, 10, "all 10 fetchlands fit mono-blue");
+  const colorless = await getOk("mode=fits&colors=C&cycle=fetch&limit=100");
+  assert.equal(colorless.meta.total, 10, "all 10 fetchlands fit a colorless commander");
+  assert.ok(colorless.results.some((r) => r.name === "Flooded Strand"), "Flooded Strand fits colorless");
+  const wu = await getOk("mode=fits&colors=WU&cycle=fetch&limit=100");
+  assert.equal(wu.meta.total, 10, "all 10 fetchlands fit WU");
+  assert.ok(wu.results.some((r) => r.name === "Flooded Strand"), "Flooded Strand fits WU");
   const wubrg = await allRows("mode=fits&colors=WUBRG");
   assert.equal(wubrg.filter((r) => r.cycle === "fetch").length, 10);
   // Produces never matches a fetchland, not even colorless (see the
