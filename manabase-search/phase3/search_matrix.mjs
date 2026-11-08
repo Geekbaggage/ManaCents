@@ -65,11 +65,13 @@ async function main() {
   r = await get("/api/manabase-search?include_basics=0&limit=1");
   check("include_basics=0 -> 1200", r.data?.meta?.total === 1200, `total=${r.data?.meta?.total}`);
 
-  // 14-15. Fits mode
+  // 14-15. Fits mode (fetchland CI correction Nov 7: CI [] — colorless —
+  // moved fits U 416 → 426 and fits C 354 → 364; the 10 fetchlands now
+  // fit every commander).
   r = await get("/api/manabase-search?mode=fits&colors=U&limit=1");
-  check("fits U 416", r.data?.meta?.total === 416, `total=${r.data?.meta?.total}`);
+  check("fits U 426", r.data?.meta?.total === 426, `total=${r.data?.meta?.total}`);
   r = await get("/api/manabase-search?mode=fits&colors=C&limit=1");
-  check("fits C 354", r.data?.meta?.total === 354, `total=${r.data?.meta?.total}`);
+  check("fits C 364", r.data?.meta?.total === 364, `total=${r.data?.meta?.total}`);
 
   // 16-19. Honest 400s
   for (const [name, path] of [
@@ -143,9 +145,10 @@ async function main() {
   const fs = await findByName("Flooded Strand");
   check("Flooded Strand served, fetch model",
     !!fs && fs.cycle === "fetch" && fs.entry?.status === "conditional" &&
+    Array.isArray(fs.color_identity) && fs.color_identity.length === 0 &&
     (fs.entry?.condition ?? "").includes("produces no mana itself") &&
     typeof fs.oracle_text === "string" && fs.oracle_text.includes("Search your library"),
-    fs ? `${fs.cycle} ${fs.entry?.status}` : "not found");
+    fs ? `${fs.cycle} ${fs.entry?.status} CI=${JSON.stringify(fs.color_identity)}` : "not found");
 
   console.log(`\n${pass} pass, ${fail} fail`);
   if (failures.length) console.log("Failures:", failures.join("; "));
