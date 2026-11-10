@@ -1038,6 +1038,68 @@
       "total_from_scratch": 14.46,
       "verified_date": "2026-11-08",
       "reel_url": "https://www.instagram.com/reel/DffS3QLiaRX/"
+    },
+    {
+      "caveats": [
+        "All three pieces must be on the battlefield, and a land must enter to start the loop.",
+        "Casting the three pieces costs 11 mana total.",
+        "The token loop is mandatory \u2014 sacrifice Sporemound itself to the Bombardment to stop it. Without the Bombardment, the two-card engine alone can force a draw.",
+        "Life and Limb makes all your Forests into 1/1 creatures, so board wipes can take your lands too."
+      ],
+      "color_identity": [
+        "G",
+        "R"
+      ],
+      "combo_type": "infinite",
+      "episode": 19,
+      "id": "sporemound-life-and-limb-goblin-bombardment",
+      "loop_steps": [
+        "Play a land. Sporemound's landfall trigger creates a 1/1 Saproling token.",
+        "Life and Limb makes that Saproling a Forest land too, so its entering triggers Sporemound again. Repeat forever \u2014 infinite Saprolings.",
+        "Sacrifice Saprolings to Goblin Bombardment: 1 damage each. Infinite tokens, infinite damage."
+      ],
+      "outcome": "Infinite damage \u2014 sacrifice Saprolings to Goblin Bombardment, 1 damage each.",
+      "payoff_class": "tokens",
+      "pieces": [
+        {
+          "art": "https://cards.scryfall.io/art_crop/front/9/0/90594c9c-95a5-4d3c-9005-863fa710cdbd.jpg?1783908620",
+          "finish": "nonfoil",
+          "name": "Sporemound",
+          "oracle_id": "1be56a3d-a6c0-4b65-ae71-3d90ceefc6c0",
+          "oracle_text": "Landfall \u2014 Whenever a land you control enters, create a 1/1 green Saproling creature token.",
+          "price": 0.17,
+          "printing": "PLST #M14-196",
+          "role": "engine"
+        },
+        {
+          "art": "https://cards.scryfall.io/art_crop/front/e/2/e262f55e-9239-4a97-a19e-9b08fb34502e.jpg?1783926784",
+          "finish": "nonfoil",
+          "name": "Goblin Bombardment",
+          "oracle_id": "edad60c6-80de-4033-af1b-a703ac332983",
+          "oracle_text": "Sacrifice a creature: This enchantment deals 1 damage to any target.",
+          "price": 2.51,
+          "printing": "SCH #45",
+          "role": "spark"
+        },
+        {
+          "art": "https://cards.scryfall.io/art_crop/front/2/7/2721724d-92ae-4c0c-88dd-628888c468bf.jpg?1783927776",
+          "finish": "nonfoil",
+          "name": "Life and Limb",
+          "oracle_id": "d0d7250b-70d2-43f9-ae15-837227061ccb",
+          "oracle_text": "All Forests and all Saprolings are 1/1 green Saproling creatures and Forest lands in addition to their other types. (They're affected by summoning sickness.)",
+          "price": 0.79,
+          "printing": "TSR #215",
+          "role": "enabler"
+        }
+      ],
+      "prerequisites": [
+        "Sporemound on the battlefield, Life and Limb on the battlefield, Goblin Bombardment on the battlefield",
+        "A land entering to start the loop (land card + unused land play)"
+      ],
+      "slug": "sporemound-life-and-limb-goblin-bombardment",
+      "title": "Sporemound + Life and Limb + Goblin Bombardment",
+      "total_from_scratch": 3.47,
+      "verified_date": "2026-11-09"
     }
   ]
 }
