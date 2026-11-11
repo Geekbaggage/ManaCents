@@ -1101,6 +1101,67 @@
       "total_from_scratch": 3.47,
       "verified_date": "2026-11-09",
       "reel_url": "https://www.instagram.com/reel/Dfi9P9LgjX2/"
+    },
+    {
+      "caveats": [
+        "All three pieces must be on the battlefield, and Blasting Station must be untapped (or cast Ornithopter to untap it).",
+        "Casting the three pieces costs 7 mana total.",
+        "Enduring Renewal reveals your hand. When you would draw a card, reveal the top card instead: creature cards go to your graveyard, not your hand.",
+        "Removal on Renewal or Station breaks the engine, and graveyard exile ends it. You choose when to stop. This loop never forces a draw."
+      ],
+      "color_identity": [
+        "W"
+      ],
+      "combo_type": "infinite",
+      "episode": 20,
+      "id": "enduring-renewal-blasting-station-ornithopter",
+      "loop_steps": [
+        "Sacrifice Ornithopter to Blasting Station: 1 damage. Enduring Renewal returns it to your hand.",
+        "Cast Ornithopter for 0. A creature entered, so Blasting Station untaps.",
+        "Sacrifice it again: 1 more damage. Repeat forever, infinite damage."
+      ],
+      "outcome": "Infinite damage: sacrifice Ornithopter to Blasting Station, 1 damage each.",
+      "payoff_class": "damage",
+      "pieces": [
+        {
+          "art": "https://cards.scryfall.io/art_crop/front/5/7/57a966e3-c9ba-4105-a36b-54ca70ba9b77.jpg?1783943284",
+          "finish": "nonfoil",
+          "name": "Enduring Renewal",
+          "oracle_id": "47a080c4-ff04-4f52-aca0-2b8e4f4d931e",
+          "oracle_text": "Play with your hand revealed.\nIf you would draw a card, reveal the top card of your library instead. If it's a creature card, put it into your graveyard. Otherwise, draw a card.\nWhenever a creature is put into your graveyard from the battlefield, return it to your hand.",
+          "price": 1.51,
+          "printing": "TSB #7",
+          "role": "engine"
+        },
+        {
+          "art": "https://cards.scryfall.io/art_crop/front/7/1/71e2f832-6601-4232-b250-fd1c88538fbd.jpg?1783944385",
+          "finish": "nonfoil",
+          "name": "Blasting Station",
+          "oracle_id": "3a38d2d1-c4ff-4088-b1df-5feb9602ee2e",
+          "oracle_text": "{T}, Sacrifice a creature: This artifact deals 1 damage to any target.\nWhenever a creature enters, you may untap this artifact.",
+          "price": 7.38,
+          "printing": "PLST #5DN-107",
+          "role": "spark"
+        },
+        {
+          "art": "https://cards.scryfall.io/art_crop/front/3/0/305078a5-ac18-4721-bba2-3434eba5b1cf.jpg?1783918410",
+          "finish": "nonfoil",
+          "name": "Ornithopter",
+          "oracle_id": "a3a98bc9-caa0-49b7-951c-fe4e4f54e4ba",
+          "oracle_text": "Flying",
+          "price": 0.29,
+          "printing": "DMR #386",
+          "role": "enabler"
+        }
+      ],
+      "prerequisites": [
+        "Enduring Renewal on the battlefield, Blasting Station on the battlefield, Ornithopter on the battlefield or in hand",
+        "Main phase for repeated creature casts (Station untapped, or cast Ornithopter to untap it)"
+      ],
+      "slug": "enduring-renewal-blasting-station-ornithopter",
+      "title": "Enduring Renewal + Blasting Station + Ornithopter",
+      "total_from_scratch": 9.18,
+      "verified_date": "2026-11-10"
     }
   ]
 }
